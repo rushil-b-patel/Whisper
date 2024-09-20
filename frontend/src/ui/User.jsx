@@ -1,9 +1,12 @@
 import { PlusCircleIcon } from "./Icons";
-  import { useEffect, useState } from "react";
-  
-  const User = () => {
+import { useEffect, useState } from "react";
+import { useAuth } from "../context/AuthContext";
+
+const User = () => {
     const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
     const ms = new Date().getUTCMilliseconds();
+
+    const { user, logout } = useAuth();
   
     useEffect(() =>{
       localStorage.setItem("theme", theme);
@@ -44,7 +47,7 @@ import { PlusCircleIcon } from "./Icons";
         title: "Logout",
         icon: <PlusCircleIcon />,
         color: "bg-red-300 dark:bg-red-800",
-        onclick: () => {},
+        onclick: () => logout(),
       },
     ];
 
@@ -56,7 +59,7 @@ import { PlusCircleIcon } from "./Icons";
             src={`https://api.dicebear.com/5.x/bottts-neutral/svg?seed=${ms}`}
             className="my-auto ml-3 rounded-full w-7 h-7"
           />
-          <p className="mr-3 font-bold text-gray-800 dark:text-gray-200">Rushil</p>
+          <p className="mr-3 font-bold text-gray-800 dark:text-gray-200">{user.userName}</p>
         </div>
         <ul className="absolute w-72 p-2 bg-slate-50 dark:bg-gray-900 shadow-[rgba(0,_0,_0,_0.24)_0px_0px_40px] shadow-slate-300 dark:shadow-slate-900 hidden md:group-hover:flex flex-col -left-[8em] rounded-xl ">
           {items.map((item) => (

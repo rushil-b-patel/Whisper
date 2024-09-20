@@ -25,16 +25,16 @@ export const login = async (req, res)=>{
             return res.status(400).json({message: 'Email not verified. Please verify your email'});
         }
 
-        generateTokenAndSetCookie(res, user._id);
+        const token = generateTokenAndSetCookie(res, user._id);
         await user.save();
 
         res.status(200).json({
             success: true,
             message: 'Logged in successfully',
+            token,
             user: {
-                userName: user.userName,
-                email: user.email,
-                isVerified: user.isVerified
+                ...user._doc,
+                password: null
             }
         })
     }
@@ -68,17 +68,17 @@ export const signup = async (req, res)=>{
 
         await user.save();
 
-        generateTokenAndSetCookie(res, user._id);
+        const token = generateTokenAndSetCookie(res, user._id);
 
         await sendVerificationEmail(email, verificationToken);
 
         res.status(201).json({
             success: true,
             message: 'User created successfully',
+            token,
             user: {
-                userName: user.userName,
-                email: user.email,
-                isVerified: user.isVerified
+                ...user._doc,
+                password: null
             }
         })
 
@@ -110,9 +110,8 @@ export const verifyEmail = async (req, res)=>{
             success: true,
             message: 'Email verified successfully',
             user: {
-                userName: user.userName,
-                email: user.email,
-                isVerified: user.isVerified
+                ...user._doc,
+                password: null
             }
         });
     }
@@ -188,9 +187,8 @@ export const checkAuth = async (req, res) => {
         res.status(200).json({
             success: true,
             user: {
-                userName: user.userName,
-                email: user.email,
-                isVerified: user.isVerified
+                ...user._doc,
+                password: null
             }
         })
     }

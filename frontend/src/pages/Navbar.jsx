@@ -6,12 +6,14 @@ import { MenuLinks } from '../components/MenuLinks';
 import { NavigationLinks } from '../ui/NavigationLinks';
 import User from '../ui/User';
 import { MobileMenu } from '../ui/MobileMenu';
+import { useAuth } from '../context/AuthContext';
 
 function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isUser, setIsUser] = useState(false);
+  
+  const {user} = useAuth();
   
   useEffect(() => {
     setMobileMenuOpen(false);
@@ -39,7 +41,7 @@ function Navbar() {
               <KbarInput />
             </div> */}
             {
-              isUser ? <User /> : 
+              user ? <User /> : 
               <>
                 <button onClick={()=>navigate('/login')} className="">Sign In</button>
                 <button onClick={()=>navigate('/signup')} className="">Sign Up</button>

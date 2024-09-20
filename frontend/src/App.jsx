@@ -4,6 +4,8 @@ import Home from "./pages/Home";
 import Navbar from "./pages/Navbar";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
+import ProtectedRoutes from "./context/ProtectedRoutes";
+import RedirectRoutes from "./context/RedirectRoutes";
 
 function App() {
 
@@ -11,13 +13,20 @@ function App() {
     <>
     <Navbar />
     <Routes>
-      <Route index element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} />
+      
+      {/* <Route path='/' element={<ProtectedRoutes element={<Home />}></ProtectedRoutes>} /> */}
+      <Route path='/' element={<Home />} />
+      <Route path='/login' element={<RedirectRoutes ><Login /></RedirectRoutes>} />
+      <Route path='/signup' element={<RedirectRoutes ><Signup /></RedirectRoutes>} />
       <Route path="*" element={<NotFound />} />
+    
     </Routes>
     </>
   )
 }
 
 export default App
+
+// Navigation to auth pages after login
+// error showing in ui
+// Verify-email page and logic
