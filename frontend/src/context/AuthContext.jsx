@@ -7,6 +7,8 @@ const AuthContext = createContext();
 export const AuthProvider = ({children}) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
     const navigate = useNavigate();
 
     const login = async (email, password) => {
@@ -22,7 +24,7 @@ export const AuthProvider = ({children}) => {
         }
         catch(error){
             console.error('login failed', error);
-            throw error;
+            setError(error.response?.data?.message || 'An error occurred while logging in');
         }
     }
 
@@ -38,7 +40,7 @@ export const AuthProvider = ({children}) => {
         }
         catch(error){
             console.error('signup failed', error);
-            throw error;
+            setError(error.response?.data?.message || 'An error occurred during signup');
         }
     }
 
@@ -56,7 +58,7 @@ export const AuthProvider = ({children}) => {
         }
         catch(error){
             console.error('verify email failed', error);
-            throw error;
+            setError(error.response?.data?.message || 'An error occurred while verifying email');
         }
     }
 
@@ -64,12 +66,12 @@ export const AuthProvider = ({children}) => {
         try{
             axios.defaults.withCredentials = true;
             const response = await axios.get('http://localhost:8080/auth/check-auth');
-            setUser(response.data);
+            setUser(response.data.user);
             console.log('me', response);
         }
         catch(error){
             console.error('verify auth failed', error);
-            throw error;
+            setError(error.response?.data?.message || 'An error occurred while verifying authentication');
         }
         finally{
             setLoading(false);
@@ -88,7 +90,7 @@ export const AuthProvider = ({children}) => {
     },[])
 
     return(
-        <AuthContext.Provider value={{user, login, signup, logout, verifyAuth, verifyEmail, loading}}>
+        <AuthContext.Provider value={{user, login, signup, logout, verifyAuth, verifyEmail, loading, error}}>
             {children}
         </AuthContext.Provider>
     )

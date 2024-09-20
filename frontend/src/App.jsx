@@ -14,8 +14,7 @@ function App() {
     <Navbar />
     <Routes>
       
-      {/* <Route path='/' element={<ProtectedRoutes element={<Home />}></ProtectedRoutes>} /> */}
-      <Route path='/' element={<Home />} />
+      <Route path='/' element={<ProtectedRoutes element={<Home />}></ProtectedRoutes>} />
       <Route path='/login' element={<RedirectRoutes ><Login /></RedirectRoutes>} />
       <Route path='/signup' element={<RedirectRoutes ><Signup /></RedirectRoutes>} />
       <Route path="*" element={<NotFound />} />
@@ -27,6 +26,6 @@ function App() {
 
 export default App
 
-// Navigation to auth pages after login
+
 // error showing in ui
 // Verify-email page and logic
