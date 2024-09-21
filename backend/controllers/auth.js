@@ -15,14 +15,14 @@ export const login = async (req, res)=>{
         
         const user = await User.findOne({email});
         if(!user){
-            return res.status(400).json({message: 'Invalid username or email'});
+            return res.status(400).json({message: `User doesn't exist`});
         }
         const passwordMatch = await bcrypt.compare(password, user.password);
         if(!passwordMatch){
             return res.status(400).json({message: 'Invalid password'});
         }
         if(!user.isVerified){
-            return res.status(400).json({message: 'Email not verified. Please verify your email'});
+            return res.status(403).json({message: 'Email not verified. Please verify your email', redirect: true});
         }
 
         const token = generateTokenAndSetCookie(res, user._id);
@@ -89,15 +89,20 @@ export const signup = async (req, res)=>{
 }
 
 export const verifyEmail = async (req, res)=>{
-    const {data} = req.body;
+    const {code} = req.body;
+    console.log("otp",code);
     try{
         const user = await User.findOne({
-            verificationToken: data,
+            verificationToken: code,
             verificationTokenExpires: { $gt: Date.now() }
         })
+        console.log("user",user);
         if(!user){
-            return res.status(400).json({message: 'Invalid or expired token'});
+            console.log("if condition");
+            return res.status(400).json({success: false, message: 'Invalid or expired code. Please try again...', redirect: false});
         }
+
+        console.log("after if");
         user.isVerified = true;
         user.verificationToken = undefined;
         user.verificationTokenExpires = undefined;
@@ -112,7 +117,8 @@ export const verifyEmail = async (req, res)=>{
             user: {
                 ...user._doc,
                 password: null
-            }
+            },
+            redirect: true
         });
     }
     catch(error){

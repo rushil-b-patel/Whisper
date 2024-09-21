@@ -5,30 +5,48 @@ import { useNavigate } from 'react-router-dom';
 const AuthContext = createContext();
 
 export const AuthProvider = ({children}) => {
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
 
+    const [user, setUser] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
     const navigate = useNavigate();
 
+    useEffect(async () => {
+        const token = localStorage.getItem('token');
+        if(token){
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            await verifyAuth();
+        }
+        else{
+            setIsLoading(false);
+        }
+    },[]);
+
+
     const login = async (email, password) => {
+        setIsLoading(true);
+        setError(null);
         try{
             const response = await axios.post('http://localhost:8080/auth/login', {email, password});
             const {token, user} = response.data;
-            console.log('token', token);
-            console.log('user', user);
             setUser(user);
+            console.log('user', user);
             localStorage.setItem('token', token);
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            navigate('/');            
+            navigate(user.isVerified ? '/' : '/verify-email');
         }
         catch(error){
             console.error('login failed', error);
             setError(error.response?.data?.message || 'An error occurred while logging in');
         }
+        finally{
+            setIsLoading(false);
+        }
     }
 
     const signup = async (userName, email, password) => {
+        setIsLoading(true);
+        setError(null);
         try{
             const response = await axios.post('http://localhost:8080/auth/signup', {userName, email, password});
             const {token, user} = response.data;
@@ -36,11 +54,15 @@ export const AuthProvider = ({children}) => {
             console.log('user', user);
             localStorage.setItem('token', token);
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            navigate('/');
+            
+            navigate(user.isVerified ? '/' : '/verify-email');
         }
         catch(error){
             console.error('signup failed', error);
             setError(error.response?.data?.message || 'An error occurred during signup');
+        }
+        finally{
+            setIsLoading(false);
         }
     }
 
@@ -51,15 +73,26 @@ export const AuthProvider = ({children}) => {
         navigate('/login');
     }
 
-    const verifyEmail = (code) => {
+    const verifyEmail = async (code) => {
+        setIsLoading(true);
+        setError(null);
         try{
-            const response = axios.post('http://localhost:8080/auth/verify-email', {code});
-            setUser(response.data);
+            const response = await axios.post('http://localhost:8080/auth/verify-email', {code});
+            console.log('verify email', response);
+            if(response.data.success){
+                setUser(response.data.user);
+                navigate('/');
+            }
+            else{
+                console.log('email not verified');
+                setError(response.data.message || 'Email verification failed');
+            }
         }
         catch(error){
-            console.error('verify email failed', error);
+            console.error('Verifying email failed', error);
             setError(error.response?.data?.message || 'An error occurred while verifying email');
         }
+        setIsLoading(false);
     }
 
     const verifyAuth = async () => {
@@ -71,26 +104,14 @@ export const AuthProvider = ({children}) => {
         }
         catch(error){
             console.error('verify auth failed', error);
-            setError(error.response?.data?.message || 'An error occurred while verifying authentication');
         }
         finally{
-            setLoading(false);
+            setIsLoading(false);
         }
     }
 
-    useEffect(()=>{
-        const token = localStorage.getItem('token');
-        if(token){
-            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            verifyAuth();
-        }
-        else{
-            setLoading(false);
-        }
-    },[])
-
     return(
-        <AuthContext.Provider value={{user, login, signup, logout, verifyAuth, verifyEmail, loading, error}}>
+        <AuthContext.Provider value={{user, login, signup, logout, verifyAuth, verifyEmail, isLoading, error, setError}}>
             {children}
         </AuthContext.Provider>
     )

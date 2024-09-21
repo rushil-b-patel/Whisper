@@ -4,8 +4,8 @@ import Home from "./pages/Home";
 import Navbar from "./pages/Navbar";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
-import ProtectedRoutes from "./context/ProtectedRoutes";
-import RedirectRoutes from "./context/RedirectRoutes";
+import {ProtectedRoute, RedirectRoute, VerifyEmailRoute} from "./context/ProtectedRoutes";
+import VerifyEmail from "./pages/VerifyEmail";
 
 function App() {
 
@@ -14,9 +14,11 @@ function App() {
     <Navbar />
     <Routes>
       
-      <Route path='/' element={<ProtectedRoutes element={<Home />}></ProtectedRoutes>} />
-      <Route path='/login' element={<RedirectRoutes ><Login /></RedirectRoutes>} />
-      <Route path='/signup' element={<RedirectRoutes ><Signup /></RedirectRoutes>} />
+      <Route path='/' element={<Home />} />
+      <Route path='/login' element={<RedirectRoute ><Login /></RedirectRoute>} />
+      <Route path='/signup' element={<RedirectRoute ><Signup /></RedirectRoute>} />
+      <Route path='/verify-email' element={<VerifyEmailRoute ><VerifyEmail /></VerifyEmailRoute>} />
+      
       <Route path="*" element={<NotFound />} />
     
     </Routes>

@@ -1,14 +1,19 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Eye, EyeOff } from '../ui/Icons';
 import { useAuth } from '../context/AuthContext';
+import { Link } from 'react-router-dom';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const { login } = useAuth();
+  const { login, isLoading, error, setError } = useAuth();
   
+  useEffect(() => {
+    return ()=>setError(null);
+  }, [email, password]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     await login(email, password);
@@ -77,12 +82,17 @@ const Login = () => {
                 type="submit"
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 onClick={handleSubmit}
+                disabled={isLoading}
               >
-                Sign in
+              {isLoading ? 'Loading...' : 'Sign in'}
               </button>
+              {error && <p className='text-red-500 font-semibold mt-2 '>{error}</p>}
             </div>
           </form>
-
+          <div className='my-4 text-sm flex justify-center space-x-1'>
+            <p>Don't have an account? </p>
+            <Link to='/signup' className='text-blue-500 text-sm hover:underline'>Signup</Link>
+          </div>
           <div className="mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">

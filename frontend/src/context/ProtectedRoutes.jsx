@@ -1,7 +1,7 @@
 import { useAuth } from './AuthContext';
 import { Navigate } from 'react-router-dom';
 
-function ProtectedRoutes({children}) {
+function ProtectedRoute({children}) {
     
     const {user} = useAuth();
     
@@ -13,4 +13,27 @@ function ProtectedRoutes({children}) {
     )
 }
 
-export default ProtectedRoutes
+
+function RedirectRoute({children}) {
+    
+    const { user } = useAuth();
+
+    if(user){
+        return <Navigate to="/" />
+    }
+    return(
+        children
+    )
+}
+
+function VerifyEmailRoute({children}) {
+    
+    const { user } = useAuth();
+    
+    if(user && !user.isVerified){
+        return children;
+    }
+    return <Navigate to="/" />
+}
+
+export { ProtectedRoute, RedirectRoute, VerifyEmailRoute }

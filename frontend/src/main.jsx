@@ -8,6 +8,6 @@ createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <AuthProvider>
       <App />
-    </AuthProvider>,
+    </AuthProvider>
   </BrowserRouter>
 )

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { EyeOff, Eye } from '../ui/Icons';
 import { useAuth } from '../context/AuthContext';
+import { Link } from 'react-router-dom';
 
 const Signup = () => {
   const [userName, setUserName] = useState('');
@@ -8,7 +9,12 @@ const Signup = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const { signup } = useAuth();
+  const { signup, isLoading, error, setError } = useAuth();
+
+  useEffect(() => {
+    return () => setError(null);
+  }, [userName, email, password]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     await signup(userName, email, password);
@@ -94,11 +100,16 @@ const Signup = () => {
               <button
                 type="submit"
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                onClick={handleSubmit}
+                disabled={isLoading}
               >
-                Sign up
+                {isLoading ? 'loading...' : 'Sign up'}
               </button>
+              {error && <p className='text-red-500 font-semibold mt-2'>{error}</p>}
             </div>
+            <div className='text-sm flex justify-center space-x-1'>
+            <p>Already have an account?</p>
+            <Link to='/login' className='text-blue-500 text-sm hover:underline'>Login</Link>
+          </div>
           </form>
 
           <div className="mt-6">
