@@ -1,6 +1,7 @@
 import { PlusCircleIcon } from "./Icons";
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const User = () => {
     const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
@@ -24,12 +25,17 @@ const User = () => {
       setTheme(newTheme);
     };
 
+    const navigate = useNavigate();
+    const onSelect = (path) => {
+      navigate(path);
+    }
+
     const items = [
       {
         title: "Profile",
         icon: <PlusCircleIcon />,
         color: "bg-indigo-300 dark:bg-indigo-800",
-        onclick: () => {},
+        onclick: () => onSelect("/profile"),
       },
       {
         title: theme === "light" ? "Dark theme" : "Light theme",

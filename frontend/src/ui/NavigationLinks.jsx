@@ -61,33 +61,7 @@ import { ClockIcon, DocumentIcon, PaperAirplaneIcon, ReceiptRefundIcon, PlusCirc
       ],
     },
     {
-      name: "Clients",
-      subLinks: [
-        {
-          name: "Create",
-          description: "Create a new client",
-          link: "/create-client",
-          color: "bg-green-300 dark:bg-green-700",
-          icon: <PlusCircleIcon />,
-        },
-        {
-          name: "Manage",
-          description: "Manage clients",
-          link: "/manage-clients",
-          color: "bg-blue-300 dark:bg-blue-700",
-          icon: <ListBulletIcon />,
-        },
-        {
-          name: "Archive",
-          description: "Manage all archived clients",
-          link: "/archive-clients",
-          color: "bg-red-300 dark:bg-red-700",
-          icon: <ReceiptRefundIcon />,
-        },
-      ],
-    },
-    {
-      name: "Employees",
+      name: "Peers",
       subLinks: [
         {
           name: "Create",

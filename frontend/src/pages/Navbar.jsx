@@ -42,10 +42,10 @@ function Navbar() {
             </div> */}
             {
               user ? <User /> : 
-              <>
-                <button onClick={()=>navigate('/login')} className="">Sign In</button>
-                <button onClick={()=>navigate('/signup')} className="">Sign Up</button>
-              </>
+              <div>
+                <button onClick={()=>navigate('/login')} className=" p-2 rounded-md hover:bg-slate-200 font-medium">Sign In</button>
+                <button onClick={()=>navigate('/signup')} className=" p-2 rounded-md hover:bg-slate-200 font-medium">Sign Up</button>
+              </div>
             } 
           </div>
       </div>

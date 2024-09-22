@@ -6,6 +6,8 @@ import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import {ProtectedRoute, RedirectRoute, VerifyEmailRoute} from "./context/ProtectedRoutes";
 import VerifyEmail from "./pages/VerifyEmail";
+import Profile from "./pages/Profile";
+import { Toaster } from "react-hot-toast";
 
 function App() {
 
@@ -15,6 +17,7 @@ function App() {
     <Routes>
       
       <Route path='/' element={<Home />} />
+      <Route path='/profile' element={<ProtectedRoute ><Profile /></ProtectedRoute>} />
       <Route path='/login' element={<RedirectRoute ><Login /></RedirectRoute>} />
       <Route path='/signup' element={<RedirectRoute ><Signup /></RedirectRoute>} />
       <Route path='/verify-email' element={<VerifyEmailRoute ><VerifyEmail /></VerifyEmailRoute>} />
@@ -22,6 +25,7 @@ function App() {
       <Route path="*" element={<NotFound />} />
     
     </Routes>
+    <Toaster />
     </>
   )
 }
