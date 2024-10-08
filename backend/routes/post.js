@@ -4,7 +4,7 @@ import { verifyToken } from '../middlewares/postVerifyToken.js';
 
 const router = express.Router();
 
-router.post('/create', verifyToken, createPost);
+router.post('/create-post', verifyToken, createPost);
 router.get('/', getAllPosts);   
 router.get('/user', verifyToken, getUserPosts);
 router.get('/:id', getPost);

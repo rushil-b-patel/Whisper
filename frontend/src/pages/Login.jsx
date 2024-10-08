@@ -18,7 +18,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     await login(email, password);
-    toast.success('Logged in successfully');
+    // toast.success('Logged in successfully');
   };
 
   return (
@@ -101,7 +101,7 @@ const Login = () => {
                 <div className="w-full border-t border-gray-300" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">
+                <span className="px-2 bg-white text-black">
                   Or continue with
                 </span>
               </div>

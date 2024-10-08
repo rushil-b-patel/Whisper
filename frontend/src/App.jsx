@@ -8,6 +8,7 @@ import {ProtectedRoute, RedirectRoute, VerifyEmailRoute} from "./context/Protect
 import VerifyEmail from "./pages/VerifyEmail";
 import Profile from "./pages/Profile";
 import { Toaster } from "react-hot-toast";
+import CreatePost from "./pages/CreatePost";
 
 function App() {
 
@@ -21,7 +22,7 @@ function App() {
       <Route path='/login' element={<RedirectRoute ><Login /></RedirectRoute>} />
       <Route path='/signup' element={<RedirectRoute ><Signup /></RedirectRoute>} />
       <Route path='/verify-email' element={<VerifyEmailRoute ><VerifyEmail /></VerifyEmailRoute>} />
-      
+      <Route path='/create-post' element={<ProtectedRoute ><CreatePost /></ProtectedRoute>} />
       <Route path="*" element={<NotFound />} />
     
     </Routes>
@@ -31,7 +32,3 @@ function App() {
 }
 
 export default App
-
-
-// error showing in ui
-// Verify-email page and logic

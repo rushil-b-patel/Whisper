@@ -2,9 +2,11 @@ import { useAuth } from './AuthContext';
 import { Navigate } from 'react-router-dom';
 
 function ProtectedRoute({children}) {
-    
-    const {user} = useAuth();
-    
+
+    const {user, isLoading} = useAuth();
+    if(isLoading){
+        return <div>Loading...</div>
+    }
     if(!user){
         return <Navigate to="/login" />
     }
@@ -16,8 +18,10 @@ function ProtectedRoute({children}) {
 
 function RedirectRoute({children}) {
     
-    const { user } = useAuth();
-
+    const { user, isLoading } = useAuth();
+    if(isLoading){
+        return <div>Loading...</div>
+    }
     if(user){
         return <Navigate to="/" />
     }
@@ -28,8 +32,10 @@ function RedirectRoute({children}) {
 
 function VerifyEmailRoute({children}) {
     
-    const { user } = useAuth();
-    
+    const { user, isLoading } = useAuth();
+    if(isLoading){
+        return <div>Loading...</div>
+    }
     if(user && !user.isVerified){
         return children;
     }

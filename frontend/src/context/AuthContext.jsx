@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect} from 'react'
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 const AuthContext = createContext();
 
@@ -11,15 +12,35 @@ export const AuthProvider = ({children}) => {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    useEffect(async () => {
-        const token = localStorage.getItem('token');
-        if(token){
-            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            await verifyAuth();
+    const verifyAuth = async () => {
+        try{
+            axios.defaults.withCredentials = true;
+            const response = await axios.get('http://localhost:8080/auth/check-auth');
+            setUser(response.data.user);
+            console.log('me', response);
         }
-        else{
+        catch(error){
+            console.error('verify auth failed', error);
+        }
+        finally{
             setIsLoading(false);
         }
+    }
+
+    useEffect(() => {
+        const checkTokenAndVerifyAuth = async () => {
+            const token = localStorage.getItem('token');
+            if(token){
+                axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+                await verifyAuth();
+            }
+            else{
+                setIsLoading(false);
+            }
+        };
+        
+        checkTokenAndVerifyAuth();
+    
     },[]);
 
 
@@ -34,6 +55,7 @@ export const AuthProvider = ({children}) => {
             localStorage.setItem('token', token);
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
             navigate(user.isVerified ? '/' : '/verify-email');
+            toast.success('Logged in successfully');
         }
         catch(error){
             console.error('login failed', error);
@@ -95,24 +117,9 @@ export const AuthProvider = ({children}) => {
         setIsLoading(false);
     }
 
-    const verifyAuth = async () => {
-        try{
-            axios.defaults.withCredentials = true;
-            const response = await axios.get('http://localhost:8080/auth/check-auth');
-            setUser(response.data.user);
-            console.log('me', response);
-        }
-        catch(error){
-            console.error('verify auth failed', error);
-        }
-        finally{
-            setIsLoading(false);
-        }
-    }
-
     return(
         <AuthContext.Provider value={{user, login, signup, logout, verifyAuth, verifyEmail, isLoading, error, setError}}>
-            {children}
+            {!isLoading && children}
         </AuthContext.Provider>
     )
 }
