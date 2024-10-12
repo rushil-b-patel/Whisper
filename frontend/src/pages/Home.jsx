@@ -1,54 +1,54 @@
-import { useEffect, useState } from 'react'
-import { usePostService } from '../context/PostService'
+import { useEffect, useState } from "react";
+import { usePostService } from "../context/PostService";
+import PostCard from "../ui/PostCard";
 
 function Home() {
-
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const { getAllPosts } = usePostService();
-  
+
   useEffect(() => {
     const fetchPosts = async () => {
-      try{
+      try {
         const response = await getAllPosts();
         setPosts(response.posts);
         setError(null);
-      }
-      catch(error) {
+      } catch (error) {
         console.error("fetch posts failed", error);
-        setError(error.response?.data?.message || "An error occurred while fetching posts");
-      }
-      finally {
+        setError(
+          error.response?.data?.message ||
+            "An error occurred while fetching posts"
+        );
+      } finally {
         setIsLoading(false);
       }
-    }
+    };
     fetchPosts();
   }, []);
 
   return (
-    <div className='bg-slate-200 dark:bg-black h-[calc(100vh-4em)] flex justify-center items-center'>
-      <div className='bg-white dark:bg-slate-800 p-4 rounded-lg shadow-lg'>
-        <h1 className='text-2xl font-semibold'>Home</h1>
-        <div>
-          {isLoading ? (
-            <p>Loading...</p>
-          ) : error ? (
-            <p className='text-red-500'>{error}</p>
-          ) : posts.length > 0 ? (
+    <div className='bg-white dark:bg-black min-h-[calc(100vh-4em)] flex justify-center items-start py-8'>
+    <div className='w-1/2 max-w-2xl'>
+      <h1 className='text-4xl font-bold text-center text-gray-800 dark:text-white mb-8'>create post section</h1>
+      {isLoading ? (
+        <p>Loading posts...</p>
+      ) : error ? (
+        <p className='text-red-500'>{error}</p>
+      ) : (
+        <div className='grid grid-cols-1'>
+          {posts && posts.length > 0 ? (
             posts.map(post => (
-              <div key={post._id} className='p-4 my-4 bg-slate-100 dark:bg-slate-700 rounded-lg'>
-                <h2 className='text-xl font-semibold'>{post.title}</h2>
-                <p>{post.description}</p>
-              </div>
+              <PostCard key={post._id} post={post} />
             ))
           ) : (
             <p>No posts available</p>
           )}
         </div>
-      </div>
+      )}
     </div>
+  </div>
   );
 }
 
-export default Home
+export default Home;

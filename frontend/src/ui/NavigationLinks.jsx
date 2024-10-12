@@ -5,9 +5,9 @@ import { ClockIcon, DocumentIcon, PaperAirplaneIcon, ReceiptRefundIcon, PlusCirc
       name: "Add",
       subLinks: [
         {
-          name: "Work time",
-          description: "Log and manage your work time",
-          link: "/work-time",
+          name: "Create Post",
+          description: "Create a new post",
+          link: "/create-post",
           color: "bg-teal-300 dark:bg-teal-700",
           icon: <ClockIcon />,
         },

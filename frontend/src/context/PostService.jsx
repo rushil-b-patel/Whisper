@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 const API = "http://localhost:8080";
 
@@ -9,12 +10,20 @@ export const usePostService = () => {
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
 
-  const createPost = async (token, post) => {
+  const createPost = async (token, formData) => {
     setError(null);
     setIsLoading(true);
     try {
-      const response = await axios.post(`${API}/post/create-post`, token, post);
-      return response.data;
+      const response = await axios.post(`${API}/post/create-post`, formData, 
+            { 
+              headers: 
+                {
+                  "Authorization": `Bearer ${token}`,
+                  "Content-Type": "multipart/form-data",
+                }
+            });
+      console.log("create post response", response);
+      toast.success("Post created successfully");
     } catch (error) {
       console.error("create post failed", error);
       setError(error);

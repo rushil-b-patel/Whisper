@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { usePostService } from '../context/PostService';
 
 function CreatePost() {
   const [title, setTitle] = useState('');
@@ -6,12 +7,27 @@ function CreatePost() {
   const [category, setCategory] = useState('');
   const [image, setImage] = useState(null);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    const postData = async 
+  const token = localStorage.getItem('token');
+  const {createPost} = usePostService();
 
+  const handleSubmit = async (e) =>  {
+    e.preventDefault();
     console.log({ title, description, category, image });
+    console.log(token);
+
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('description', description);
+    formData.append('category', category);
+    if (image) {
+      formData.append('image', image);
+    }
+    console.log(formData);
+    await createPost(token, formData);
+    setTitle('');
+    setDescription('');
+    setCategory('');
+    setImage(null);
   };
 
   return (

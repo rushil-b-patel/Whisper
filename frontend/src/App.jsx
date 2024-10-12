@@ -4,6 +4,8 @@ import Home from "./pages/Home";
 import Navbar from "./pages/Navbar";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
+import LeftSideBar from "./components/LeftSideBar";
+import RightSidebar from "./components/RightSidebar";
 import {ProtectedRoute, RedirectRoute, VerifyEmailRoute} from "./context/ProtectedRoutes";
 import VerifyEmail from "./pages/VerifyEmail";
 import Profile from "./pages/Profile";
@@ -15,8 +17,8 @@ function App() {
   return (
     <>
     <Navbar />
+
     <Routes>
-      
       <Route path='/' element={<Home />} />
       <Route path='/profile' element={<ProtectedRoute ><Profile /></ProtectedRoute>} />
       <Route path='/login' element={<RedirectRoute ><Login /></RedirectRoute>} />
@@ -24,7 +26,6 @@ function App() {
       <Route path='/verify-email' element={<VerifyEmailRoute ><VerifyEmail /></VerifyEmailRoute>} />
       <Route path='/create-post' element={<ProtectedRoute ><CreatePost /></ProtectedRoute>} />
       <Route path="*" element={<NotFound />} />
-    
     </Routes>
     <Toaster />
     </>

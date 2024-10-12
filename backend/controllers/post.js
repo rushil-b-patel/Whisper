@@ -2,8 +2,9 @@ import { Post } from '../models/post.js';
 
 export const createPost = async (req, res) => {
     try {
-        const { title, description, imageUrl, category } = req.body;
-        const post = new Post({ title, description, user: req.userId, imageUrl, category });
+        const { title, description, category } = req.body;
+        const imageUrl = req.file ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}` : null;
+        const post = new Post({ title, description, user: req.userId, image: imageUrl, category });
         await post.save();
         res.status(201).json({sucess: true, post});
     } catch(error){
