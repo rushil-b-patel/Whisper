@@ -66,11 +66,11 @@ export const AuthProvider = ({children}) => {
         }
     }
 
-    const signup = async (userName, email, password) => {
+    const signup = async ( userName, email, password) => {
         setIsLoading(true);
         setError(null);
         try{
-            const response = await axios.post('http://localhost:8080/auth/signup', {userName, email, password});
+            const response = await axios.post('http://localhost:8080/auth/signup', { userName, email, password});
             const {token, user} = response.data;
             setUser(user);
             console.log('user', user);

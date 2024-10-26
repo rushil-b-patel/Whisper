@@ -50,10 +50,15 @@ export const signup = async (req, res)=>{
         if(!userName || !email || !password){
             return res.status(400).json({message: 'Please fill in all fields'});
         }
-        
-        const userExist = await User.findOne({email});
-        if(userExist){
-            return res.status(400).json({success:false, message: 'User already exists'});
+
+        const userNameExist = await User.findOne({userName});
+        if(userNameExist){
+            return res.status(400).json({success:false, message: 'Username already exists'});
+        }
+
+        const userEmailExist = await User.findOne({email});
+        if(userEmailExist){
+            return res.status(400).json({success:false, message: 'Email already exists'});
         }
         
         const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();

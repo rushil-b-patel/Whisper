@@ -108,11 +108,11 @@ const Signup = () => {
               </button>
               {error && <p className='text-red-500 font-semibold mt-2'>{error}</p>}
             </div>
+          </form>
             <div className='text-sm flex justify-center space-x-1'>
             <p>Already have an account?</p>
             <Link to='/login' className='text-blue-500 text-sm hover:underline'>Login</Link>
-          </div>
-          </form>
+            </div>
 
           <div className="mt-6">
             <div className="relative">
@@ -120,7 +120,7 @@ const Signup = () => {
                 <div className="w-full border-t border-gray-300" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">
+                <span className="px-2 bg-white text-black">
                   Or continue with
                 </span>
               </div>
