@@ -52,7 +52,7 @@ export const usePostService = () => {
     setError(null);
     setIsLoading(true);
     try {
-      const response = await axios.get(`${API}/post/${id}`, token);
+      const response = await axios.get(`${API}/post/${id}`, { headers: { "Authorization": `Bearer ${token}` } });
       return response.data;
     } catch (error) {
       console.error("get user post failed", error);
@@ -98,9 +98,9 @@ export const usePostService = () => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        `${API}/post/add-comment/${id}`,
-        token,
-        text
+          `${API}/post/add-comment/${id}`,
+          { text },
+          { headers: { "Authorization": `Bearer ${token}` } }
       );
       return response.data;
     } catch (error) {

@@ -1,15 +1,17 @@
 import { useNavigate } from 'react-router-dom';
 import { Comment, ChevronDown, ChevronUp } from './Icons'
+import { useAuth } from '../context/AuthContext';
 
 function PostCard({ post }) {
-  const navigate = useNavigate(); // For navigation
+  const navigate = useNavigate(); 
 
   if (!post) return <div>Error: Data is missing...!</div>;
-
-  // Handle redirect to single post
+  
   const handleRedirect = () => {
     navigate(`/posts/${post.id}`);
   };
+
+  console.log(post);
 
   return (
     <div 
@@ -23,8 +25,8 @@ function PostCard({ post }) {
           className='w-10 h-10 rounded-full mr-4'
         />
         <div>
-          <h2 className='text-lg font-semibold text-gray-800 dark:text-white'>author name</h2>
-          <p className='text-sm text-gray-500 dark:text-gray-400'>username & designation</p>
+          <h2 className='text-lg font-semibold text-gray-800 dark:text-white'>username</h2>
+          <p className='text-sm text-gray-500 dark:text-gray-400'>department</p>
         </div>
       </div>
 
