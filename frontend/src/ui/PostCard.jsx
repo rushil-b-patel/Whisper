@@ -11,7 +11,7 @@ function PostCard({ post }) {
     navigate(`/posts/${post.id}`);
   };
 
-  console.log(post);
+  // console.log(post.user?.userName);
 
   return (
     <div 
@@ -25,8 +25,8 @@ function PostCard({ post }) {
           className='w-10 h-10 rounded-full mr-4'
         />
         <div>
-          <h2 className='text-lg font-semibold text-gray-800 dark:text-white'>username</h2>
-          <p className='text-sm text-gray-500 dark:text-gray-400'>department</p>
+          <h2 className='text-lg font-semibold text-gray-800 dark:text-white'>{post.user?.userName || "Unknown User"}</h2>
+          <p className='text-sm text-gray-500 dark:text-gray-400'>{post.user?.department || "Unknown department"}</p>
         </div>
       </div>
 

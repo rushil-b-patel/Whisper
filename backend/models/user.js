@@ -15,6 +15,15 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
+    department:{
+        type: String,
+    },
+    location:{
+        type: String,
+    },
+    Bio:{
+        type: String,
+    },
     isVerified:{
         type: Boolean,
         default: false

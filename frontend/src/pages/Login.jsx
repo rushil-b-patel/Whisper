@@ -43,7 +43,7 @@ const Login = () => {
                   type="email"
                   autoComplete="email"
                   required
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 sm:text-sm"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
@@ -61,7 +61,7 @@ const Login = () => {
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
                   required
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 sm:text-sm"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
@@ -82,7 +82,7 @@ const Login = () => {
             <div>
               <button
                 type="submit"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition"
                 onClick={handleSubmit}
                 disabled={isLoading}
               >
@@ -95,7 +95,6 @@ const Login = () => {
             <p>Don't have an account? </p>
             <Link to='/signup' className='text-blue-500 text-sm hover:underline'>Signup</Link>
           </div>
-          <div className="mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-300" />
@@ -110,7 +109,6 @@ const Login = () => {
             <div className="mt-6 grid grid-cols-3 gap-3">
               {/* Add social login buttons here if needed */}
             </div>
-          </div>
         </div>
       </div>
     </div>
