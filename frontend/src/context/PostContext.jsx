@@ -51,7 +51,6 @@ export const usePostService = () => {
   const getPost = async (id) => {
     setError(null);
     setIsLoading(true);
-    console.log("getPost called");
     try {
       const response = await axios.get(`${API}/post/${id}`);
       return response.data;

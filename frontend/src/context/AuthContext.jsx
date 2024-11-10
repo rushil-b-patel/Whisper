@@ -17,7 +17,6 @@ export const AuthProvider = ({children}) => {
             axios.defaults.withCredentials = true;
             const response = await axios.get('http://localhost:8080/auth/check-auth');
             setUser(response.data.user);
-            console.log('me', response);
         }
         catch(error){
             console.error('verify auth failed', error);

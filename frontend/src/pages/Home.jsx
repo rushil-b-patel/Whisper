@@ -30,7 +30,7 @@ function Home() {
   return (
     <div className='bg-white dark:bg-black min-h-[calc(100vh-4em)] flex justify-center items-start py-8'>
     <div className='w-1/2 max-w-2xl'>
-      <h1 className='text-4xl font-bold text-center text-gray-800 dark:text-white mb-8'>create post section</h1>
+      {/* create post section */}
       {isLoading ? (
         <p>Loading posts...</p>
       ) : error ? (
