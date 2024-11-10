@@ -36,7 +36,15 @@ export const upVotePost = async (req, res) => {
         if(!post) {
             return res.status(404).json({success: false, message: 'Post not found'});
         }
+        if(post.upVotedUsers.includes(req.user.id)){
+            return res.status(400).json({success: false, message: 'You have already upvoted this post'});
+        }
+        if(post.downVotedUsers.includes(req.user.id)){
+            post.downVotes -= 1;
+            post.downVotedUsers = post.downVotedUsers.filter((user) => user.toString() !== req.user.id);
+        }
         post.upVotes += 1;
+        post.upVotedUsers.push(req.user.id);
         await post.save();
         res.status(200).json({success: true, post});
     } catch (error) {
@@ -50,7 +58,15 @@ export const downVotePost = async (req, res) => {
         if(!post) {
             return res.status(404).json({success: false, message: 'Post not found'});
         }
+        if(post.downVotedUsers.includes(req.user.id)){
+            return res.status(400).json({success: false, message: 'You have already downvoted this post'});
+        }
+        if(post.upVotedUsers.includes(req.user.id)){
+            post.upVotes -= 1;
+            post.upVotedUsers = post.upVotedUsers.filter((user) => user.toString() !== req.user.id);
+        }
         post.downVotes += 1;
+        post.downVotedUsers.push(req.user.id);
         await post.save();
         res.status(200).json({success: true, post});
     } catch (error) {

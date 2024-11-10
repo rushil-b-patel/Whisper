@@ -42,6 +42,14 @@ const postSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
+    upVotedUsers:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    downVotedUsers:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }],
     category: {
         type: String,
         required: true

@@ -127,16 +127,6 @@ export const usePostService = () => {
     }
   };
 
-return{
-    error,
-    isLoading,
-    createPost,
-    getAllPosts,
-    getPost,
-    upVotePost,
-    downVotePost,
-    addComment,
-    updatePost
-}
+  return{ error, isLoading, createPost, getAllPosts, getPost, upVotePost, downVotePost, addComment, updatePost }
 
 };
