@@ -208,3 +208,31 @@ export const checkAuth = async (req, res) => {
         res.status(500).json({message: 'Server Error'});
     }
 }
+
+export const updateUser = async (req, res) => {
+    try{
+        const user = await User.findById(req.userId);
+        if(!user){
+            return res.status(400).json({message: 'User not found', success: false});
+        }
+        const { userName, department, location, previousSchool, bio } = req.body;
+        user.userName = userName;
+        user.department = department;
+        user.location = location;
+        // user.previousSchool = previousSchool;
+        user.bio = bio;
+        await user.save();
+        res.status(200).json({
+            success: true,
+            message: 'User updated successfully',
+            user: {
+                ...user._doc,
+                password: null
+            }
+        })
+    }
+    catch(error){
+        console.error("Error updating user",error);
+        res.status(500).json({message: 'Server Error'});
+    }
+}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { usePostService } from '../context/PostService';
+import { usePostService } from '../context/PostContext';
 
 function CreatePost() {
   const [title, setTitle] = useState('');
@@ -12,8 +12,6 @@ function CreatePost() {
 
   const handleSubmit = async (e) =>  {
     e.preventDefault();
-    console.log({ title, description, category, image });
-    console.log(token);
 
     const formData = new FormData();
     formData.append('title', title);
@@ -22,7 +20,6 @@ function CreatePost() {
     if (image) {
       formData.append('image', image);
     }
-    console.log(formData);
     await createPost(token, formData);
     setTitle('');
     setDescription('');
@@ -85,7 +82,7 @@ function CreatePost() {
           <div className="pt-4">
             <button
               type="submit"
-              className="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2"
+              className="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition"
             >
               Submit Post
             </button>

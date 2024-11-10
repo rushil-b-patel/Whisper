@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { usePostService } from "../context/PostService";
+import { usePostService } from "../context/PostContext";
 import PostCard from "../ui/PostCard";
 
 function Home() {

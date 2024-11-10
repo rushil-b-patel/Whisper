@@ -48,14 +48,15 @@ export const usePostService = () => {
     }
   };
 
-  const getUserPosts = async (token, id) => {
+  const getPost = async (id) => {
     setError(null);
     setIsLoading(true);
+    console.log("getPost called");
     try {
-      const response = await axios.get(`${API}/post/${id}`, { headers: { "Authorization": `Bearer ${token}` } });
+      const response = await axios.get(`${API}/post/${id}`);
       return response.data;
     } catch (error) {
-      console.error("get user post failed", error);
+      console.error("Post fetching failed", error);
       setError(error);
       throw error;
     } finally {
@@ -132,7 +133,7 @@ return{
     isLoading,
     createPost,
     getAllPosts,
-    getUserPosts,
+    getPost,
     upVotePost,
     downVotePost,
     addComment,

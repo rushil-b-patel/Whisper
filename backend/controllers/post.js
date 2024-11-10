@@ -78,6 +78,7 @@ export const addComment = async (req, res) => {
 }
 
 export const getPost = async (req, res) => {
+    console.log(req.params.id);
     try {
         const post = await Post.findById(req.params.id).populate('user', 'username');
         if(!post){

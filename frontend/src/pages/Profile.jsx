@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 
 function Profile() {
@@ -8,26 +8,15 @@ function Profile() {
   const [userName, setUserName] = useState(user?.userName || "");
   const [department, setDepartment] = useState(user?.department || "");
   const [location, setLocation] = useState(user?.location || "");
-  const [previousSchool, setPreviousSchool] = useState(user?.previousCompany || "");
+  const [previousSchool, setPreviousSchool] = useState(user?.previousSchool || "");
   const [bio, setBio] = useState(user?.bio || "");
-  const [isModified, setIsModified] = useState(false);
 
-  useEffect(() => {
-    if (
-      userName !== user?.userName ||
-      department !== user?.department ||
-      location !== user?.location ||
-      previousSchool !== user?.previousCompany ||
-      bio !== user?.bio
-    ) {
-      setIsModified(true);
-    } else {
-      setIsModified(false);
-    }
-  }, [userName, department, location, previousSchool, bio, user]);
+  const { updateUserData, isLoading } = useAuth();
 
-  const handleSave = () => {
+  const handleSave = async (e) => {
+    e.preventDefault();
     console.log({ userName, department, location, previousSchool, bio });
+    await updateUserData({ userName, department, location, bio });
     setIsModified(false);
   };
 
@@ -91,7 +80,9 @@ function Profile() {
           onClick={handleSave}
           className="w-full bg-black text-white font-semibold py-3 rounded-lg hover:bg-gray-900 transition"
         >
-          Save All
+          {
+            isLoading ? "Saving..." : "Save"
+          }
         </button>
         <p className="text-sm text-center text-gray-500 mt-4">
           Only your username will be visible in your company's private channel.

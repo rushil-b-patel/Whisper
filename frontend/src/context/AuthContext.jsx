@@ -117,8 +117,23 @@ export const AuthProvider = ({children}) => {
         setIsLoading(false);
     }
 
+    const updateUserData = async (data) => {
+        setIsLoading(true);
+        setError(null);
+        try{
+            const response = await axios.put('http://localhost:8080/auth/update-user', data);
+            setUser(response.data.user);
+            toast.success('Profile Updated');
+        }
+        catch(error){
+            console.error('Update user data failed', error);
+            setError(error.response?.data?.message || 'An error occurred while updating profile');
+        }
+        setIsLoading(false);
+    }
+
     return(
-        <AuthContext.Provider value={{user, login, signup, logout, verifyAuth, verifyEmail, isLoading, error, setError}}>
+        <AuthContext.Provider value={{user, login, signup, logout, verifyAuth, verifyEmail, updateUserData , isLoading, error, setError}}>
             {!isLoading && children}
         </AuthContext.Provider>
     )

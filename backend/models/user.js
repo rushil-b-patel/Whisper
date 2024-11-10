@@ -21,7 +21,7 @@ const userSchema = new Schema({
     location:{
         type: String,
     },
-    Bio:{
+    bio:{
         type: String,
     },
     isVerified:{
