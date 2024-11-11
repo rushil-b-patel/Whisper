@@ -11,11 +11,8 @@ function PostDetail() {
   const [post, setPost] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { upVotePost, downVotePost } = usePostService();
   const navigate = useNavigate();
-  const [votes, setVotes] = useState({upVoted: false, downVoted: false});
 
-  const token = localStorage.getItem("token");
   const { user } = useAuth();
 
   useEffect(() => {
@@ -25,9 +22,6 @@ function PostDetail() {
       try {
         const response = await getPost(id);
         setPost(response.post);
-        const upVoted = response.post.upVotedUsers.includes(user._id);
-        const downVoted = response.post.downVotedUsers.includes(user._id);
-        setVotes({ upVoted, downVoted });
       } catch (err) {
         console.error("Error fetching post:", err);
         setError(err.message || "Failed to load post");
@@ -43,52 +37,6 @@ function PostDetail() {
       setIsLoading(false);
     }
   }, [id, user._id]);
-
-  const handleUpVote = async () => {
-    try{
-      if(!token){
-        throw new Error("You need to login to upvote a post");
-      }
-      const response = await upVotePost(token, id);
-      if(!response){
-        throw new Error("Failed to upvote post");
-      }
-      if(response.success){
-        setPost((prev)=>({...prev, upVotes: response.post.upVotes, downVotes: response.post.downVotes}));
-        setVotes({ upVoted: !votes.upVoted, downVoted: false });
-      }
-      else{
-        alert(response.message);
-      }
-    }
-    catch(err){
-      console.error("Error upvoting post:", err);
-      setError(err.message);
-    }
-  };
-
-  const handleDownVote = async () => {
-    try{
-      if(!token){
-        throw new Error("You need to login to downvote a post");
-      }
-      const response = await downVotePost(token, id);
-      if(!response){
-        throw new Error("Failed to downvote post");
-      }
-      if(response.success){
-        setPost((prev)=>({...prev, upVotes: response.post.upVotes, downVotes: response.post.downVotes}));
-        setVotes({ upVoted: false, downVoted: !votes.downVoted }); 
-      }
-      else{
-        alert(response.message);
-      }
-    }
-    catch(err){
-      console.error("Error downvoting post:", err);
-      setError(err.message);
-    }
-  };
 
 
   if (isLoading) {
@@ -172,24 +120,7 @@ function PostDetail() {
 
             <div className="border-t border-gray-100 dark:border-slate-700 pt-6">
               <div className="flex items-center justify-between">
-                {/* <div className="flex items-center gap-2 border border-gray-200 dark:bg-slate-700 dark:border-none rounded-xl p-1">
-                  <button className={`flex items-center space-x-2 transition-colors ${votes.upVoted ? "text-red-500 dark:text-red-500" : "text-black dark:text-white"}`}
-                    onClick={handleUpVote}
-                  >
-                    <ChevronUp className="w-5 h-5" />
-                  </button>
-                  <p className="text-black dark:text-white">
-                    {post.upVotes - post.downVotes}
-                  </p> 
-                  <button className={`flex items-center space-x-2 transition-colors ${votes.downVoted ? "text-blue-500 dark:text-blue-500" : "text-black dark:text-white"}`}
-                    onClick={handleDownVote}
-                  >
-                    <ChevronDown className="w-5 h-5" />
-                  </button>
-                </div> */}
-
-                <VoteBar votes={votes} handleUpVote={handleUpVote} handleDownVote={handleDownVote} post={post} />
-
+                <VoteBar id={id} />
                 <div className="flex items-center space-x-4">
                   <button className="flex items-center space-x-2 text-black hover:text-indigo-600 dark:text-white dark:hover:text-indigo-400 transition-colors">
                     <Share2 className="w-5 h-5" />

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Comment, ChevronDown, ChevronUp } from './Icons';
+import VoteBar from '../components/voteBar';
 
 function PostCard({ post }) {
   const navigate = useNavigate();
@@ -67,12 +68,7 @@ function PostCard({ post }) {
 
       <div className="flex justify-between items-center pl-2 sm:pl-3">
         <div className="flex items-center space-x-4 sm:space-x-6">
-          <button className="group flex items-center text-black hover:text-indigo-500 transition-colors dark:text-white dark:hover:text-indigo-400">
-            <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 transform group-hover:scale-110 transition-transform" />
-          </button>
-          <button className="group flex items-center text-black hover:text-indigo-500 transition-colors dark:text-white dark:hover:text-indigo-400">
-            <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 transform group-hover:scale-110 transition-transform" />
-          </button>
+            <VoteBar id={post._id} />
           <button className="group flex items-center text-black hover:text-indigo-500 transition-colors dark:text-white dark:hover:text-indigo-400">
             <Comment className="w-4 h-4 sm:w-5 sm:h-5 transform group-hover:scale-110 transition-transform" />
           </button>
