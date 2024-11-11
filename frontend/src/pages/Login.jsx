@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Eye, EyeOff } from '../ui/Icons';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
-import toast from 'react-hot-toast';
 
 const Login = () => {
   const [email, setEmail] = useState('');

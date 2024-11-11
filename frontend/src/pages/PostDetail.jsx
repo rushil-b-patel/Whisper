@@ -3,17 +3,20 @@ import { useNavigate, useParams } from "react-router-dom";
 import { usePostService } from "../context/PostContext";
 import { ChevronLeft, Share2, Bookmark} from "lucide-react";
 import { ChevronDown, ChevronUp } from "../ui/Icons";
+import { useAuth } from "../context/AuthContext";
 
 function PostDetail() {
   const { id } = useParams();
   const { getPost } = usePostService();
   const [post, setPost] = useState(null);
+  const [userVote, setUserVote] = useState({ upvoted: false, downvoted: false });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const { upVotePost, downVotePost } = usePostService();
   const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -22,6 +25,10 @@ function PostDetail() {
       try {
         const response = await getPost(id);
         setPost(response.post);
+        console.log(response);
+        const hasUpVoted = response.post.upVotedUsers.includes(user.id);
+        const hasDownVoted = response.post.downVotedUsers.includes(user.id);
+        setUserVote({ upvoted: hasUpVoted, downvoted: hasDownVoted });
       } catch (err) {
         console.error("Error fetching post:", err);
         setError(err.message || "Failed to load post");
@@ -49,6 +56,10 @@ function PostDetail() {
       }
       if(response.success){
         setPost((prev)=>({...prev, upVotes: response.post.upVotes, downVotes: response.post.downVotes}));
+        setUserVote((prevVote) => ({
+          upvoted: !prevVote.upvoted,   
+          downvoted: false
+      }));
       }
       else{
         alert(response.message);
@@ -71,6 +82,10 @@ function PostDetail() {
       }
       if(response.success){
         setPost((prev)=>({...prev, upVotes: response.post.upVotes, downVotes: response.post.downVotes}));
+        setUserVote((prevVote) => ({
+          upvoted: false,               
+          downvoted: !prevVote.downvoted
+      }));
       }
       else{
         alert(response.message);
@@ -165,7 +180,7 @@ function PostDetail() {
             <div className="border-t border-gray-100 dark:border-slate-700 pt-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 border border-gray-200 dark:bg-slate-700 rounded-xl p-1">
-                  <button className="flex items-center space-x-2 text-black hover:text-red-500 dark:text-white dark:hover:text-red-500 transition-colors"
+                  <button className={`flex items-center space-x-2 transition-colors ${userVote.upvoted ? "text-red-500 dark:text-red-500" : "text-black dark:text-white hover:text-red-500 dark:hover:text-red-500"} text-black hover:text-red-500 dark:text-white dark:hover:text-red-500 `}
                     onClick={handleUpVote}
                   >
                     <ChevronUp className="w-5 h-5" />
