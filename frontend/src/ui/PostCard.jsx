@@ -56,8 +56,7 @@ function PostCard({ post }) {
 
       {post.image && (
         <div className="relative mb-3 sm:mb-5 p-0.5 sm:p-1 rounded-xl overflow-hidden group">
-          <div className="absolute inset-0 bg-gradient-to-r from-indigo-50 to-violet-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300
-dark:from-indigo-900/20 dark:to-violet-900/20" />
+          <div className="absolute inset-0 bg-gradient-to-r from-indigo-50 to-violet-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 dark:from-indigo-900/20 dark:to-violet-900/20" />
           <img
             src={post.image}
             alt={post.title}

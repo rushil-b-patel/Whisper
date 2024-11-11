@@ -67,7 +67,7 @@ export const usePostService = () => {
     setError(null);
     setIsLoading(true);
     try {
-      const response = await axios.put(`${API}/post/upvote/${id}`, token);
+      const response = await axios.put(`${API}/post/upvote/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       return response.data;
     } catch (error) {
       console.error("upvote post failed", error);
@@ -82,7 +82,7 @@ export const usePostService = () => {
     setError(null);
     setIsLoading(true);
     try {
-      const response = await axios.put(`${API}/post/downvote/${id}`, token);
+      const response = await axios.put(`${API}/post/downvote/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       return response.data;
     } catch (error) {
       console.error("downvote post failed", error);
@@ -127,6 +127,6 @@ export const usePostService = () => {
     }
   };
 
-  return{ error, isLoading, createPost, getAllPosts, getPost, upVotePost, downVotePost, addComment, updatePost }
+  return{ error, isLoading, setError, setIsLoading, createPost, getAllPosts, getPost, upVotePost, downVotePost, addComment, updatePost }
 
 };

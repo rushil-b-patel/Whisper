@@ -2,18 +2,18 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { usePostService } from "../context/PostContext";
 import { ChevronLeft, Share2, Bookmark} from "lucide-react";
-import { ChevronDown, ChevronUp } from "../ui/Icons";
 import { useAuth } from "../context/AuthContext";
+import VoteBar from "../components/voteBar";
 
 function PostDetail() {
   const { id } = useParams();
   const { getPost } = usePostService();
   const [post, setPost] = useState(null);
-  const [userVote, setUserVote] = useState({ upvoted: false, downvoted: false });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const { upVotePost, downVotePost } = usePostService();
   const navigate = useNavigate();
+  const [votes, setVotes] = useState({upVoted: false, downVoted: false});
 
   const token = localStorage.getItem("token");
   const { user } = useAuth();
@@ -25,10 +25,9 @@ function PostDetail() {
       try {
         const response = await getPost(id);
         setPost(response.post);
-        console.log(response);
-        const hasUpVoted = response.post.upVotedUsers.includes(user.id);
-        const hasDownVoted = response.post.downVotedUsers.includes(user.id);
-        setUserVote({ upvoted: hasUpVoted, downvoted: hasDownVoted });
+        const upVoted = response.post.upVotedUsers.includes(user._id);
+        const downVoted = response.post.downVotedUsers.includes(user._id);
+        setVotes({ upVoted, downVoted });
       } catch (err) {
         console.error("Error fetching post:", err);
         setError(err.message || "Failed to load post");
@@ -43,7 +42,7 @@ function PostDetail() {
       setError("No post ID provided");
       setIsLoading(false);
     }
-  }, []);
+  }, [id, user._id]);
 
   const handleUpVote = async () => {
     try{
@@ -56,10 +55,7 @@ function PostDetail() {
       }
       if(response.success){
         setPost((prev)=>({...prev, upVotes: response.post.upVotes, downVotes: response.post.downVotes}));
-        setUserVote((prevVote) => ({
-          upvoted: !prevVote.upvoted,   
-          downvoted: false
-      }));
+        setVotes({ upVoted: !votes.upVoted, downVoted: false });
       }
       else{
         alert(response.message);
@@ -82,10 +78,7 @@ function PostDetail() {
       }
       if(response.success){
         setPost((prev)=>({...prev, upVotes: response.post.upVotes, downVotes: response.post.downVotes}));
-        setUserVote((prevVote) => ({
-          upvoted: false,               
-          downvoted: !prevVote.downvoted
-      }));
+        setVotes({ upVoted: false, downVoted: !votes.downVoted }); 
       }
       else{
         alert(response.message);
@@ -179,19 +172,24 @@ function PostDetail() {
 
             <div className="border-t border-gray-100 dark:border-slate-700 pt-6">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 border border-gray-200 dark:bg-slate-700 rounded-xl p-1">
-                  <button className={`flex items-center space-x-2 transition-colors ${userVote.upvoted ? "text-red-500 dark:text-red-500" : "text-black dark:text-white hover:text-red-500 dark:hover:text-red-500"} text-black hover:text-red-500 dark:text-white dark:hover:text-red-500 `}
+                {/* <div className="flex items-center gap-2 border border-gray-200 dark:bg-slate-700 dark:border-none rounded-xl p-1">
+                  <button className={`flex items-center space-x-2 transition-colors ${votes.upVoted ? "text-red-500 dark:text-red-500" : "text-black dark:text-white"}`}
                     onClick={handleUpVote}
                   >
                     <ChevronUp className="w-5 h-5" />
                   </button>
-                  {post.upVotes - post.downVotes}
-                  <button className="flex items-center space-x-2 text-black hover:text-blue-500 dark:text-white dark:hover:text-blue-500 transition-colors"
+                  <p className="text-black dark:text-white">
+                    {post.upVotes - post.downVotes}
+                  </p> 
+                  <button className={`flex items-center space-x-2 transition-colors ${votes.downVoted ? "text-blue-500 dark:text-blue-500" : "text-black dark:text-white"}`}
                     onClick={handleDownVote}
                   >
                     <ChevronDown className="w-5 h-5" />
                   </button>
-                </div>
+                </div> */}
+
+                <VoteBar votes={votes} handleUpVote={handleUpVote} handleDownVote={handleDownVote} post={post} />
+
                 <div className="flex items-center space-x-4">
                   <button className="flex items-center space-x-2 text-black hover:text-indigo-600 dark:text-white dark:hover:text-indigo-400 transition-colors">
                     <Share2 className="w-5 h-5" />
@@ -204,7 +202,7 @@ function PostDetail() {
             </div>
 
             <div className="mt-3">
-              <h3 className="mt-3 text-lg font-semibold font-mono text-black dark:text-white">
+              <h3 className="mt-3 text-lg font-semibold font-sans text-black dark:text-white">
                 Comments
               </h3>
               <div className="mb-6 mt-3">
@@ -213,7 +211,7 @@ function PostDetail() {
                   className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 transition-all font-mono resize-none"
                   rows={1}
                 />
-                <button className="mt-3 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all font-mono font-semibold text-sm">
+                <button className="mt-3 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all font-sans font-semibold text-sm">
                   Post Comment
                 </button>
               </div>
