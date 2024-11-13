@@ -97,11 +97,7 @@ export const usePostService = () => {
     setError(null);
     setIsLoading(true);
     try {
-      const response = await axios.post(
-          `${API}/post/add-comment/${id}`,
-          { text },
-          { headers: { "Authorization": `Bearer ${token}` } }
-      );
+      const response = await axios.post(`${API}/post/add-comment/${id}`, { text }, { headers: { "Authorization": `Bearer ${token}` } });
       return response.data;
     } catch (error) {
       console.error("add comment failed", error);

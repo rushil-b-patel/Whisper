@@ -2,18 +2,20 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { usePostService } from "../context/PostContext";
 import { ChevronLeft, Share2, Bookmark} from "lucide-react";
-import { useAuth } from "../context/AuthContext";
 import VoteBar from "../components/voteBar";
+import toast from "react-hot-toast";
+import Comment from "../components/Comment";
 
 function PostDetail() {
   const { id } = useParams();
-  const { getPost } = usePostService();
+  const { getPost, addComment } = usePostService();
   const [post, setPost] = useState(null);
+  const [comment, setComment] = useState("");
+  const [comments, setComments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const { user } = useAuth();
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -22,6 +24,7 @@ function PostDetail() {
       try {
         const response = await getPost(id);
         setPost(response.post);
+        setComments(response.post.comments || []);
       } catch (err) {
         console.error("Error fetching post:", err);
         setError(err.message || "Failed to load post");
@@ -36,21 +39,44 @@ function PostDetail() {
       setError("No post ID provided");
       setIsLoading(false);
     }
-  }, [id, user._id]);
+  }, [id]);
+
+  const handleComment = async (event) =>{
+    event.preventDefault();
+    setError(null);
+    try{
+      const token = localStorage.getItem("token");
+      if(!token){
+        toast.error("Login to comment",{
+          position:"bottom-right"
+        })
+        throw new Error("Login to comment");
+      }
+      if(comment.trim().length === 0){
+        toast.error("Comment cannot be empty",{
+          position:"bottom-right"
+        })
+        return;
+      }
+      console.log("Adding comment", comment);
+      const response = await addComment(token, id, comment);
+      if(response.success){
+        setComments((prevComments) => [comment, ...prevComments]);
+        setComment("");
+        console.log("Comment added", response);
+      }
+    }
+    catch(err){
+      console.error("Error adding comment:", err);
+      setError(err.message || "Failed to add comment");
+    }
+  }
 
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-lg">Loading post...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-red-500">Error: {error}</div>
       </div>
     );
   }
@@ -97,7 +123,7 @@ function PostDetail() {
           </div>
 
           <div className="p-6">
-            <h1 className="text-3xl font-bold mb-4 font-mono bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent dark:from-indigo-400 dark:to-violet-400">
+            <h1 className="text-3xl font-bold mb-4 font-mono text-indigo-600 bg-clip-text dark:text-indigo-400">
               {post?.title}
             </h1>
 
@@ -106,7 +132,7 @@ function PostDetail() {
                 <img
                   src={post.image}
                   alt={post.title}
-                  className="w-full object-cover rounded-xl max-h-[500px]"
+                  className="w-full object-cover rounded-xl"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
@@ -141,32 +167,18 @@ function PostDetail() {
                   placeholder="Add a comment..."
                   className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 transition-all font-mono resize-none"
                   rows={1}
+                  onChange={(e) => setComment(e.target.value)}
+                  value={comment}
                 />
-                <button className="mt-3 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all font-sans font-semibold text-sm">
-                  Post Comment
+                <button className="mt-3 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all font-sans font-semibold text-sm"
+                    onClick={handleComment}
+                >
+                  {isLoading ? "Posting..." : "Post Comment"}
                 </button>
               </div>
-              
-              <div className="space-y-4">
-                <div className="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-4">
-                  <div className="flex items-center mb-2">
-                    <img
-                      src="/api/placeholder/32/32"
-                      alt="Commenter"
-                      className="w-8 h-8 rounded-full mr-3"
-                    />
-                    <div>
-                      <h4 className="font-mono font-semibold text-gray-900 dark:text-white">
-                        Sample User
-                      </h4>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">2 hours ago</p>
-                    </div>
-                  </div>
-                  <p className="text-gray-700 dark:text-gray-300 font-mono">
-                    This is a sample comment. Replace with actual comment data.
-                  </p>
-                </div>
-              </div>
+
+                  <Comment post={post} />
+            
             </div>
           </div>
         </div>

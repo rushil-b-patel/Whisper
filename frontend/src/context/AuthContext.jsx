@@ -54,7 +54,9 @@ export const AuthProvider = ({children}) => {
             localStorage.setItem('token', token);
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
             navigate(user.isVerified ? '/' : '/verify-email');
-            toast.success('Logged in successfully');
+            toast.success('Logged in successfully',{
+                position: 'bottom-right'
+            });
         }
         catch(error){
             console.error('login failed', error);
@@ -122,7 +124,9 @@ export const AuthProvider = ({children}) => {
         try{
             const response = await axios.put('http://localhost:8080/auth/update-user', data);
             setUser(response.data.user);
-            toast.success('Profile Updated');
+            toast.success('Profile Updated',{
+                position: 'bottom-right'
+            });
         }
         catch(error){
             console.error('Update user data failed', error);

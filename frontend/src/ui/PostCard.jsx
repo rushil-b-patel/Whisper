@@ -69,8 +69,11 @@ function PostCard({ post }) {
       <div className="flex justify-between items-center pl-2 sm:pl-3">
         <div className="flex items-center space-x-4 sm:space-x-6">
             <VoteBar id={post._id} />
-          <button className="group flex items-center text-black hover:text-indigo-500 transition-colors dark:text-white dark:hover:text-indigo-400">
+          <button className="group flex items-center border border-gray-200 rounded-xl p-1 px-3 gap-3 text-black dark:text-white dark:border-none dark:bg-slate-700 hover:bg-slate-200  transition-colors">
             <Comment className="w-4 h-4 sm:w-5 sm:h-5 transform group-hover:scale-110 transition-transform" />
+            <p className="text-black font-mono font-bold text-lg dark:text-white">
+              {post.comments?.length || 0}
+            </p>
           </button>
         </div>
       </div>

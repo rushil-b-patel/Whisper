@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Bolt, BoltSlash, BoltSlashSolid, BoltSolid, ChevronDown, ChevronUp } from "../ui/Icons";
+import { Bolt, BoltSlash, BoltSlashSolid, BoltSolid } from "../ui/Icons";
 import { usePostService } from "../context/PostContext";
 import { useAuth } from "../context/AuthContext";
+import toast from "react-hot-toast";
 
 function VoteBar({ id }) {
 
@@ -15,6 +16,7 @@ function VoteBar({ id }) {
   const { user } = useAuth();
 
   useEffect(() => {
+  
     const fetchPost = async () => {
       setIsLoading(true);
       setError(null);
@@ -38,17 +40,23 @@ function VoteBar({ id }) {
       setError("No post ID provided");
       setIsLoading(false);
     }
-  }, [id, user._id]);
+  }, [id]);
 
 
   const handleUpVote = async (event) => {
     event.stopPropagation();
     try{
       if(!token){
+        toast.error("You need to login to upvote a post",{
+          position:"bottom-right"
+        });
         throw new Error("You need to login to upvote a post");
       }
       const response = await upVotePost(token, id);
       if(!response){
+        toast.error("Failed to upvote post",{
+          position:"bottom-right"
+        });
         throw new Error("Failed to upvote post");
       }
       if(response.success){
@@ -69,10 +77,16 @@ function VoteBar({ id }) {
     event.stopPropagation();
     try{
       if(!token){
+        toast.error("You need to login to downvote a post",{
+          position:"bottom-right"
+        });
         throw new Error("You need to login to downvote a post");
       }
       const response = await downVotePost(token, id);
       if(!response){
+        toast.error("Failed to downvote post",{
+          position:"bottom-right"
+        });
         throw new Error("Failed to downvote post");
       }
       if(response.success){

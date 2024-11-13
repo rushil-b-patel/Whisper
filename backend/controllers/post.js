@@ -86,18 +86,18 @@ export const downVotePost = async (req, res) => {
 
 export const addComment = async (req, res) => {
     try {
-        const { text } = req.body;
-        if(!text) {
-            return res.status(400).json({success: false, message: 'Content is required'});
-        }
         const post = await Post.findById(req.params.id);
         if(!post) {
             return res.status(404).json({success: false, message: 'Post not found'});
         }
-        const comment = { text, User: req.userId };
+        const { text } = req.body;
+        if(!text) {
+            return res.status(400).json({success: false, message: 'Content is required'});
+        }
+        const comment = { text, User: req.userId, createdAt: new Date() };
         post.comments.push(comment);
         await post.save();
-        res.status(200).json({success: true, post});
+        res.status(200).json({success: true, comment});
     } catch (error) {
         res.status(500).json({success: false, message: error.message });
     }
