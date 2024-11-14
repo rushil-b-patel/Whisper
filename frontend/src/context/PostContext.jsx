@@ -123,6 +123,20 @@ export const usePostService = () => {
     }
   };
 
-  return{ error, isLoading, setError, setIsLoading, createPost, getAllPosts, getPost, upVotePost, downVotePost, addComment, updatePost }
+  const deleteComment = async (token, id, commentId) =>{
+    setError(null);
+    setIsLoading(true);
+    try {
+      const response = await axios.delete(`${API}/post/delete-comment/${id}/${commentId}`, { headers: { "Authorization": `Bearer ${token}` } });
+      return response.data;
+    } catch (error) {
+      console.error("delete comment failed", error);
+      setError(error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  }
+  return{ error, isLoading, setError, setIsLoading, createPost, getAllPosts, getPost, upVotePost, downVotePost, addComment, updatePost, deleteComment }
 
 };

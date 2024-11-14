@@ -177,7 +177,7 @@ function PostDetail() {
                 </button>
               </div>
 
-                  <Comment post={post} />
+                  <Comment post={post} comments={comments} setComments={setComments} />
             
             </div>
           </div>

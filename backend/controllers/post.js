@@ -131,3 +131,30 @@ export const updatePost = async (req, res) => {
         res.status(500).json({success: false, message: error.message });
     }
 }
+
+export const deleteComment = async (req, res) =>{
+    console.log(req.params.id, req.params.commentId);
+    try{
+        const post = await Post.findById(req.params.id);
+        console.log("post",post.comments);
+        if(!post){
+            return res.status(404).json({success: false, message: 'Post not found'});
+        }
+        const comment = post.comments.find((comment) => comment._id.toString() === req.params.commentId);
+        console.log("comment",comment.User);
+        if(!comment){
+            return res.status(404).json({success: false, message: 'Comment not found'});
+        }
+        if(comment.User.toString() !== req.userId){
+            return res.status(401).json({success: false, message: 'Unauthorized'});
+        }
+        await Post.updateOne(
+            { _id: req.params.id },
+            { $pull: { comments: { _id: req.params.commentId } } }
+          );
+        res.status(200).json({success: true, post});
+    }
+    catch(error){
+        res.status(500).json({success: false, message: error.message });
+    }
+}
