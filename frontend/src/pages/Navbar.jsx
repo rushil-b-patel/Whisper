@@ -20,7 +20,7 @@ function Navbar() {
   }, [location]);
 
   return (
-    <nav className="flex items-center justify-between h-16 px-4 lg:px-24 bg-gray-50 dark:bg-black">
+    <nav className="flex items-center justify-between h-16 px-1 lg:px-24 bg-gray-50 dark:bg-black">
       <div className="flex items-center w-full lg:w-auto">
         <div className="mr-4">
           <WhisperLogo />
@@ -35,55 +35,54 @@ function Navbar() {
         </div>
       </div>
 
-      <div className="hidden lg:flex space-x-6 items-center">
+      <div className="hidden lg:flex">
         <MenuLinks menuLinks={NavigationLinks} />
+      </div>
+
+      <div className="flex space-x-2 lg:space-x-6 items-center">
         {user ? (
           <User />
         ) : (
           <>
             <button
-              onClick={() => navigate('/login')}
-              className="font-semibold text-black dark:text-white hover:bg-gray-200 px-4 py-2 rounded-md transition"
+              onClick={() => navigate("/login")}
+              className="font-semibold text-black hover:bg-gray-200 rounded-md py-2 px-4 lg:px-6 lg:py-2 transition whitespace-nowrap"
             >
               Sign In
             </button>
-            <button
-              onClick={() => navigate('/signup')}
-              className="text-sm py-1 px-4 lg:px-4 lg:py-2 font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 transition"
+            <button 
+              className="relative inline-block px-4 py-2 font-medium group transition whitespace-nowrap"
+              onClick={() => navigate("/signup")}
             >
-              Sign Up
+              <span class="absolute inset-0 w-full h-full transition duration-200 ease-out transform translate-x-1 translate-y-1 bg-black group-hover:-translate-x-0 group-hover:-translate-y-0"></span>
+              <span class="absolute inset-0 w-full h-full bg-white border-2 border-black group-hover:bg-black"></span>
+              <span class="relative text-black group-hover:text-white">
+                Sign Up
+              </span>
             </button>
           </>
         )}
       </div>
 
-      <div className="lg:hidden flex items-center">
-        <HamburgerButton isOpen={isMobileMenuOpen} onClick={() => setMobileMenuOpen(!isMobileMenuOpen)} />
+      <div className="lg:hidden flex right-0 items-center">
+        <HamburgerButton
+          isOpen={isMobileMenuOpen}
+          onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
+        />
       </div>
 
       {isMobileMenuOpen && (
-        <div className="absolute top-16 left-0 w-full bg-gray-50 dark:bg-black z-50">
+        <div className="absolute left-0 w-full bg-gray-50 dark:bg-black z-50 top-0">
           <MobileMenu menuLinks={NavigationLinks} />
-          <div className="flex flex-col items-center space-y-2 p-4">
+          {/* <div className="flex flex-col items-center space-y-2 p-4">
             {user ? (
               <User />
             ) : (
               <>
-                <button
-                  onClick={() => navigate('/login')}
-                  className="w-full font-semibold text-black dark:text-white hover:bg-gray-200 px-4 py-2 rounded-md transition text-center"
-                >
-                  Sign In
-                </button>
-                <button
-                  onClick={() => navigate('/signup')}
-                  className="w-full text-sm py-2 font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 transition text-center"
-                >
-                  Sign Up
-                </button>
+                
               </>
             )}
-          </div>
+          </div> */}
         </div>
       )}
     </nav>
