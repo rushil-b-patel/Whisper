@@ -176,9 +176,7 @@ function PostDetail() {
                   {isLoading ? "Posting..." : "Post Comment"}
                 </button>
               </div>
-
                   <Comment post={post} comments={comments} setComments={setComments} />
-            
             </div>
           </div>
         </div>

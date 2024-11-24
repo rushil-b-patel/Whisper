@@ -3,12 +3,10 @@ import { HorizontalOption } from "../ui/Icons";
 import { usePostService } from "../context/PostContext";
 
 function Comment({ post, onCommentDeleted }) {
-    const [option, setOption] = useState(false);
+    const [option, setOption] = useState(null);
     const { deleteComment } = usePostService();
     const token = localStorage.getItem("token"); 
     const [comments, setComments] = useState(post.comments || []);
-
-    console.log(post.comments[0].User);
 
     const handleDeleteComment = async (commentId) => {
         try {
@@ -51,10 +49,10 @@ function Comment({ post, onCommentDeleted }) {
                         </p>
                     </div>
                     <div className="relative">
-                        <button onClick={() => setOption((prev) => !prev)}>
+                        <button onClick={() => setOption(option === comment._id ? null : comment._id)}>
                             <HorizontalOption />
                         </button>
-                        {option && (
+                        {option === comment._id && (
                             <ul className="absolute right-0 mt-2 bg-white dark:bg-gray-800 rounded shadow-lg text-gray-600 dark:text-gray-300">
                                 <li>
                                     <button

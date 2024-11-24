@@ -106,7 +106,7 @@ function VoteBar({ id }) {
   if(isLoading || !post){
     return (
       <div className="text-black dark:text-white font-mono">
-        loading...!
+        0
       </div>
     );
   }
