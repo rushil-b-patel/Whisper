@@ -21,13 +21,11 @@ function Navbar() {
 
   return (
     <nav className="flex items-center justify-between h-16 px-4 lg:px-24 bg-gray-50 dark:bg-black">
-      {/* Logo and Search */}
       <div className="flex items-center w-full lg:w-auto">
         <div className="mr-4">
           <WhisperLogo />
         </div>
 
-        {/* Search bar: Hidden on mobile, visible on large screens */}
         <div className="hidden lg:block flex-grow max-w-md">
           <input
             type="text"
@@ -37,7 +35,6 @@ function Navbar() {
         </div>
       </div>
 
-      {/* Links and User Profile: Hidden on mobile */}
       <div className="hidden lg:flex space-x-6 items-center">
         <MenuLinks menuLinks={NavigationLinks} />
         {user ? (
@@ -60,12 +57,10 @@ function Navbar() {
         )}
       </div>
 
-      {/* Mobile Menu Toggle Button */}
       <div className="lg:hidden flex items-center">
         <HamburgerButton isOpen={isMobileMenuOpen} onClick={() => setMobileMenuOpen(!isMobileMenuOpen)} />
       </div>
 
-      {/* Mobile Menu: Visible only when toggled on mobile */}
       {isMobileMenuOpen && (
         <div className="absolute top-16 left-0 w-full bg-gray-50 dark:bg-black z-50">
           <MobileMenu menuLinks={NavigationLinks} />

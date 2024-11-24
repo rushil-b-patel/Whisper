@@ -4,8 +4,6 @@ import Home from "./pages/Home";
 import Navbar from "./pages/Navbar";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
-import LeftSideBar from "./components/LeftSideBar";
-import RightSidebar from "./components/RightSidebar";
 import {ProtectedRoute, RedirectRoute, VerifyEmailRoute} from "./context/ProtectedRoutes";
 import VerifyEmail from "./pages/VerifyEmail";
 import Profile from "./pages/Profile";
