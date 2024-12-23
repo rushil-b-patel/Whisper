@@ -76,7 +76,7 @@ function PostDetail() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="min-h-screen flex items-center justify-center h-64 dark:bg-black">
         <div className="text-lg">Loading post...</div>
       </div>
     );
@@ -84,7 +84,7 @@ function PostDetail() {
 
   if (!post) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="min-h-screen flex items-center justify-center h-64 dark:bg-black">
         <div className="text-gray-500">No post found</div>
       </div>
     );

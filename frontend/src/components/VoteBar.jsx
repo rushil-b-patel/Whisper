@@ -112,18 +112,18 @@ function VoteBar({ id }) {
   }
 
   return (
-    <div className={`flex items-center gap-4 border border-gray-200 dark:bg-slate-700 dark:border-none rounded-xl p-1 ${votes.upVoted ? "bg-[#d93900]" : ""} ${votes.downVoted ? "bg-indigo-600" : ""} transition-all`}>
+    <div className={`flex items-center gap-4 border border-gray-200 text-black dark:text-white dark:bg-slate-700 dark:border-none rounded-xl p-1 ${votes.upVoted ? "bg-[#d93900]" : ""} ${votes.downVoted ? "bg-[#6a5cff]" : ""} transition-all`}>
       <button
-        className={`flex items-center space-x-2 transition-colors ${votes.upVoted ? "": ""}`}
+        className={`flex items-center space-x-2 transition-colors`}
         onClick={handleUpVote}
       >
         {votes.upVoted ? <BoltSolid /> : <Bolt />}
       </button>
-      <p className="text-black dark:text-white font-mono font-bold text-lg">
+      <p className={`font-mono font-bold text-lg px-1 ${votes.upVoted || votes.downVoted ? "text-white" : ""}`} >
         {post.upVotes - post.downVotes}
       </p>
       <button
-        className={`flex items-center space-x-2 transition-colors ${votes.downVoted ? "" : ""}`}
+        className={`flex items-center space-x-2 transition-colors`}
         onClick={handleDownVote}
       >
         {votes.downVoted ? <BoltSlashSolid /> : <BoltSlash />}

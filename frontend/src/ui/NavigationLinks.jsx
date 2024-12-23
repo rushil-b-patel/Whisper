@@ -1,6 +1,4 @@
-import { ClockIcon, DocumentIcon, PaperAirplaneIcon, ReceiptRefundIcon, PlusCircleIcon, ListBulletIcon, DocumentTextIcon, CommandLineIcon, TicketIcon, HeartIcon, GiftIcon} from "./Icons";
-  
-  export const NavigationLinks = [
+export const NavigationLinks = [
     {
       name: "Create",
       link: "/create-post",

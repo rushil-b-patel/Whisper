@@ -30,7 +30,6 @@ function Home() {
   return (
     <div className='bg-white dark:bg-black min-h-[calc(100vh-4em)] flex justify-center items-start py-8'>
     <div className='w-1/2 max-w-2xl'>
-      {/* create post section */}
       {isLoading ? (
         <p>Loading posts...</p>
       ) : error ? (

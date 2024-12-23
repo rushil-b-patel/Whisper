@@ -128,10 +128,14 @@ export const usePostService = () => {
     setIsLoading(true);
     try {
       const response = await axios.delete(`${API}/post/delete-comment/${id}/${commentId}`, { headers: { "Authorization": `Bearer ${token}` } });
+      if(response.data.success){
+        toast.success(response.data.message || "Comment deleted successfully");
+      }
       return response.data;
     } catch (error) {
       console.error("delete comment failed", error);
       setError(error);
+      toast.error(error.response?.data?.message || "Error deleting comment");
       throw error;
     } finally {
       setIsLoading(false);

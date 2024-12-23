@@ -1,4 +1,3 @@
-import { PlusCircleIcon } from "./Icons";
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -33,25 +32,25 @@ const User = () => {
     const items = [
       {
         title: "Profile",
-        icon: <PlusCircleIcon />,
+        icon: "👤",
         color: "bg-indigo-300 dark:bg-indigo-800",
         onclick: () => onSelect("/profile"),
       },
       {
         title: theme === "light" ? "Dark theme" : "Light theme",
-        icon: theme === "light" ? <PlusCircleIcon /> : <PlusCircleIcon />,
+        icon: theme === "light" ? "🌙" : "☀️",
         color: "bg-teal-300 dark:bg-teal-800",
         onclick: () => onChangeThemeClick(),
       },
       {
         title: "Settings",
-        icon: <PlusCircleIcon />,
+        icon: "⚙️",
         color: "bg-fuchsia-300 dark:bg-fuchsia-800",
         onclick: () => {},
       },
       {
         title: "Logout",
-        icon: <PlusCircleIcon />,
+        icon: "🚪",
         color: "bg-red-300 dark:bg-red-800",
         onclick: () => logout(),
       },

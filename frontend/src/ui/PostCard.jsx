@@ -7,7 +7,7 @@ function PostCard({ post }) {
   const navigate = useNavigate();
 
   if (!post) return (
-    <div className="bg-white border-2 border-red-500 p-3 rounded-lg text-red-500 font-mono shadow-sm">
+    <div className="bg-white border-2 border-red-500 p-3 rounded-lg text-red-500 font-mono shadow-sm dark:bg-slate-900">
       Error: Data is missing...!
     </div>
   );
