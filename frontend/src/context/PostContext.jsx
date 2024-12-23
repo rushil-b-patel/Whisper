@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import toast from "react-hot-toast";
 
 const API = "http://localhost:8080";
@@ -48,7 +48,7 @@ export const usePostService = () => {
     }
   };
 
-  const getPost = async (id) => {
+  const getPost = useCallback(async (id) => {
     setError(null);
     setIsLoading(true);
     try {
@@ -61,7 +61,7 @@ export const usePostService = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   const upVotePost = async (token, id) => {
     setError(null);

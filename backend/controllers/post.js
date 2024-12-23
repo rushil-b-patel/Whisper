@@ -105,7 +105,7 @@ export const addComment = async (req, res) => {
 
 export const getPost = async (req, res) => {
     try {
-        const post = await Post.findById(req.params.id).populate('user', 'userName department');
+        const post = await Post.findById(req.params.id).populate('user', 'userName department').populate('comments.User' , 'userName');
         if(!post){
             return res.status(404).json({success: false, message: 'Post not found'});
         }

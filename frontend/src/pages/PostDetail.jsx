@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { usePostService } from "../context/PostContext";
 import { ChevronLeft, Share2, Bookmark} from "lucide-react";
@@ -26,51 +26,52 @@ function PostDetail() {
         setPost(response.post);
         setComments(response.post.comments || []);
       } catch (err) {
-        console.error("Error fetching post:", err);
         setError(err.message || "Failed to load post");
       } finally {
         setIsLoading(false);
       }
     };
 
-    if (id) {
+    if(id){
       fetchPost();
     } else {
       setError("No post ID provided");
       setIsLoading(false);
     }
-  }, [id]);
+  }, [id, getPost]);
 
-  const handleComment = async (event) =>{
+  const handleAddComment = useCallback(async (event) => {
     event.preventDefault();
     setError(null);
-    try{
+  
+    try {
       const token = localStorage.getItem("token");
-      if(!token){
-        toast.error("Login to comment",{
-          position:"bottom-right"
-        })
+      if (!token) {
+        toast.error("Login to comment", { position: "bottom-right" });
         throw new Error("Login to comment");
       }
-      if(comment.trim().length === 0){
-        toast.error("Comment cannot be empty",{
-          position:"bottom-right"
-        })
+  
+      if (comment.trim().length === 0) {
+        toast.error("Comment cannot be empty", { position: "bottom-right" });
         return;
       }
-      console.log("Adding comment", comment);
+  
       const response = await addComment(token, id, comment);
-      if(response.success){
-        setComments((prevComments) => [comment, ...prevComments]);
+      console.log(response);
+      if (response.success) {
+        const newComment = response.comment;
+        setComments((prevComments) => [newComment, ...prevComments]);
         setComment("");
-        console.log("Comment added", response);
       }
-    }
-    catch(err){
-      console.error("Error adding comment:", err);
+    } catch (err) {
       setError(err.message || "Failed to add comment");
     }
-  }
+  }, [addComment, id, comment]);
+  
+
+  const handleDeleteComment = useCallback((deletedCommentId) =>{
+    setComments((prevComments) => prevComments.filter((comment) => comment._id !== deletedCommentId));
+  },[]);
 
 
   if (isLoading) {
@@ -171,12 +172,12 @@ function PostDetail() {
                   value={comment}
                 />
                 <button className="mt-3 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all font-sans font-semibold text-sm"
-                    onClick={handleComment}
+                    onClick={handleAddComment}
                 >
                   {isLoading ? "Posting..." : "Post Comment"}
                 </button>
               </div>
-                  <Comment post={post} comments={comments} setComments={setComments} />
+                  <Comment post={post} comments={comments} onDeleteComment={handleDeleteComment} />
             </div>
           </div>
         </div>
