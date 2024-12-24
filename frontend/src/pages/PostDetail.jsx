@@ -1,72 +1,93 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { usePostService } from "../context/PostContext";
 import { ChevronLeft, Share2, Bookmark} from "lucide-react";
 import VoteBar from "../components/voteBar";
 import toast from "react-hot-toast";
 import Comment from "../components/Comment";
+import { useAuth } from "../context/AuthContext";
+import { Bars } from "../ui/Icons";
 
 function PostDetail() {
   const { id } = useParams();
   const { getPost, addComment } = usePostService();
+  const { user } = useAuth();
   const [post, setPost] = useState(null);
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
   const navigate = useNavigate();
-
+  const [showOptions, setShowOptions] = useState(false);
+  const dropdownRef = useRef(null);
+  console.log(user);
+  const handleEditPost = () => {
+    
+  };
+  
+  const handleDeletePost = async () => {
+   
+  };
 
   useEffect(() => {
     const fetchPost = async () => {
       setIsLoading(true);
-      setError(null);
       try {
         const response = await getPost(id);
         setPost(response.post);
         setComments(response.post.comments || []);
       } catch (err) {
-        setError(err.message || "Failed to load post");
+        console.error("Error fetching post:", err);
       } finally {
         setIsLoading(false);
       }
     };
 
-    if(id){
+    if (id) {
       fetchPost();
-    } else {
-      setError("No post ID provided");
-      setIsLoading(false);
     }
   }, [id, getPost]);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowOptions(false);
+      }
+    };
+  
+    if (showOptions) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+  
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showOptions]);
+
   const handleAddComment = useCallback(async (event) => {
     event.preventDefault();
-    setError(null);
+  
+    if (!comment.trim()) {
+      toast.error("Comment cannot be empty", { position: "bottom-right" });
+      return;
+    }
   
     try {
       const token = localStorage.getItem("token");
       if (!token) {
         toast.error("Login to comment", { position: "bottom-right" });
-        throw new Error("Login to comment");
-      }
-  
-      if (comment.trim().length === 0) {
-        toast.error("Comment cannot be empty", { position: "bottom-right" });
         return;
       }
   
       const response = await addComment(token, id, comment);
-      console.log(response);
       if (response.success) {
-        const newComment = response.comment;
-        setComments((prevComments) => [newComment, ...prevComments]);
-        setComment("");
+        setComments((prevComments) => [response.comment, ...prevComments]);
+        setComment(""); // Clear input field
       }
     } catch (err) {
-      setError(err.message || "Failed to add comment");
+      console.error("Error posting comment:", err);
     }
-  }, [addComment, id, comment]);
+  }, [comment, id, addComment]);
+  
   
 
   const handleDeleteComment = useCallback((deletedCommentId) =>{
@@ -92,7 +113,7 @@ function PostDetail() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-black py-8 px-4 sm:px-6 lg:px-8">
-      <button 
+      <button
         onClick={() => navigate(-1)}
         className="mb-6 lg:ml-14 flex items-center text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
       >
@@ -117,8 +138,39 @@ function PostDetail() {
                   {post?.user?.userName || "Unknown User"}
                 </h2>
                 <p className="text-sm text-gray-500 dark:text-gray-400 font-mono">
-                  {post?.user?.department || "Unknown Department"} • {(new Date(post?.createdAt)).toString().split(" ").slice(1, 4).join(" ")}
+                  {post?.user?.department || "Unknown Department"} •{" "}
+                  {new Date(post?.createdAt).toString().split(" ").slice(1, 4).join(" ")}
                 </p>
+              </div>
+              <div className="ml-auto relative">
+                {user?._id === post?.user?._id && (
+                  <div className="auto relative" ref={dropdownRef}>
+                    <button
+                      className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+                      onClick={() => setShowOptions(!showOptions)}
+                    >
+                      <div className="w-5 h-5 text-gray-600 dark:text-gray-300">
+                        <Bars />
+                      </div>
+                    </button>
+                    {showOptions && (
+                      <div className="absolute right-0 mt-2 w-36 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50">
+                        <button
+                          className="w-full px-4 py-2 text-sm text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          onClick={handleEditPost}
+                        >
+                          Edit Post
+                        </button>
+                        <button
+                          className="w-full px-4 py-2 text-sm text-left text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          onClick={handleDeletePost}
+                        >
+                          Delete Post
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -171,13 +223,18 @@ function PostDetail() {
                   onChange={(e) => setComment(e.target.value)}
                   value={comment}
                 />
-                <button className="mt-3 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all font-sans font-semibold text-sm"
-                    onClick={handleAddComment}
+                <button
+                  className="mt-3 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all font-sans font-semibold text-sm"
+                  onClick={handleAddComment}
                 >
                   {isLoading ? "Posting..." : "Post Comment"}
                 </button>
               </div>
-                  <Comment post={post} comments={comments} onDeleteComment={handleDeleteComment} />
+              <Comment
+                post={post}
+                comments={comments}
+                onDeleteComment={handleDeleteComment}
+              />
             </div>
           </div>
         </div>

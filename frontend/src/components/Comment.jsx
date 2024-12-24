@@ -70,7 +70,7 @@ function Comment({ post, comments, onDeleteComment }) {
                             <ThreeDots />
                         </button>
                         {option === comment._id && (
-                            <ul className="absolute right-0 mt-2 bg-white dark:bg-gray-800 rounded shadow-lg hover:shadow-none text-black dark:text-white transition">
+                            <ul className="absolute right-0 bg-white dark:bg-gray-800 rounded shadow-lg hover:shadow-none text-black dark:text-white transition">
                                 <li>
                                     {user._id === comment.User._id && 
                                     <div 

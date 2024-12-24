@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Comment, ChevronDown, ChevronUp } from './Icons';
 import VoteBar from '../components/voteBar';
@@ -12,15 +12,13 @@ function PostCard({ post }) {
     </div>
   );
 
-  const handleRedirect = async () => {
+  const handleRedirect = useCallback(() => {
     if (post._id) {
       console.log("Redirecting to post detail page with ID:", post._id);
       navigate(`/post/${post._id}`);
-    } else {
-      console.error("Post ID is missing, cannot redirect.");
     }
-  };
-
+  }, [post._id, navigate]);
+  
   return (
     <div className="relative bg-white w-full sm:max-w-xl mx-auto p-4 sm:p-6 cursor-pointer mb-4 sm:mb-6 rounded-xl transform transition-all duration-300 border border-slate-200 hover:border-indigo-500/30hover:shadow-lg sm:hover:shadow-xl hover:shadow-indigo-100 dark:bg-slate-900 dark:border-slate-800 dark:hover:border-indigo-500/30 dark:hover:shadow-indigo-900/20"
       onClick={handleRedirect}
