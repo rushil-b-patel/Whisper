@@ -108,21 +108,6 @@ export const usePostService = () => {
     }
   };
 
-  const updatePost = async (token, id, post) => {
-    setError(null);
-    setIsLoading(true);
-    try {
-      const response = await axios.put(`${API}/post/update/${id}`, token, post);
-      return response.data;
-    } catch (error) {
-      console.error("update post failed", error);
-      setError(error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const deleteComment = async (token, id, commentId) =>{
     setError(null);
     setIsLoading(true);
@@ -141,6 +126,6 @@ export const usePostService = () => {
       setIsLoading(false);
     }
   }
-  return{ error, isLoading, setError, setIsLoading, createPost, getAllPosts, getPost, upVotePost, downVotePost, addComment, updatePost, deleteComment }
+  return{ error, isLoading, setError, setIsLoading, createPost, getAllPosts, getPost, upVotePost, downVotePost, addComment, deleteComment }
 
 };

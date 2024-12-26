@@ -5,16 +5,16 @@ import upload from '../utils/multer.js';
 
 const router = express.Router();
 
-router.post('/create-post', upload.single('image'), verifyToken, createPost);
 router.get('/', getAllPosts);   
-router.get('/user', verifyToken, getUserPosts);
 router.get('/:id', getPost);
+router.get('/user', verifyToken, getUserPosts);
 
-router.put('/update/:id', verifyToken, updatePost);
+router.post('/create-post', upload.single('image'), verifyToken, createPost);
 router.put('/upvote/:id', verifyToken, upVotePost);
 router.put('/downvote/:id', verifyToken, downVotePost);
-
 router.post('/add-comment/:id', verifyToken, addComment);
 router.delete('/delete-comment/:id/:commentId', verifyToken, deleteComment);
+
+router.put('/update/:id', verifyToken, updatePost);
 
 export default router;

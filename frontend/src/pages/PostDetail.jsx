@@ -1,16 +1,15 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { usePostService } from "../context/PostContext";
-import { ChevronLeft, Share2, Bookmark} from "lucide-react";
 import VoteBar from "../components/voteBar";
 import toast from "react-hot-toast";
 import Comment from "../components/Comment";
 import { useAuth } from "../context/AuthContext";
-import { Bars } from "../ui/Icons";
+import { Bars, Trash, Save, ChevronLeft, Share } from "../ui/Icons";
 
 function PostDetail() {
   const { id } = useParams();
-  const { getPost, addComment } = usePostService();
+  const { getPost, addComment} = usePostService();
   const { user } = useAuth();
   const [post, setPost] = useState(null);
   const [comment, setComment] = useState("");
@@ -19,11 +18,11 @@ function PostDetail() {
   const navigate = useNavigate();
   const [showOptions, setShowOptions] = useState(false);
   const dropdownRef = useRef(null);
-  console.log(user);
-  const handleEditPost = () => {
-    
-  };
   
+  const handleSavePost = () => {
+   
+  }
+
   const handleDeletePost = async () => {
    
   };
@@ -155,18 +154,28 @@ function PostDetail() {
                     </button>
                     {showOptions && (
                       <div className="absolute right-0 mt-2 w-36 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50">
-                        <button
-                          className="w-full px-4 py-2 text-sm text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                          onClick={handleEditPost}
-                        >
-                          Edit Post
-                        </button>
-                        <button
-                          className="w-full px-4 py-2 text-sm text-left text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"
-                          onClick={handleDeletePost}
-                        >
-                          Delete Post
-                        </button>
+                        <div className="flex items-center cursor-pointer space-x-4 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">
+                          <div className="text-black dark:text-white">
+                            <Save />
+                          </div>
+                          <button
+                            className="text-lg text-left text-black dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                            onClick={handleSavePost}
+                          >
+                            Save
+                          </button>
+                        </div>
+                        <div className="flex items-center cursor-pointer space-x-4 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">
+                          <div className="text-black dark:text-white">
+                            <Trash />
+                          </div>
+                            <button
+                            className="text-lg text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                            onClick={handleDeletePost}
+                            >
+                            Delete
+                          </button>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -200,14 +209,9 @@ function PostDetail() {
             <div className="border-t border-gray-100 dark:border-slate-700 pt-6">
               <div className="flex items-center justify-between">
                 <VoteBar id={id} />
-                <div className="flex items-center space-x-4">
                   <button className="flex items-center space-x-2 text-black hover:text-indigo-600 dark:text-white dark:hover:text-indigo-400 transition-colors">
-                    <Share2 className="w-5 h-5" />
+                    <Share className="w-5 h-5" />
                   </button>
-                  <button className="flex items-center space-x-2 text-black hover:text-indigo-600 dark:text-white dark:hover:text-indigo-400 transition-colors">
-                    <Bookmark className="w-5 h-5" />
-                  </button>
-                </div>
               </div>
             </div>
 

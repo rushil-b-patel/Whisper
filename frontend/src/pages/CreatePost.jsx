@@ -6,11 +6,12 @@ function CreatePost() {
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
   const [image, setImage] = useState(null);
+  const [length, setLength] = useState(300);
 
   const token = localStorage.getItem('token');
-  const {createPost} = usePostService();
+  const { createPost } = usePostService();
 
-  const handleSubmit = async (e) =>  {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const formData = new FormData();
@@ -27,16 +28,22 @@ function CreatePost() {
     setImage(null);
   };
 
+  const handleDescriptionChange = (e) => {
+    if (e.target.value.length <= length) {
+      setDescription(e.target.value);
+    }
+  };
+
   return (
-    <div className="bg-slate-200 dark:bg-black h-[calc(100vh-4em)] flex justify-center items-center">
-      <div className="bg-white shadow-lg rounded-lg p-8 max-w-lg w-full">
-        <h2 className="text-3xl font-bold text-center mb-6 text-black">Create a Post</h2>
+    <div className="dark:bg-black h-[calc(100vh-4em)] flex flex-col justify-center items-center">
+      <div className="bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-700 rounded-lg p-8 max-w-2xl w-full shadow-lg">
+        <h2 className="text-3xl font-bold mb-6 text-slate-600 dark:text-gray-400">Create Post</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-lg font-medium text-black">Title</label>
+            <label className="block text-lg font-medium text-black dark:text-gray-300">Title</label>
             <input
               type="text"
-              className="mt-1 p-2 w-full border rounded-lg shadow-sm"
+              className="mt-1 p-2 w-full border rounded-lg shadow-sm dark:bg-gray-700 dark:text-gray-300"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Enter your post title"
@@ -45,20 +52,21 @@ function CreatePost() {
           </div>
 
           <div>
-            <label className="block text-lg font-medium text-black">Description</label>
+            <label className="block text-lg font-medium text-black dark:text-gray-300">Description</label>
             <textarea
-              className="mt-1 p-2 w-full border rounded-lg shadow-sm"
+              className="mt-1 p-2 w-full border rounded-lg shadow-sm dark:bg-gray-700 dark:text-gray-300"
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={handleDescriptionChange}
               placeholder="Enter a brief description"
               required
             />
+            <p className='flex justify-end text-sm text-gray-500 dark:text-gray-400'>{description.length}/{length} left</p>
           </div>
 
           <div>
-            <label className="block text-lg font-medium text-black">Category</label>
+            <label className="block text-lg font-medium text-black dark:text-gray-300">Category</label>
             <select
-              className="mt-1 p-2 w-full border rounded-lg shadow-sm"
+              className="mt-1 p-2 w-full border rounded-lg shadow-sm dark:bg-gray-700 dark:text-gray-300"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               required
@@ -71,10 +79,10 @@ function CreatePost() {
           </div>
 
           <div className='flex justify-between content-center'>
-            <label className="p-2 pl-0 text-lg font-medium text-black">Upload Image</label>
+            <label className="p-2 pl-0 text-lg font-medium text-black dark:text-gray-300">Upload Image</label>
             <input
               type="file"
-              className="p-2 border rounded-lg shadow-sm"
+              className="p-2 border rounded-lg shadow-sm dark:bg-gray-700 dark:text-gray-300"
               onChange={(e) => setImage(e.target.files[0])}
             />
           </div>

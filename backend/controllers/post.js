@@ -125,6 +125,8 @@ export const updatePost = async (req, res) => {
         }
         post.title = title; 
         post.description = description;
+        post.category = category;
+        
         await post.save();
         res.status(200).json({success: true, post});
     } catch (error) {
