@@ -8,7 +8,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const { login, isLoading, error, setError } = useAuth();
+  const { login, isLoading, error, setError, setIsLoading } = useAuth();
   
   useEffect(() => {
     return ()=>setError(null);
@@ -16,7 +16,19 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await login(email, password);
+    setIsLoading(true);
+    setError(null);
+    try{
+      const response = await login(email, password);
+      const { user } = response;
+      navigate(user.isVerified ? '/' : '/verify-email');
+    }
+    catch(error){
+      setError(error.response?.data?.message || 'An error occurred while logging in');
+    }
+    finally{
+      setIsLoading(false);
+    }
   };
 
   return (

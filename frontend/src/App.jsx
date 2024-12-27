@@ -1,7 +1,6 @@
 import { Route, Routes } from "react-router-dom"
 import Signup from "./pages/Signup";
 import Home from "./pages/Home";
-import Navbar from "./pages/Navbar";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import {ProtectedRoute, RedirectRoute, VerifyEmailRoute} from "./context/ProtectedRoutes";
@@ -10,6 +9,7 @@ import Profile from "./pages/Profile";
 import { Toaster } from "react-hot-toast";
 import CreatePost from "./pages/CreatePost";
 import PostDetail from "./pages/PostDetail.jsx";
+import Navbar from "./components/Navbar.jsx";
 
 function App() {
 

@@ -14,7 +14,6 @@ function PostCard({ post }) {
 
   const handleRedirect = useCallback(() => {
     if (post._id) {
-      console.log("Redirecting to post detail page with ID:", post._id);
       navigate(`/post/${post._id}`);
     }
   }, [post._id, navigate]);

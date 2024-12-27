@@ -16,10 +16,7 @@ function Home() {
         setError(null);
       } catch (error) {
         console.error("fetch posts failed", error);
-        setError(
-          error.response?.data?.message ||
-            "An error occurred while fetching posts"
-        );
+        setError(error.response?.data?.message || "An error occurred while fetching posts");
       } finally {
         setIsLoading(false);
       }
@@ -28,25 +25,27 @@ function Home() {
   }, []);
 
   return (
-    <div className='bg-white dark:bg-black min-h-[calc(100vh-4em)] flex justify-center items-start py-8'>
-    <div className='w-1/2 max-w-2xl'>
-      {isLoading ? (
-        <p>Loading posts...</p>
-      ) : error ? (
-        <p className='text-red-500'>{error}</p>
-      ) : (
-        <div className='grid grid-cols-1'>
-          {posts && posts.length > 0 ? (
-            posts.map(post => (
-              <PostCard key={post._id} post={post} />
-            ))
-          ) : (
-            <p>No posts available</p>
-          )}
-        </div>
-      )}
+    <div className="bg-gray-50 dark:bg-black min-h-screen py-8 flex justify-center items-start">
+      <div className="w-full max-w-3xl">
+        {isLoading ? (
+          <div className="min-h-screen flex justify-center items-center">
+            <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : error ? (
+          <p className="text-red-600 text-center">{error}</p>
+        ) : (
+          <div className="grid gap-1">
+            {posts && posts.length > 0 ? (
+              posts.map((post) => <PostCard key={post._id} post={post} />)
+            ) : (
+              <p className="text-gray-600 dark:text-gray-400 text-center">
+                No posts available
+              </p>
+            )}
+          </div>
+        )}
+      </div>
     </div>
-  </div>
   );
 }
 

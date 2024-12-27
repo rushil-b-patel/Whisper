@@ -27,7 +27,6 @@ function VoteBar({ id }) {
         const downVoted = response.post.downVotedUsers.includes(user._id);
         setVotes({ upVoted, downVoted });
       } catch (err) {
-        console.error("Error fetching post:", err);
         setError(err.message || "Failed to load post");
       } finally {
         setIsLoading(false);
@@ -68,7 +67,6 @@ function VoteBar({ id }) {
       }
     }
     catch(err){
-      console.error("Error upvoting post:", err);
       setError(err.message);
     }
   };
@@ -98,7 +96,6 @@ function VoteBar({ id }) {
       }
     }
     catch(err){
-      console.error("Error downvoting post:", err);
       setError(err.message);
     }
   };

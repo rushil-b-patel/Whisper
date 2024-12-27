@@ -96,22 +96,22 @@ function PostDetail() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center h-64 dark:bg-black">
-        <div className="text-lg">Loading post...</div>
+      <div className="h-[calc(100vh-4em)] flex justify-center items-center">
+            <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   if (!post) {
     return (
-      <div className="min-h-screen flex items-center justify-center h-64 dark:bg-black">
+      <div className="h-[calc(100vh-4em)] flex items-center justify-center dark:bg-black">
         <div className="text-gray-500">No post found</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-black py-8 px-4 sm:px-6 lg:px-8">
+    <div className="h-[calc(100vh-4em)] bg-gray-50 dark:bg-black py-8 px-4 sm:px-6 lg:px-8">
       <button
         onClick={() => navigate(-1)}
         className="mb-6 lg:ml-14 flex items-center text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
@@ -122,7 +122,7 @@ function PostDetail() {
 
       <div className="max-w-4xl mx-auto">
         <div className="overflow-hidden bg-white dark:bg-black shadow-md dark:shadow-gray-700">
-          <div className="px-6 py-4 border-b border-gray-100 dark:border-slate-700">
+          <div className="px-6 py-4 border-gray-100 dark:border-slate-700">
             <div className="flex items-center">
               <div className="relative group">
                 <div className="absolute inset-0 bg-indigo-400 rounded-full blur-md opacity-20 group-hover:opacity-30 trasition-opacity" />

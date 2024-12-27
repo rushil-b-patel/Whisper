@@ -50,13 +50,9 @@ export const AuthProvider = ({children}) => {
             const response = await axios.post('http://localhost:8080/auth/login', {email, password});
             const {token, user} = response.data;
             setUser(user);
-            console.log('user', user);
             localStorage.setItem('token', token);
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            navigate(user.isVerified ? '/' : '/verify-email');
-            toast.success('Logged in successfully',{
-                position: 'bottom-right'
-            });
+            return response.data;
         }
         catch(error){
             console.error('login failed', error);
@@ -136,7 +132,7 @@ export const AuthProvider = ({children}) => {
     }
 
     return(
-        <AuthContext.Provider value={{user, login, signup, logout, verifyAuth, verifyEmail, updateUserData , isLoading, error, setError}}>
+        <AuthContext.Provider value={{user, login, signup, logout, verifyAuth, verifyEmail, updateUserData , isLoading, setIsLoading, error, setError}}>
             {!isLoading && children}
         </AuthContext.Provider>
     )

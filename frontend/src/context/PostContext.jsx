@@ -22,10 +22,9 @@ export const usePostService = () => {
                   "Content-Type": "multipart/form-data",
                 }
             });
-      console.log("create post response", response);
       toast.success("Post created successfully");
+      return response.data;
     } catch (error) {
-      console.error("create post failed", error);
       setError(error);
       throw error;
     } finally {
@@ -40,7 +39,6 @@ export const usePostService = () => {
       const response = await axios.get(`${API}/post`);
       return response.data;
     } catch (error) {
-      console.error("get all posts failed", error);
       setError(error);
       throw error;
     } finally {
@@ -55,7 +53,6 @@ export const usePostService = () => {
       const response = await axios.get(`${API}/post/${id}`);
       return response.data;
     } catch (error) {
-      console.error("Post fetching failed", error);
       setError(error);
       throw error;
     } finally {
@@ -70,7 +67,6 @@ export const usePostService = () => {
       const response = await axios.put(`${API}/post/upvote/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       return response.data;
     } catch (error) {
-      console.error("upvote post failed", error);
       setError(error);
       throw error;
     } finally {
@@ -85,7 +81,6 @@ export const usePostService = () => {
       const response = await axios.put(`${API}/post/downvote/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       return response.data;
     } catch (error) {
-      console.error("downvote post failed", error);
       setError(error);
       throw error;
     } finally {
@@ -100,7 +95,6 @@ export const usePostService = () => {
       const response = await axios.post(`${API}/post/add-comment/${id}`, { text }, { headers: { "Authorization": `Bearer ${token}` } });
       return response.data;
     } catch (error) {
-      console.error("add comment failed", error);
       setError(error);
       throw error;
     } finally {
@@ -118,7 +112,6 @@ export const usePostService = () => {
       }
       return response.data;
     } catch (error) {
-      console.error("delete comment failed", error);
       setError(error);
       toast.error(error.response?.data?.message || "Error deleting comment");
       throw error;

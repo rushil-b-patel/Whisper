@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { HamburgerButton } from '../components/HamburgerButton';
+import { HamburgerButton } from './HamburgerButton';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { WhisperLogo } from '../components/WhisperLogo';
-import { MenuLinks } from '../components/MenuLinks';
+import { WhisperLogo } from './WhisperLogo';
+import { MenuLinks } from './MenuLinks';
 import { NavigationLinks } from '../ui/NavigationLinks';
 import User from '../ui/User';
 import { MobileMenu } from '../ui/MobileMenu';
@@ -20,7 +20,7 @@ function Navbar() {
   }, [location]);
 
   return (
-    <nav className="flex items-center justify-between h-16 px-1 lg:px-24 bg-gray-50 dark:bg-black">
+    <nav className="flex items-center justify-between h-16 px-1 lg:px-16 bg-white dark:bg-black">
       <div className="flex items-center w-full lg:w-auto">
         <div className="mr-4">
           <WhisperLogo />
