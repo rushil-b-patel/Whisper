@@ -13,15 +13,27 @@ const userSchema = new Schema({
     },
     password:{
         type: String,
-        required: true
+        required: function(){
+            return !this.googleId && !this.githubId;
+        }
+    },
+    googleId:{
+        type: String,
+        unique: true,
+        sparse: true
+    },
+    githubId:{
+        type: String,
+        unique: true,
+        sparse: true
     },
     department:{
         type: String,
     },
-    location:{
+    bio:{
         type: String,
     },
-    bio:{
+    profilePicture:{
         type: String,
     },
     isVerified:{

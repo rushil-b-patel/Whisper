@@ -3,6 +3,7 @@ import { User } from '../models/user.js';
 import { generateTokenAndSetCookie } from '../utils/generateTokenAndSetCookie.js';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
+import { verifyGoogleToken } from '../utils/googleAuth.js';
 import { CLIENT_URI } from '../utils/envVariables.js';
 
 
@@ -74,7 +75,6 @@ export const signup = async (req, res)=>{
         await user.save();
 
         const token = generateTokenAndSetCookie(res, user._id);
-
         await sendVerificationEmail(email, verificationToken);
 
         res.status(201).json({
@@ -236,6 +236,49 @@ export const updateUser = async (req, res) => {
     }
     catch(error){
         console.error("Error updating user",error);
+        res.status(500).json({message: 'Server Error'});
+    }
+}
+
+export const googleLogin = async (req, res) => {
+    const { token } = req.body;
+    try{
+        const user = await verifyGoogleToken(token);
+        res.status(200).json({user});
+    }
+    catch(error){
+        console.error("Error logging in with google",error);
+        res.status(500).json({message: 'Server Error'});
+    }
+}
+
+export const googleSignup = async (req, res) => {
+    console.log("google signup");
+    const { googleToken } = req.body;
+    try{
+        const userData = await verifyGoogleToken(googleToken);
+        console.log("userData",userData);
+        let user = await User.findOne({ email: userData.email });
+        if(user){
+            return res.status(400).json({ message: 'User already exists. Please log in.' });
+        }
+        const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
+        user = new User({
+            userName: userData.name,
+            email: userData.email,
+            googleId: userData.sub,
+            verificationToken,
+            verificationTokenExpires: Date.now() + 1 * 60 * 60 * 1000,
+        })
+        await user.save();
+
+        const token = generateTokenAndSetCookie(res, user._id);
+        await sendVerificationEmail(user.email, verificationToken);
+        
+        res.status(200).json({message: 'User created successfully', user, token});
+    }
+    catch(error){
+        console.error("Error signing up with google",error);
         res.status(500).json({message: 'Server Error'});
     }
 }
