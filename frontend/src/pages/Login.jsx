@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Eye, EyeOff } from '../ui/Icons';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -30,6 +31,13 @@ const Login = () => {
       setIsLoading(false);
     }
   };
+
+  const handleSuccess = async (response) => {
+    console.log(response);
+  }
+  const handleError = async (error) => {
+    console.log(error);
+  }
 
   return (
     <div className="bg-gray-100 flex flex-col h-[calc(100vh-4em)] justify-center p-12 sm:px-6 lg:px-8">
@@ -117,7 +125,7 @@ const Login = () => {
             </div>
 
             <div className="mt-6 grid grid-cols-3 gap-3">
-              {/* Add social login buttons here if needed */}
+              <GoogleLogin onSuccess={handleSuccess} onError={handleError} />
             </div>
         </div>
       </div>

@@ -18,7 +18,6 @@ function Profile() {
     e.preventDefault();
     console.log({ userName, department, location, previousSchool, bio });
     await updateUserData({ userName, department, location, bio });
-    setIsModified(false);
   };
 
   return (
