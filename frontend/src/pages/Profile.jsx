@@ -3,14 +3,12 @@ import { useAuth } from '../context/AuthContext';
 
 function Profile() {
 
-  const {user} = useAuth();
-
+  const { user, updateUserData, isLoading } = useAuth();
   const [email, setEmail] = useState(user?.email || "");
-  const [userName, setUserName] = useState(user?.userName || "");
+  const [userName, setUserName] = useState(user?.userName || user?.name || "");
   const [department, setDepartment] = useState(user?.department || "");
   const [bio, setBio] = useState(user?.bio || "");
 
-  const { updateUserData, isLoading } = useAuth();
 
   const handleSave = async (e) => {
     e.preventDefault();

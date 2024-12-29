@@ -239,10 +239,16 @@ export const updateUser = async (req, res) => {
 }
 
 export const googleLogin = async (req, res) => {
-    const { token } = req.body;
+    const { googleToken } = req.body;
     try{
-        const user = await verifyGoogleToken(token);
-        res.status(200).json({user});
+        const userData = await verifyGoogleToken(googleToken);
+        let user = await User.findOne({ email: userData.email});
+        if(!user){
+            return res.status(400).json({message: 'User not found. Please sign up'});
+        }
+        const token = generateTokenAndSetCookie(res, user._id);
+        await user.save();
+        return res.status(200).json({message: 'Google login success', token, user});        
     }
     catch(error){
         console.error("Error logging in with google",error);

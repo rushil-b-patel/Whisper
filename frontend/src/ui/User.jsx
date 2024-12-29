@@ -64,7 +64,7 @@ const User = () => {
             src={`https://api.dicebear.com/5.x/bottts-neutral/svg?seed=${ms}`}
             className="my-auto ml-3 rounded-full w-7 h-7"
           />
-          <p className="font-mono mr-3 font-bold text-black dark:text-white">{user.userName}</p>
+          <p className="font-mono mr-3 font-bold text-black dark:text-white">{user.userName || user.name}</p>
         </div>
         <ul className="absolute w-72 p-2 bg-slate-50 dark:bg-gray-900 border-2 border-gray-200 dark:border-slate-800 hidden md:group-hover:flex flex-col -left-[8em] rounded-xl ">
           {items.map((item) => (

@@ -23,8 +23,7 @@ const Signup = () => {
     toast.success('Signed up successfully');
   };
 
-  const handleGoogleSignup = async (response, e) => {
-      // e.preventDefault();
+  const handleGoogleSignup = async (response) => {
       await googleSignup(response);
       toast.success('Signed up successfully');
   }
@@ -142,7 +141,7 @@ const Signup = () => {
           <div className="mt-6 grid grid-cols-3 gap-3">
             <GoogleLogin
               onSuccess={handleGoogleSignup}
-              onError={() => console.log("Google signup failed")}
+              onFailure={() => console.log("Google signup failed")}
               useOneTap
             />
           </div>

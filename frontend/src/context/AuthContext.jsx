@@ -84,6 +84,22 @@ export const AuthProvider = ({children}) => {
         }
     }
 
+    const googleLogin = async (response) => {
+        try{
+            const result = await axios.post('http://localhost:8080/auth/google/login', {
+                googleToken: response.credential
+            });
+            const { token, user } = result.data;
+            setUser(user);
+            localStorage.setItem('token', token);
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            navigate(result.data.user.email_verified ? '/' : '/verify-email');
+        }
+        catch(error){
+            console.log(error);
+        }
+    }
+
     const googleSignup = async (response) => {
         console.log(response);
         try{
@@ -150,7 +166,21 @@ export const AuthProvider = ({children}) => {
     }
 
     return(
-        <AuthContext.Provider value={{user, login, signup, googleSignup, logout, verifyAuth, verifyEmail, updateUserData , isLoading, setIsLoading, error, setError}}>
+        <AuthContext.Provider value={
+            {user, 
+            isLoading, 
+            error, 
+            login, 
+            signup, 
+            googleSignup, 
+            googleLogin, 
+            logout, 
+            verifyAuth, 
+            verifyEmail, 
+            updateUserData , 
+            setIsLoading, 
+            setError}
+            }>
             {!isLoading && children}
         </AuthContext.Provider>
     )

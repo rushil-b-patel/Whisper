@@ -9,7 +9,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const { login, isLoading, error, setError, setIsLoading } = useAuth();
+  const { login, googleLogin, isLoading, error, setError, setIsLoading } = useAuth();
   
   useEffect(() => {
     return ()=>setError(null);
@@ -32,8 +32,8 @@ const Login = () => {
     }
   };
 
-  const handleSuccess = async (response) => {
-    console.log(response);
+  const handlegoogleLogin = async (response) => {
+    await googleLogin(response);
   }
   const handleError = async (error) => {
     console.log(error);
@@ -125,7 +125,7 @@ const Login = () => {
             </div>
 
             <div className="mt-6 grid grid-cols-3 gap-3">
-              <GoogleLogin onSuccess={handleSuccess} onError={handleError} />
+              <GoogleLogin onSuccess={handlegoogleLogin} onFailure={handleError} />
             </div>
         </div>
       </div>
