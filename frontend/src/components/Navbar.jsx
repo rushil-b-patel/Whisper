@@ -46,7 +46,7 @@ function Navbar() {
           <>
             <button
               onClick={() => navigate("/login")}
-              className="font-semibold text-black hover:bg-gray-200 rounded-md py-2 px-4 lg:px-6 lg:py-2 transition whitespace-nowrap"
+              className="hidden lg:block font-semibold text-black hover:bg-gray-200 rounded-md py-2 px-4 lg:px-6 lg:py-2 transition whitespace-nowrap"
             >
               Sign In
             </button>
@@ -64,7 +64,7 @@ function Navbar() {
         )}
       </div>
 
-      <div className="lg:hidden flex right-0 items-center">
+      <div className="lg:hidden flex items-center">
         <HamburgerButton
           isOpen={isMobileMenuOpen}
           onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
@@ -72,7 +72,7 @@ function Navbar() {
       </div>
 
       {isMobileMenuOpen && (
-        <div className="absolute left-0 w-full bg-gray-50 dark:bg-black z-50 top-0">
+        <div className="absolute w-full bg-gray-50 dark:bg-black z-50 top-0">
           <MobileMenu menuLinks={NavigationLinks} />
           {/* <div className="flex flex-col items-center space-y-2 p-4">
             {user ? (

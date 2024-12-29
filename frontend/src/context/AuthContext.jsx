@@ -31,15 +31,14 @@ export const AuthProvider = ({children}) => {
             const token = localStorage.getItem('token');
             if(token){
                 axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+                console.log('verifyauth called')
                 await verifyAuth();
             }
             else{
                 setIsLoading(false);
             }
         };
-        
         checkTokenAndVerifyAuth();
-    
     },[]);
 
 
@@ -96,6 +95,7 @@ export const AuthProvider = ({children}) => {
             setUser(user);
             localStorage.setItem('token', token);
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            setUser(user);
             navigate(result.data.user.isVerified ? '/' : '/verify-email');
         }
         catch(error){

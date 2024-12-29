@@ -218,11 +218,9 @@ export const updateUser = async (req, res) => {
         if(!user){
             return res.status(400).json({message: 'User not found', success: false});
         }
-        const { userName, department, location, previousSchool, bio } = req.body;
+        const { userName, department, bio } = req.body;
         user.userName = userName;
         user.department = department;
-        user.location = location;
-        // user.previousSchool = previousSchool;
         user.bio = bio;
         await user.save();
         res.status(200).json({

@@ -8,16 +8,13 @@ function Profile() {
   const [email, setEmail] = useState(user?.email || "");
   const [userName, setUserName] = useState(user?.userName || "");
   const [department, setDepartment] = useState(user?.department || "");
-  const [location, setLocation] = useState(user?.location || "");
-  const [previousSchool, setPreviousSchool] = useState(user?.previousSchool || "");
   const [bio, setBio] = useState(user?.bio || "");
 
   const { updateUserData, isLoading } = useAuth();
 
   const handleSave = async (e) => {
     e.preventDefault();
-    console.log({ userName, department, location, previousSchool, bio });
-    await updateUserData({ userName, department, location, bio });
+    await updateUserData({ userName, department, bio });
   };
 
   return (
@@ -60,17 +57,6 @@ function Profile() {
             type="text"
             value={department}
             onChange={(e) => setDepartment(e.target.value)}
-            className="w-full p-3 dark:bg-slate-700 dark:border-none border border-gray-300 rounded-lg"
-          />
-        </div>
-
-        <div>
-          <label className="block font-semibold mb-2">Previous School/College</label>
-          <input
-            type="text"
-            placeholder="E.g. Nirma, RPTP etc."
-            value={previousSchool}
-            onChange={(e) => setPreviousSchool(e.target.value)}
             className="w-full p-3 dark:bg-slate-700 dark:border-none border border-gray-300 rounded-lg"
           />
         </div>
