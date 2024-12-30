@@ -6,8 +6,8 @@ import { useAuth } from "../context/AuthContext";
 function Comment({ post, comments, onDeleteComment }) {
     const [option, setOption] = useState(null);
     const { deleteComment } = usePostService();
-    const token = localStorage.getItem("token");
     const { user } = useAuth();
+    const token = localStorage.getItem("token");
 
     const formattedComments = useMemo(() => {
         return comments.map((comment) => ({
@@ -28,6 +28,10 @@ function Comment({ post, comments, onDeleteComment }) {
             console.error("Error deleting comment:", err);
         }
     };
+
+    // useEffect(() => {
+    //     console.log("Updated comments: ", comments)
+    // }, [comments]);
 
     useEffect(() => {
         const handleClickOutside = (e) => {
@@ -72,7 +76,7 @@ function Comment({ post, comments, onDeleteComment }) {
                         {option === comment._id && (
                             <ul className="absolute right-0 bg-white dark:bg-gray-800 rounded shadow-lg hover:shadow-none text-black dark:text-white transition">
                                 <li>
-                                    {user._id === comment.User._id && 
+                                    {user?._id === comment.User._id && 
                                     <div 
                                         className="flex items-center cursor-pointer space-x-2 px-2 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
                                         onClick={() => handleDeleteComment(comment._id)}

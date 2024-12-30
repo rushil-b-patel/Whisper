@@ -3,6 +3,19 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
+const BASE_API = import.meta.env.VITE_BASE_API;
+const BASE_API_MOBILE = import.meta.env.VITE_BASE_API;
+
+const getBaseURI = () =>{
+    const isMobile = /iphone|ipad|ipod|Android/i.test(navigator.userAgent);
+    if(isMobile){
+      return BASE_API_MOBILE;
+    }
+    return BASE_API;
+}
+
+const API = getBaseURI(); 
+
 const AuthContext = createContext();
 
 export const AuthProvider = ({children}) => {
@@ -15,7 +28,7 @@ export const AuthProvider = ({children}) => {
     const verifyAuth = async () => {
         try{
             axios.defaults.withCredentials = true;
-            const response = await axios.get('http://localhost:8080/auth/check-auth');
+            const response = await axios.get(`${API}/auth/check-auth`);
             setUser(response.data.user);
         }
         catch(error){
@@ -46,7 +59,7 @@ export const AuthProvider = ({children}) => {
         setIsLoading(true);
         setError(null);
         try{
-            const response = await axios.post('http://localhost:8080/auth/login', {email, password});
+            const response = await axios.post(`${API}/auth/login`, {email, password});
             const {token, user} = response.data;
             setUser(user);
             localStorage.setItem('token', token);
@@ -66,7 +79,7 @@ export const AuthProvider = ({children}) => {
         setIsLoading(true);
         setError(null);
         try{
-            const response = await axios.post('http://localhost:8080/auth/signup', { userName, email, password});
+            const response = await axios.post(`${API}/auth/signup`, { userName, email, password});
             const {token, user} = response.data;
             setUser(user);
             console.log('user', user);
@@ -86,7 +99,7 @@ export const AuthProvider = ({children}) => {
 
     const googleLogin = async (response) => {
         try{
-            const result = await axios.post('http://localhost:8080/auth/google/login', {
+            const result = await axios.post(`${API}/auth/google/login`, {
                 googleToken: response.credential
             });
             const { token, user } = result.data;
@@ -103,7 +116,7 @@ export const AuthProvider = ({children}) => {
     const googleSignup = async (response) => {
         console.log(response);
         try{
-            const result = await axios.post('http://localhost:8080/auth/google/signup', {
+            const result = await axios.post(`${API}/auth/google/signup`, {
                 googleToken: response.credential
             });
             console.log(result.data);
@@ -130,7 +143,7 @@ export const AuthProvider = ({children}) => {
         setIsLoading(true);
         setError(null);
         try{
-            const response = await axios.post('http://localhost:8080/auth/verify-email', {code});
+            const response = await axios.post(`${API}/auth/verify-email`, {code});
             console.log('verify email', response);
             if(response.data.success){
                 setUser(response.data.user);
@@ -153,7 +166,7 @@ export const AuthProvider = ({children}) => {
         setError(null);
         try{
             axios.defaults.withCredentials = true;
-            const response = await axios.put('http://localhost:8080/auth/update-user', data);
+            const response = await axios.put(`${API}/auth/update-user`, data);
             setUser(response.data.user);
             toast.success('Profile Updated',{
                 position: 'bottom-right'

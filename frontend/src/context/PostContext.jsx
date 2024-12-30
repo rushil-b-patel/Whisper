@@ -2,7 +2,18 @@ import axios from "axios";
 import { useCallback, useState } from "react";
 import toast from "react-hot-toast";
 
-const API = "http://localhost:8080";
+const BASE_API = import.meta.env.VITE_BASE_API;
+const BASE_API_MOBILE = import.meta.env.VITE_BASE_API_MOBILE;
+
+const getBaseURI = () =>{
+  const isMobile = /iphone|ipad|ipod|Android/i.test(navigator.userAgent);
+  if(isMobile){
+    return BASE_API_MOBILE;
+  }
+  return BASE_API;
+}
+
+const API = getBaseURI();
 
 
 export const usePostService = () => {
@@ -36,9 +47,13 @@ export const usePostService = () => {
     setError(null);
     setIsLoading(true);
     try {
+      console.log("getting all posts");
+      console.log(`${API}/post`);
       const response = await axios.get(`${API}/post`);
+      console.log(response);
       return response.data;
     } catch (error) {
+      console.log("error getting all posts", error);
       setError(error);
       throw error;
     } finally {

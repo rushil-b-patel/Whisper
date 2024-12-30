@@ -12,6 +12,7 @@ function Home() {
     const fetchPosts = async () => {
       try {
         const response = await getAllPosts();
+        console.log(response);
         setPosts(response.posts);
         setError(null);
       } catch (error) {

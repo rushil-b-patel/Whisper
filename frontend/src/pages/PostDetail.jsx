@@ -80,7 +80,7 @@ function PostDetail() {
       const response = await addComment(token, id, comment);
       if (response.success) {
         setComments((prevComments) => [response.comment, ...prevComments]);
-        setComment(""); // Clear input field
+        setComment("");
       }
     } catch (err) {
       console.error("Error posting comment:", err);

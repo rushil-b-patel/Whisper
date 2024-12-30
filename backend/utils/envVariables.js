@@ -8,5 +8,6 @@ export const MAILTRAP_TOKEN = process.env.MAILTRAP_TOKEN;
 export const GMAIL_USER = process.env.GMAIL_USER;
 export const GMAIL_PASS = process.env.GMAIL_PASS;
 export const CLIENT_URI = process.env.CLIENT_URI;
+export const CLIENT_URI_MOBILE = process.env.CLIENT_URI_MOBILE;
 export const NODE_ENV = process.env.NODE_ENV;
 export const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
