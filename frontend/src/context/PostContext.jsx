@@ -47,10 +47,7 @@ export const usePostService = () => {
     setError(null);
     setIsLoading(true);
     try {
-      console.log("getting all posts");
-      console.log(`${API}/post`);
       const response = await axios.get(`${API}/post`);
-      console.log(response);
       return response.data;
     } catch (error) {
       console.log("error getting all posts", error);

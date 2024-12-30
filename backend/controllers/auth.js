@@ -8,6 +8,7 @@ import { CLIENT_URI } from '../utils/envVariables.js';
 
 
 export const login = async (req, res)=>{
+    console.log("login");
     const { email, password } = req.body;
     try{
         if(!email || !password){
