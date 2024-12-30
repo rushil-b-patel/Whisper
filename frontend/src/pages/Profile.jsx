@@ -4,10 +4,11 @@ import { useAuth } from '../context/AuthContext';
 function Profile() {
 
   const { user, updateUserData, isLoading } = useAuth();
-  const [email, setEmail] = useState(user?.email || "");
-  const [userName, setUserName] = useState(user?.userName || user?.name || "");
-  const [department, setDepartment] = useState(user?.department || "");
-  const [bio, setBio] = useState(user?.bio || "");
+  console.log(user);
+  const [email, setEmail] = useState(user.email || "");
+  const [userName, setUserName] = useState(user.userName || user?.name || "");
+  const [department, setDepartment] = useState(user.department || "");
+  const [bio, setBio] = useState(user.bio || "");
 
 
   const handleSave = async (e) => {
@@ -19,7 +20,7 @@ function Profile() {
     <div className='bg-white dark:bg-black justify-center items-center text-black dark:text-[#F2F2F2]'>
     <div className="max-w-4xl mx-auto p-6 font-sans">
       <h1 className="text-3xl font-bold mb-8">Your Profile</h1>
-      <div className="space-y-6">
+      <div className="space-y-5">
         <div>
           <label className="block font-semibold mb-2">Email</label>
           <input

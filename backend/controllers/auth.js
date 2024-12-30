@@ -195,13 +195,16 @@ export const checkAuth = async (req, res) => {
         if(!user){
             return res.status(400).json({message: 'User not found'});
         }
-        const { _id, userName, email } = user;
+        const { _id, userName, email, bio, department, isVerified } = user;
         res.status(200).json({
             success: true,
             user: {
                 _id,
                 userName,
                 email,
+                bio,
+                department,
+                isVerified,
                 password: null
             }
         })

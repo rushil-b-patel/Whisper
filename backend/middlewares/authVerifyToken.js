@@ -3,7 +3,6 @@ import { JWT_SECRET } from '../utils/envVariables.js';
 
 export const verifyToken = (req, res, next) => {
     const token = req.cookies.token;
-    
     if (!token) {
         return res.status(401).json({ success: false, message: 'Unauthorized - no token provided' });
     }

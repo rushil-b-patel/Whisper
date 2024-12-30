@@ -152,6 +152,7 @@ export const AuthProvider = ({children}) => {
         setIsLoading(true);
         setError(null);
         try{
+            axios.defaults.withCredentials = true;
             const response = await axios.put('http://localhost:8080/auth/update-user', data);
             setUser(response.data.user);
             toast.success('Profile Updated',{
