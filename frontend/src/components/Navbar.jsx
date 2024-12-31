@@ -20,7 +20,7 @@ function Navbar() {
   }, [location]);
 
   return (
-    <nav className="flex items-center justify-between h-16 px-1 lg:px-16 bg-white dark:bg-black">
+    <nav className="flex items-center justify-between h-16 px-1 lg:px-16 bg-[#0e1113] border-b-[1px] border-[#2A3236]">
       <div className="flex items-center w-full lg:w-auto">
         <div className="mr-4">
           <WhisperLogo />
@@ -30,7 +30,7 @@ function Navbar() {
           <input
             type="text"
             placeholder="Search"
-            className="w-full p-2 text-sm text-black dark:text-white bg-gray-200 border rounded-lg dark:bg-gray-900 focus:outline-none border-none"
+            className="w-full p-2 text-sm text-[#eef1f3] bg-[#2A3236] border rounded-lg dark:bg-gray-900 focus:outline-none border-none"
           />
         </div>
       </div>
@@ -46,7 +46,7 @@ function Navbar() {
           <>
             <button
               onClick={() => navigate("/login")}
-              className="hidden lg:block font-semibold text-black hover:bg-gray-200 rounded-md py-2 px-4 lg:px-6 lg:py-2 transition whitespace-nowrap"
+              className="hidden lg:block font-semibold text-[#eef1f3] hover:bg-[#2A3236] rounded-md py-2 px-4 lg:px-6 lg:py-2 transition whitespace-nowrap"
             >
               Sign In
             </button>
@@ -55,7 +55,7 @@ function Navbar() {
               onClick={() => navigate("/signup")}
             >
               <span className="absolute inset-0 w-full h-full transition duration-200 ease-out transform translate-x-1 translate-y-1 bg-black group-hover:-translate-x-0 group-hover:-translate-y-0"></span>
-              <span className="absolute inset-0 w-full h-full bg-white border-2 border-black group-hover:bg-black"></span>
+              <span className="absolute inset-0 w-full h-full bg-white border-2 border-black group-hover:bg-[black]"></span>
               <span className="relative text-black group-hover:text-white">
                 Sign Up
               </span>
@@ -74,15 +74,6 @@ function Navbar() {
       {isMobileMenuOpen && (
         <div className="absolute w-full bg-gray-50 dark:bg-black z-50 top-0">
           <MobileMenu menuLinks={NavigationLinks} />
-          {/* <div className="flex flex-col items-center space-y-2 p-4">
-            {user ? (
-              <User />
-            ) : (
-              <>
-                
-              </>
-            )}
-          </div> */}
         </div>
       )}
     </nav>

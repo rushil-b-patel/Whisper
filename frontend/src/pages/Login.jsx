@@ -39,19 +39,16 @@ const Login = () => {
     console.log(error);
   }
 
-  return (
-    <div className="bg-gray-100 flex flex-col h-[calc(100vh-4em)] justify-center p-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="text-center text-3xl font-extrabold text-gray-900">
+  return ( 
+    <div className="bg-[#0e1113] flex flex-col h-[calc(100vh-4em)] justify-center p-12 sm:px-6 lg:px-8s">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md border-r-[1px] border-l-[1px] border-[#2A3236]">
+        <h2 className="text-center text-3xl font-extrabold text-[#eef1f3]">
           Sign in to your account
         </h2>
-      </div>
-
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+      <div className="bg-[#0e1113] text-[#eef1f3] py-8 px-4 shadow sm:rounded-lg sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-sm font-medium">
                 Email address
               </label>
               <div className="mt-1">
@@ -69,7 +66,7 @@ const Login = () => {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-medium">
                 Password
               </label>
               <div className="mt-1 relative">
@@ -118,7 +115,7 @@ const Login = () => {
                 <div className="w-full border-t border-gray-300" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-black">
+                <span className="px-2 py-1 bg-white rounded text-[#0e1113]">
                   Or continue with
                 </span>
               </div>

@@ -7,7 +7,7 @@ export const MenuLinks = ({ menuLinks }) => {
         <li key={link.name} className="p-2 font-bold rounded-lg lg:px-4">
           <Link
             to={link.link}
-            className="text-black dark:text-white hover:bg-slate-200 dark:hover:bg-slate-800 rounded-md p-2"
+            className="text-[#eef1f3] hover:bg-[#2A3236] rounded-md p-2"
           >
             {link.name}
           </Link>
