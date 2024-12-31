@@ -48,7 +48,7 @@ function Navbar() {
               onClick={() => navigate("/login")}
               className="hidden lg:block font-semibold text-[#eef1f3] hover:bg-[#2A3236] rounded-md py-2 px-4 lg:px-6 lg:py-2 transition whitespace-nowrap"
             >
-              Sign In
+              Log In
             </button>
             <button 
               className="relative inline-block px-4 py-2 font-medium group transition whitespace-nowrap"
