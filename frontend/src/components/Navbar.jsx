@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { HamburgerButton } from './HamburgerButton';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { WhisperLogo } from './WhisperLogo';
 import { MenuLinks } from './MenuLinks';
 import { NavigationLinks } from '../ui/NavigationLinks';
@@ -21,25 +21,33 @@ function Navbar() {
 
   return (
     <nav className="flex items-center justify-between h-16 px-1 lg:px-16 dark:bg-[#0e1113] border-b-[1px] dark:border-[#2A3236]">
-      <div className="flex items-center w-full lg:w-auto">
-        <div className="mr-4">
+        <div className="flex items-center">
           <WhisperLogo />
         </div>
-
-        <div className="hidden lg:block flex-grow max-w-md">
+        <div className="hidden lg:block flex-grow max-w-md mx-4">
           <input
             type="text"
             placeholder="Search"
             className="w-full p-2 text-sm text-black bg-gray-300 dark:bg-[#2A3236] border rounded-lg focus:outline-none border-none"
           />
         </div>
-      </div>
 
-      <div className="hidden lg:flex">
-        <MenuLinks menuLinks={NavigationLinks} />
-      </div>
+        <div className="flex items-center space-x-2 lg:space-x-6">
+          <div className="flex space-x-2 md:space-x-4 font-medium lg:text-base">
+            <Link
+              to="/create-post"
+              className="p-2 rounded hover:bg-slate-200 dark:hover:bg-[#2A3236] transition"
+            >
+              Create
+            </Link>
+            <Link
+              to="/peers"
+              className="p-2 rounded hover:bg-slate-200 dark:hover:bg-[#2A3236] transition"
+            >
+              Peers
+            </Link>
+        </div>
 
-      <div className="flex space-x-2 lg:space-x-6 items-center">
         {user ? (
           <User />
         ) : (
@@ -50,7 +58,7 @@ function Navbar() {
             >
               Log In
             </button>
-            <button 
+            <button
               className="relative inline-block px-4 py-2 font-medium group transition whitespace-nowrap"
               onClick={() => navigate("/signup")}
             >
@@ -63,19 +71,6 @@ function Navbar() {
           </>
         )}
       </div>
-
-      <div className="lg:hidden flex items-center">
-        <HamburgerButton
-          isOpen={isMobileMenuOpen}
-          onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
-        />
-      </div>
-
-      {isMobileMenuOpen && (
-        <div className="absolute w-full bg-gray-50 dark:bg-black z-50 top-0">
-          <MobileMenu menuLinks={NavigationLinks} />
-        </div>
-      )}
     </nav>
   );
 }

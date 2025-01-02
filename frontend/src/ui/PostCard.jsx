@@ -19,7 +19,7 @@ function PostCard({ post }) {
   }, [post._id, navigate]);
   
   return (
-    <div className="relative bg-white w-full sm:max-w-xl mx-auto p-4 sm:p-6 cursor-pointer mb-4 sm:mb-6 rounded-xl transform transition-all duration-300 border border-slate-200 hover:border-indigo-500/30hover:shadow-lg sm:hover:shadow-xl hover:shadow-indigo-100 dark:bg-[#0e1113] dark:border-slate-800 dark:hover:border-indigo-500/30 dark:hover:shadow-indigo-900/20"
+    <div className="relative bg-white w-full sm:max-w-xl mx-auto p-4 sm:p-6 mb-4 sm:mb-6 border-y lg:rounded-xl lg:border lg:border-slate-200 hover:border-indigo-500/30hover:shadow-lg sm:hover:shadow-xl hover:shadow-indigo-100 dark:bg-[#0e1113] dark:border-slate-800 dark:hover:border-indigo-500/30 dark:hover:shadow-indigo-900/20 cursor-pointer transform transition-all duration-300"
       onClick={handleRedirect}
     >
       <div className="flex items-start sm:items-center mb-3 sm:mb-5 relative">

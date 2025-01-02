@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 const BASE_API = import.meta.env.VITE_BASE_API;
-const BASE_API_MOBILE = import.meta.env.VITE_BASE_API;
+const BASE_API_MOBILE = `http://${window.location.hostname}:8080`
 
 const getBaseURI = () =>{
     const isMobile = /iphone|ipad|ipod|Android/i.test(navigator.userAgent);
@@ -14,8 +14,7 @@ const getBaseURI = () =>{
     return BASE_API;
 }
 
-const API = getBaseURI(); 
-
+let API = getBaseURI(); 
 const AuthContext = createContext();
 
 export const AuthProvider = ({children}) => {
@@ -27,12 +26,13 @@ export const AuthProvider = ({children}) => {
 
     const verifyAuth = async () => {
         try{
-            axios.defaults.withCredentials = true;
-            const response = await axios.get(`${API}/auth/check-auth`);
+            const response = await axios.get(`${API}/auth/check-auth`, {withCredentials: true});
             setUser(response.data.user);
         }
         catch(error){
             console.error('verify auth failed', error);
+            setUser(null);
+            setError(error.response?.data?.message || 'An error occurred while verifying auth');
         }
         finally{
             setIsLoading(false);
@@ -51,16 +51,15 @@ export const AuthProvider = ({children}) => {
                 setIsLoading(false);
             }
         };
+        API = getBaseURI();
         checkTokenAndVerifyAuth();
     },[]);
-
 
     const login = async (email, password) => {
         setIsLoading(true);
         setError(null);
         try{
-            console.log(`${API}/auth/login`);
-            const response = await axios.post(`${API}/auth/login`, {email, password});
+            const response = await axios.post(`${API}/auth/login`, {email, password}, {withCredentials: true});
             const {token, user} = response.data;
             setUser(user);
             localStorage.setItem('token', token);

@@ -1,13 +1,31 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 const User = () => {
     const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
     const ms = new Date().getUTCMilliseconds();
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [isHovering, setIsHovering] = useState(false);
+    const menuRef = useRef(null);
+    const isMobileDevice = () => window.innerWidth <= 768;
 
     const { user, logout } = useAuth();
   
+    useEffect(() => {
+      const handleClickOutside = (event) =>{
+        if(menuRef.current && !menuRef.current.contains(event.target)){
+          setMenuOpen(false);
+        }
+      }
+      if(menuOpen){
+        document.addEventListener("mousedown", handleClickOutside);
+      }else{
+        document.removeEventListener("mousedown", handleClickOutside);
+      }
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [menuOpen]);
+
     useEffect(() =>{
       localStorage.setItem("theme", theme);
       if (theme === "dark") {
@@ -27,6 +45,7 @@ const User = () => {
     const navigate = useNavigate();
     const onSelect = (path) => {
       navigate(path);
+      setMenuOpen(false);
     }
 
     const items = [
@@ -58,15 +77,24 @@ const User = () => {
 
   
     return (
-      <div className="relative group z-50">
-        <div className="flex items-center h-10 gap-3 rounded-lg cursor-pointer w-fit hover:bg-slate-200 dark:hover:bg-slate-800">
+      <div 
+        className="relative group z-50" 
+        onMouseEnter={ ()=> {if(!isMobileDevice()) setIsHovering(true)} } 
+        onMouseLeave={ ()=> {if(!isMobileDevice()) setIsHovering(false)} } 
+      >
+        <div 
+          className="flex items-center h-10 rounded-lg cursor-pointer w-fit hover:bg-slate-200 dark:hover:bg-slate-800"
+          onClick={()=> {if(isMobileDevice()) setMenuOpen((prev) => !prev)} }
+        >
           <img
             src={`https://api.dicebear.com/5.x/bottts-neutral/svg?seed=${ms}`}
             className="my-auto ml-3 rounded-full w-7 h-7"
           />
           <p className="font-mono mr-3 font-bold text-black dark:text-white">{user.userName || user.name}</p>
         </div>
-        <ul className="absolute w-72 p-2 bg-slate-50 dark:bg-gray-900 border-2 border-gray-200 dark:border-slate-800 hidden md:group-hover:flex flex-col -left-[8em] rounded-xl ">
+
+        {(menuOpen || isHovering) && (
+          <ul ref={menuRef} className="absolute w-72 p-2 bg-slate-50 dark:bg-gray-900 border-2 border-gray-200 dark:border-slate-800 flex-col -left-[8em] rounded-xl ">
           {items.map((item) => (
             <li
               key={item.title}
@@ -84,9 +112,9 @@ const User = () => {
             </li>
           ))}
         </ul>
+        )}
       </div>
     );
   };
   
-  export default User;
-  
+export default User;

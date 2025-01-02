@@ -10,16 +10,7 @@ import { CLIENT_URI_MOBILE } from './utils/envVariables.js';
 
 const app = express();
 
-const allowedOrigins = [CLIENT_URI, CLIENT_URI_MOBILE];
-app.use(cors({origin: function(origin, callback){
-    if(allowedOrigins.includes(origin) || !origin){
-        callback(null, true);
-    }
-    else{
-        callback(new Error('Not allowed by CORS'));
-    }
-}, credentials: true}));
-
+app.use(cors({origin:[CLIENT_URI, CLIENT_URI_MOBILE], credentials: true}));
 
 app.use(express.json());
 app.use(cookieParser());
