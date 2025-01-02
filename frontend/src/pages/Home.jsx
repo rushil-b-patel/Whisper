@@ -26,7 +26,7 @@ function Home() {
   }, []);
 
   return (
-    <div className="bg-gray-50 dark:bg-black min-h-screen py-8 flex justify-center items-start">
+    <div className="dark:bg-[#0e1113] min-h-screen py-8 flex justify-center items-start">
       <div className="w-full max-w-3xl">
         {isLoading ? (
           <div className="min-h-screen flex justify-center items-center">

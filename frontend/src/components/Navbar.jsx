@@ -20,7 +20,7 @@ function Navbar() {
   }, [location]);
 
   return (
-    <nav className="flex items-center justify-between h-16 px-1 lg:px-16 bg-[#0e1113] border-b-[1px] border-[#2A3236]">
+    <nav className="flex items-center justify-between h-16 px-1 lg:px-16 dark:bg-[#0e1113] border-b-[1px] dark:border-[#2A3236]">
       <div className="flex items-center w-full lg:w-auto">
         <div className="mr-4">
           <WhisperLogo />
@@ -30,7 +30,7 @@ function Navbar() {
           <input
             type="text"
             placeholder="Search"
-            className="w-full p-2 text-sm text-[#eef1f3] bg-[#2A3236] border rounded-lg dark:bg-gray-900 focus:outline-none border-none"
+            className="w-full p-2 text-sm text-black bg-gray-300 dark:bg-[#2A3236] border rounded-lg focus:outline-none border-none"
           />
         </div>
       </div>
@@ -46,7 +46,7 @@ function Navbar() {
           <>
             <button
               onClick={() => navigate("/login")}
-              className="hidden lg:block font-semibold text-[#eef1f3] hover:bg-[#2A3236] rounded-md py-2 px-4 lg:px-6 lg:py-2 transition whitespace-nowrap"
+              className="hidden lg:block font-semibold dark:text-[#eef1f3] hover:bg-slate-200 rounded-md py-2 px-4 lg:px-6 lg:py-2 transition whitespace-nowrap"
             >
               Log In
             </button>

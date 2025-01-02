@@ -104,14 +104,14 @@ function PostDetail() {
 
   if (!post) {
     return (
-      <div className="h-[calc(100vh-4em)] flex items-center justify-center dark:bg-black">
+      <div className="h-[calc(100vh-4em)] flex items-center justify-center dark:bg-[#0e1113]">
         <div className="text-gray-500">No post found</div>
       </div>
     );
   }
 
   return (
-    <div className="h-[calc(100vh-4em)] bg-gray-50 dark:bg-black py-8 px-4 sm:px-6 lg:px-8">
+    <div className="bg-gray-50 dark:bg-[#0e1113] py-8 px-4 sm:px-6 lg:px-8">
       <button
         onClick={() => navigate(-1)}
         className="mb-6 lg:ml-14 flex items-center text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
@@ -120,9 +120,9 @@ function PostDetail() {
         <span className="font-mono">Back to feed</span>
       </button>
 
-      <div className="max-w-4xl mx-auto">
-        <div className="overflow-hidden bg-white dark:bg-black shadow-md dark:shadow-gray-700">
-          <div className="px-6 py-4 border-gray-100 dark:border-slate-700">
+      <div className="max-w-4xl mx-auto border-[1px] dark:border-[#2A3236] rounded">
+        <div className="overflow-hidden bg-white dark:bg-[#0e1113]">
+          <div className="px-6 py-4">
             <div className="flex items-center">
               <div className="relative group">
                 <div className="absolute inset-0 bg-indigo-400 rounded-full blur-md opacity-20 group-hover:opacity-30 trasition-opacity" />
@@ -185,12 +185,12 @@ function PostDetail() {
           </div>
 
           <div className="p-6">
-            <h1 className="text-3xl font-bold mb-4 font-mono text-indigo-600 bg-clip-text dark:text-indigo-400">
+            <h1 className="text-3xl font-bold font-mono text-indigo-600 bg-clip-text dark:text-indigo-400">
               {post?.title}
             </h1>
 
             {post?.image && (
-              <div className="relative mb-6 rounded-xl overflow-hidden group">
+              <div className="relative my-2 rounded-xl overflow-hidden group">
                 <img
                   src={post.image}
                   alt={post.title}
@@ -201,7 +201,7 @@ function PostDetail() {
             )}
 
             <div className="prose prose-indigo dark:prose-invert max-w-none mb-8">
-              <p className="text-gray-700 dark:text-gray-300 leading-relaxed font-mono">
+              <p className="text-gray-700 dark:text-[#eef1f3] leading-relaxed font-mono">
                 {post?.description}
               </p>
             </div>

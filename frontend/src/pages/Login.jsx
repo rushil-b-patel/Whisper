@@ -40,12 +40,12 @@ const Login = () => {
   }
 
   return ( 
-    <div className="bg-[#0e1113] flex flex-col h-[calc(100vh-4em)] justify-center p-12 sm:px-6 lg:px-8s">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md border-r-[1px] border-l-[1px] border-[#2A3236]">
-        <h2 className="text-center text-3xl font-extrabold text-[#eef1f3]">
-          Sign in to your account
+    <div className="dark:bg-[#0e1113] flex flex-col h-[calc(100vh-4em)] justify-center p-12 sm:px-6 lg:px-8s">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <h2 className="text-center text-3xl font-extrabold dark:text-[#eef1f3]">
+          Log into your account
         </h2>
-      <div className="bg-[#0e1113] text-[#eef1f3] py-8 px-4 shadow sm:rounded-lg sm:px-10">
+      <div className="dark:bg-[#0e1113] dark:text-[#eef1f3] py-8 px-4 sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="email" className="block text-sm font-medium">
@@ -57,8 +57,9 @@ const Login = () => {
                   name="email"
                   type="email"
                   autoComplete="email"
+                  placeholder='Email or Username'
                   required
-                  className="appearance-none block w-full px-3 py-2 bg-[#2A3236] text-[#eef1f3] outline-none rounded-md sm:text-sm"
+                  className="appearance-none block w-full px-3 py-2 dark:bg-[#2A3236] bg-slate-200 dark:text-[#eef1f3] outline-none rounded-md sm:text-sm"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
@@ -75,8 +76,9 @@ const Login = () => {
                   name="password"
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
+                  placeholder='Password'
                   required
-                  className="appearance-none block w-full px-3 py-2 bg-[#2A3236] text-[#eef1f3] outline-none rounded-md sm:text-sm"
+                  className="appearance-none block w-full px-3 py-2 dark:bg-[#2A3236] bg-slate-200 dark:text-[#eef1f3] outline-none rounded-md sm:text-sm"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
@@ -97,7 +99,7 @@ const Login = () => {
             <div>
               <button
                 type="submit"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition"
+                className="w-full flex justify-center py-2 px-4 rounded-md shadow-sm text-sm font-medium text-white hover:text-black bg-black hover:bg-white border-[2px] border-transparent hover:border-black transition animation duration-500 ease-in-out"
                 onClick={handleSubmit}
                 disabled={isLoading}
               >
