@@ -80,11 +80,11 @@ function CreatePost() {
             </select>
           </div>
 
-          <div className='flex justify-between content-center dark:border border-gray-700 rounded-lg p-2'>
-            <label className="p-2 pl-0 text-lg font-medium">Upload Image</label>
+          <div className='flex justify-between content-center dark:border border-gray-700 rounded-lg'>
+            <label className="text-lg font-medium">Upload Image</label>
             <input
               type="file"
-              className="p-2 border dark:border-none rounded-lg shadow-sm dark:bg-slate-700"
+              className="p-2 border dark:border-none rounded-lg shadow-sm dark:bg-slate-700 w-full"
               onChange={(e) => setImage(e.target.files[0])}
             />
           </div>
