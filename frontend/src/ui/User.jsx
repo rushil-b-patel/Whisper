@@ -8,7 +8,7 @@ const User = () => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [isHovering, setIsHovering] = useState(false);
     const menuRef = useRef(null);
-    const isMobileDevice = () => window.innerWidth <= 768;
+    const isMobileDevice = window.innerWidth <= 768;
 
     const { user, logout } = useAuth();
   
@@ -79,22 +79,21 @@ const User = () => {
     return (
       <div 
         className="relative group z-50" 
-        onMouseEnter={ ()=> {if(!isMobileDevice()) setIsHovering(true)} } 
-        onMouseLeave={ ()=> {if(!isMobileDevice()) setIsHovering(false)} } 
+        onMouseEnter={ ()=> {if(!isMobileDevice) setIsHovering(true)} } 
+        onMouseLeave={ ()=> {if(!isMobileDevice) setIsHovering(false)} } 
       >
-        <div 
+        <div
           className="flex items-center h-10 rounded-lg cursor-pointer w-fit hover:bg-slate-200 dark:hover:bg-slate-800"
-          onClick={()=> {if(isMobileDevice()) setMenuOpen((prev) => !prev)} }
+          onClick={()=> {if(isMobileDevice) setMenuOpen((prev) => !prev)} }
         >
           <img
             src={`https://api.dicebear.com/5.x/bottts-neutral/svg?seed=${ms}`}
-            className="my-auto ml-3 rounded-full w-7 h-7"
+            className="my-auto mx-2 rounded-full w-7 h-7"
           />
-          <p className="font-mono mr-3 font-bold text-black dark:text-white">{user.userName || user.name}</p>
+          <p className="hidden lg:block font-mono mr-3 font-bold text-black dark:text-white">{user.userName || user.name}</p>
         </div>
-
         {(menuOpen || isHovering) && (
-          <ul ref={menuRef} className="absolute w-72 p-2 bg-slate-50 dark:bg-gray-900 border-2 border-gray-200 dark:border-slate-800 flex-col -left-[8em] rounded-xl ">
+          <ul ref={menuRef} className="absolute w-60 p-2 bg-slate-50 dark:bg-[#0e1113] border-[1px] border-gray-200 dark:border-[#2A3236] flex-col -left-[8em] rounded-xl ">
           {items.map((item) => (
             <li
               key={item.title}

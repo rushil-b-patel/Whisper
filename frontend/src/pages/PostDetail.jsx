@@ -134,10 +134,10 @@ function PostDetail() {
               </div>
               <div className="ml-4">
                 <h2 className="text-lg font-semibold font-mono text-gray-900 dark:text-white">
-                  {post?.user?.userName || "Unknown User"}
+                  {post?.user?.userName || "Deleted User"}
                 </h2>
                 <p className="text-sm text-gray-500 dark:text-gray-400 font-mono">
-                  {post?.user?.department || "Unknown Department"} •{" "}
+                  {post?.user?.department || "Deleted Department"} •{" "}
                   {new Date(post?.createdAt).toString().split(" ").slice(1, 4).join(" ")}
                 </p>
               </div>

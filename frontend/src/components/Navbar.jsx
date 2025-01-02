@@ -1,26 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { HamburgerButton } from './HamburgerButton';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { WhisperLogo } from './WhisperLogo';
-import { MenuLinks } from './MenuLinks';
-import { NavigationLinks } from '../ui/NavigationLinks';
 import User from '../ui/User';
-import { MobileMenu } from '../ui/MobileMenu';
 import { useAuth } from '../context/AuthContext';
 
 function Navbar() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
-
   const { user } = useAuth();
 
-  useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [location]);
-
   return (
-    <nav className="flex items-center justify-between h-16 px-1 lg:px-16 dark:bg-[#0e1113] border-b-[1px] dark:border-[#2A3236]">
+    <nav className="flex items-center justify-between h-16 px-4 dark:bg-[#0e1113] border-b-[1px] dark:border-[#2A3236]">
         <div className="flex items-center">
           <WhisperLogo />
         </div>
@@ -32,7 +21,7 @@ function Navbar() {
           />
         </div>
 
-        <div className="flex items-center space-x-2 lg:space-x-6">
+        <div className="flex items-center space-x-2 lg:space-x-6 text-black dark:text-[#eef1f3]">
           <div className="flex space-x-2 md:space-x-4 font-medium lg:text-base">
             <Link
               to="/create-post"

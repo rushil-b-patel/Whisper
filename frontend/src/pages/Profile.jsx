@@ -4,7 +4,6 @@ import { useAuth } from '../context/AuthContext';
 function Profile() {
 
   const { user, updateUserData, isLoading } = useAuth();
-  console.log(user);
   const [email, setEmail] = useState(user.email || "");
   const [userName, setUserName] = useState(user.userName || user?.name || "");
   const [department, setDepartment] = useState(user.department || "");
@@ -17,7 +16,7 @@ function Profile() {
   };
 
   return (
-    <div className='bg-white dark:bg-black justify-center items-center text-black dark:text-[#F2F2F2]'>
+    <div className='h-[calc(100vh-4em)] bg-white dark:bg-[#0e1113] justify-center items-center text-black dark:text-[#F2F2F2]'>
     <div className="max-w-4xl mx-auto p-6 font-sans">
       <h1 className="text-3xl font-bold mb-8">Your Profile</h1>
       <div className="space-y-5">
@@ -27,7 +26,7 @@ function Profile() {
             type="text"
             value={email}
             disabled
-            className="w-full p-3 dark:bg-slate-700 dark:border-none border border-gray-300 rounded-lg"
+            className="w-full p-3 dark:bg-[#2A3236] dark:border-none border border-gray-300 rounded-lg"
           />
         </div>
         <div>
@@ -36,7 +35,7 @@ function Profile() {
             type="text"
             value={userName}
             onChange={(e) => setUserName(e.target.value)}
-            className="w-full p-3 dark:bg-slate-700 dark:border-none border border-gray-300 rounded-lg"
+            className="w-full p-3 dark:bg-[#2A3236] dark:border-none border border-gray-300 rounded-lg"
           />
         </div>
         
@@ -46,7 +45,7 @@ function Profile() {
             placeholder="Tell other users about yourself"
             value={bio}
             onChange={(e) => setBio(e.target.value)}
-            className="w-full p-3 dark:bg-slate-700 dark:border-none border border-gray-300 rounded-lg resize-none h-24"
+            className="w-full p-3 dark:bg-[#2A3236] dark:border-none border border-gray-300 rounded-lg resize-none h-24"
           />
         </div>
 
@@ -56,13 +55,13 @@ function Profile() {
             type="text"
             value={department}
             onChange={(e) => setDepartment(e.target.value)}
-            className="w-full p-3 dark:bg-slate-700 dark:border-none border border-gray-300 rounded-lg"
+            className="w-full p-3 dark:bg-[#2A3236] dark:border-none border border-gray-300 rounded-lg"
           />
         </div>
 
         <button
           onClick={handleSave}
-          className="w-full bg-black dark:bg-gray-100 text-white dark:text-black font-semibold py-3 rounded-lg hover:bg-gray-900 dark:hover:bg-gray-200 transition"
+          className="w-full font-semibold py-3 rounded-lg text-white hover:text-black dark:hover:text-white dark:hover:bg-black bg-black dark:bg-[#2A3236] hover:bg-white border-[2px] border-transparent hover:border-black transition animation duration-500 ease-in-out"
         >
           {
             isLoading ? "Saving..." : "Save"
@@ -73,6 +72,7 @@ function Profile() {
         </p>
       </div>
     </div>
+
     </div>
   );
 }

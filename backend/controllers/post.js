@@ -116,24 +116,6 @@ export const getPost = async (req, res) => {
     }
 }
 
-export const updatePost = async (req, res) => {
-    try {
-        const { title, description } = req.body;
-        const post = await Post.findById(req.params.id);
-        if(!post) {
-            return res.status(404).json({success: false, message: 'Post not found'});
-        }
-        post.title = title; 
-        post.description = description;
-        post.category = category;
-        
-        await post.save();
-        res.status(200).json({success: true, post});
-    } catch (error) {
-        res.status(500).json({success: false, message: error.message });
-    }
-}
-
 export const deleteComment = async (req, res) =>{
     console.log(req.params.id, req.params.commentId);
     try{
