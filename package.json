@@ -1,6 +1,0 @@
-{
-    "scripts":{
-        "start": "cd frontend && npm run dev & cd backend && npm run dev",
-        "dev": "nodemon index.js"
-    }
-}

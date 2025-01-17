@@ -46,7 +46,7 @@ function VoteBar({ id }) {
     event.stopPropagation();
     try{
       if(!token){
-        toast.error("You need to login to upvote a post",{
+        toast.error("login to upvote",{
           position:"bottom-right"
         });
         throw new Error("You need to login to upvote a post");
@@ -75,7 +75,7 @@ function VoteBar({ id }) {
     event.stopPropagation();
     try{
       if(!token){
-        toast.error("You need to login to downvote a post",{
+        toast.error("login to downvote",{
           position:"bottom-right"
         });
         throw new Error("You need to login to downvote a post");
