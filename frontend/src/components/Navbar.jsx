@@ -9,16 +9,18 @@ function Navbar() {
   const { user } = useAuth();
 
   return (
-    <nav className="flex items-center justify-between h-16 px-4 dark:bg-[#0e1113] border-b-[1px] dark:border-[#2A3236]">
-        <div className="flex items-center">
-          <WhisperLogo />
-        </div>
-        <div className="hidden lg:block flex-grow max-w-md mx-4">
-          <input
-            type="text"
-            placeholder="Search"
-            className="w-full p-2 text-sm text-black bg-gray-300 dark:bg-[#2A3236] border rounded-lg focus:outline-none border-none"
-          />
+    <nav className="flex items-center justify-between h-16 px-10 dark:bg-[#0e1113] border-b-[1px] dark:border-[#2A3236]">
+        <div className='flex items-center space-x-4'>
+          <div className="flex items-center">
+            <WhisperLogo />
+          </div>
+          <div className="hidden lg:block flex-grow max-w-md">
+            <input
+              type="text"
+              placeholder="Search"
+              className="w-full p-2 text-sm text-black bg-gray-200 dark:bg-[#2A3236] border rounded-lg focus:outline-none border-none"
+            />
+          </div>
         </div>
 
         <div className="flex items-center space-x-2 lg:space-x-6 text-black dark:text-[#eef1f3]">

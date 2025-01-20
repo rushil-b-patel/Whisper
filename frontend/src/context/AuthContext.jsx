@@ -44,7 +44,6 @@ export const AuthProvider = ({children}) => {
             const token = localStorage.getItem('token');
             if(token){
                 axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-                console.log('verifyauth called')
                 await verifyAuth();
             }
             else{

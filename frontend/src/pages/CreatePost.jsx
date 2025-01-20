@@ -80,8 +80,8 @@ function CreatePost() {
             </select>
           </div>
 
-          <div className='flex justify-between content-center dark:border border-gray-700 rounded-lg'>
-            <label className="text-lg font-medium">Upload Image</label>
+          <div className='flex space-x-5 items-center justify-between content-center border-gray-700 rounded-lg'>
+            <label className="text-lg font-medium whitespace-nowrap">Upload Image</label>
             <input
               type="file"
               className="p-2 border dark:border-none rounded-lg shadow-sm dark:bg-slate-700 w-full"

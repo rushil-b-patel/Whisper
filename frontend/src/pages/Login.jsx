@@ -8,12 +8,8 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-
-  const { login, googleLogin, isLoading, error, setError, setIsLoading } = useAuth();
-  
-  useEffect(() => {
-    return ()=>setError(null);
-  }, [email, password]);
+  const [error, setError] = useState(null);
+  const { login, googleLogin, isLoading, setIsLoading } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
