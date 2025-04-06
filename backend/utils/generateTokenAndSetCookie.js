@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
-import { JWT_SECRET, NODE_ENV } from './envVariables.js';
+import { JWT_SECRET, NODE_ENV, SECRET_KEY } from './envVariables.js';
+import crypto from 'crypto';
 
 export const generateTokenAndSetCookie = (res, id) =>{
     const token = jwt.sign({id}, JWT_SECRET, {expiresIn: '7d'});
@@ -12,4 +13,8 @@ export const generateTokenAndSetCookie = (res, id) =>{
     })
 
     return token;
+}
+
+export const computeEmailHash = (email) => {
+    return crypto.createHmac('sha256', SECRET_KEY).update(email).digest('hex');
 }

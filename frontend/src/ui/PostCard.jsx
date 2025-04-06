@@ -33,10 +33,10 @@ function PostCard({ post }) {
         </div>
         <div className="ml-3 sm:ml-4 max-w-[80%]">
           <h2 className="font-mono text-base sm:text-md font-bold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent truncate dark:from-indigo-400 dark:to-violet-400">
-            {post.user?.userName || "Deleted_User"}
+            {post.user?.userName || "Deleted User"}
           </h2>
           <p className="font-mono text-xs sm:text-sm text-black dark:text-white truncate">
-            {post.user?.department || "Deleted_department"}
+            {post.user?.department || ""}
           </p>
         </div>
       </div>

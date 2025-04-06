@@ -18,6 +18,7 @@ const Login = () => {
     try{
       const response = await login(email, password);
       const { user } = response;
+      console.log(user);
       navigate(user.isVerified ? '/' : '/verify-email');
     }
     catch(error){

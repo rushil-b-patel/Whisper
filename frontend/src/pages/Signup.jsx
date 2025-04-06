@@ -20,12 +20,10 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     await signup(userName, email, password);
-    toast.success('Signed up successfully');
   };
 
   const handleGoogleSignup = async (response) => {
       await googleSignup(response);
-      toast.success('Signed up successfully');
   }
 
   return (
