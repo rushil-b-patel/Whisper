@@ -97,7 +97,11 @@ export const addComment = async (req, res) => {
         const comment = { text, User: req.userId, createdAt: new Date() };
         post.comments.push(comment);
         await post.save();
-        res.status(200).json({success: true, comment});
+
+        const populatedPost = await Post.findById(post._id).populate('comments.User', 'userName');
+        const addedComment = populatedPost.comments[populatedPost.comments.length - 1];
+
+        res.status(200).json({success: true, comment: addedComment});
     } catch (error) {
         res.status(500).json({success: false, message: error.message });
     }

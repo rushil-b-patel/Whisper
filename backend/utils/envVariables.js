@@ -11,3 +11,4 @@ export const CLIENT_URI = process.env.CLIENT_URI;
 export const CLIENT_URI_MOBILE = process.env.CLIENT_URI_MOBILE;
 export const NODE_ENV = process.env.NODE_ENV;
 export const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+export const SECRET_KEY = process.env.SECRET_KEY;

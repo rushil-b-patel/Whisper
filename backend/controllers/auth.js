@@ -1,11 +1,10 @@
 import { sendPasswordResetEmail, sendResetSuccessEmail, sendVerificationEmail, sendWelcomeEmail } from '../nodeMailer/email.js';
 import { User } from '../models/user.js';
-import { generateTokenAndSetCookie } from '../utils/generateTokenAndSetCookie.js';
+import { computeEmailHash, generateTokenAndSetCookie } from '../utils/generateTokenAndSetCookie.js';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { verifyGoogleToken } from '../utils/googleAuth.js';
 import { CLIENT_URI } from '../utils/envVariables.js';
-
 
 export const login = async (req, res)=>{
     const { email, password } = req.body;
@@ -56,8 +55,10 @@ export const signup = async (req, res)=>{
         if(userNameExist){
             return res.status(400).json({success:false, message: 'Username already exists'});
         }
+        
+        const emailHash = computeEmailHash(email);
 
-        const userEmailExist = await User.findOne({email});
+        const userEmailExist = await User.findOne({ emailHash });
         if(userEmailExist){
             return res.status(400).json({success:false, message: 'Email already exists'});
         }
@@ -66,7 +67,7 @@ export const signup = async (req, res)=>{
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = new User({
             userName,
-            email,
+            emailHash,
             password: hashedPassword,
             verificationToken,
             verificationTokenExpires: Date.now() + 1 * 60 * 60 * 1000,
@@ -83,7 +84,8 @@ export const signup = async (req, res)=>{
             token,
             user: {
                 ...user._doc,
-                password: null
+                password: null,
+                email: undefined,
             }
         })
 
@@ -95,26 +97,21 @@ export const signup = async (req, res)=>{
 
 export const verifyEmail = async (req, res)=>{
     const {code} = req.body;
-    console.log("otp",code);
     try{
         const user = await User.findOne({
             verificationToken: code,
             verificationTokenExpires: { $gt: Date.now() }
         })
-        console.log("user",user);
+
         if(!user){
-            console.log("if condition");
             return res.status(400).json({success: false, message: 'Invalid or expired code. Please try again...', redirect: false});
         }
 
-        console.log("after if");
         user.isVerified = true;
         user.verificationToken = undefined;
         user.verificationTokenExpires = undefined;
         
         await user.save();
-        
-        await sendWelcomeEmail(user.email, user.userName);
         
         res.status(200).json({
             success: true,
@@ -260,11 +257,9 @@ export const googleLogin = async (req, res) => {
 }
 
 export const googleSignup = async (req, res) => {
-    console.log("google signup");
     const { googleToken } = req.body;
     try{
         const userData = await verifyGoogleToken(googleToken);
-        console.log("userData",userData);
         let user = await User.findOne({ email: userData.email });
         if(user){
             return res.status(400).json({ message: 'User already exists. Please log in.' });

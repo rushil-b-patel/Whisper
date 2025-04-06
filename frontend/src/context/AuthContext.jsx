@@ -81,10 +81,8 @@ export const AuthProvider = ({children}) => {
             const response = await axios.post(`${API}/auth/signup`, { userName, email, password});
             const {token, user} = response.data;
             setUser(user);
-            console.log('user', user);
             localStorage.setItem('token', token);
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            
             navigate(user.isVerified ? '/' : '/verify-email');
         }
         catch(error){
