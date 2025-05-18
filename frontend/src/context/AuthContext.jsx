@@ -24,15 +24,37 @@ export const AuthProvider = ({children}) => {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
+    const handleError = (error, customMessage) => {
+        const errorMessage = error.response?.data?.message || customMessage || 'An unexpected error occurred';
+        console.error(errorMessage, error);
+        setError(errorMessage);
+        toast.error(errorMessage, { position: 'bottom-right' });
+        return errorMessage;
+    };
+
     const verifyAuth = async () => {
         try{
-            const response = await axios.get(`${API}/auth/check-auth`, {withCredentials: true});
+            const token = localStorage.getItem('token');
+            if (!token) {
+                setUser(null);
+                return;
+            }
+            
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                },
+                withCredentials: true
+            };
+            
+            const response = await axios.get(`${API}/auth/check-auth`, config);
             setUser(response.data.user);
         }
         catch(error){
             console.error('verify auth failed', error);
             setUser(null);
             setError(error.response?.data?.message || 'An error occurred while verifying auth');
+            localStorage.removeItem('token');
         }
         finally{
             setIsLoading(false);
@@ -41,53 +63,74 @@ export const AuthProvider = ({children}) => {
 
     useEffect(() => {
         const checkTokenAndVerifyAuth = async () => {
-            const token = localStorage.getItem('token');
-            if(token){
-                axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-                await verifyAuth();
-            }
-            else{
-                setIsLoading(false);
-            }
+            await verifyAuth();
         };
         API = getBaseURI();
         checkTokenAndVerifyAuth();
     },[]);
 
-    const login = async (email, password) => {
+    const login = async (identifier, password) => {
         setIsLoading(true);
         setError(null);
         try{
-            const response = await axios.post(`${API}/auth/login`, {email, password}, {withCredentials: true});
-            const {token, user} = response.data;
-            setUser(user);
-            localStorage.setItem('token', token);
-            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            return response.data;
+            // Validate inputs
+            if (!identifier || !password) {
+                const msg = 'Username/Email and password are required';
+                setError(msg);
+                toast.error(msg, { position: 'bottom-right' });
+                return null;
+            }
+            
+            console.log('Login request:', { identifier, password: '****' });
+            
+            const response = await axios.post(`${API}/auth/login`, { email: identifier, password });
+            
+            console.log('Login response:', response.data);
+            
+            if (response.data && response.data.token && response.data.user) {
+                const {token, user} = response.data;
+                setUser(user);
+                localStorage.setItem('token', token);
+                axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+                toast.success('Logged in successfully', { position: 'bottom-right' });
+                return response.data;
+            } else {
+                throw new Error('Invalid response format');
+            }
         }
         catch(error){
-            console.error('login failed', error);
-            setError(error.response?.data?.message || 'An error occurred while logging in');
+            handleError(error, 'Login failed. Please check your credentials.');
+            return null;
         }
         finally{
             setIsLoading(false);
         }
     }
 
-    const signup = async ( userName, email, password) => {
+    const signup = async (userName, email, password) => {
         setIsLoading(true);
         setError(null);
         try{
+            // Validate inputs
+            if (!userName || !email || !password) {
+                const msg = 'All fields are required';
+                setError(msg);
+                toast.error(msg, { position: 'bottom-right' });
+                return null;
+            }
+            
             const response = await axios.post(`${API}/auth/signup`, { userName, email, password});
             const {token, user} = response.data;
             setUser(user);
             localStorage.setItem('token', token);
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            toast.success('Account created successfully', { position: 'bottom-right' });
             navigate(user.isVerified ? '/' : '/verify-email');
+            return response.data;
         }
         catch(error){
-            console.error('signup failed', error);
-            setError(error.response?.data?.message || 'An error occurred during signup');
+            handleError(error, 'Signup failed. Please try again.');
+            return null;
         }
         finally{
             setIsLoading(false);
@@ -95,85 +138,146 @@ export const AuthProvider = ({children}) => {
     }
 
     const googleLogin = async (response) => {
+        setIsLoading(true);
         try{
-            const result = await axios.post(`${API}/auth/google/login`, {
-                googleToken: response.credential
-            });
+            console.log('Google login response data:', response);
+            
+            if (!response || !response.credential) {
+                throw new Error('Invalid Google response');
+            }
+            
+            const result = await axios.post(
+                `${API}/auth/google/login`, 
+                { googleToken: response.credential },
+                { withCredentials: true }
+            );
+            
+            console.log('Google login server response:', result.data);
+            
             const { token, user } = result.data;
             setUser(user);
             localStorage.setItem('token', token);
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            navigate(result.data.user.email_verified ? '/' : '/verify-email');
+            
+            if (user) {
+                toast.success('Logged in successfully with Google', { position: 'bottom-right' });
+                navigate(user.isVerified ? '/' : '/verify-email');
+            }
         }
         catch(error){
-            console.log(error);
+            handleError(error, 'Google authentication failed');
+        }
+        finally {
+            setIsLoading(false);
         }
     }
 
     const googleSignup = async (response) => {
-        console.log(response);
+        setIsLoading(true);
         try{
+            console.log(response);
+            if (!response || !response.credential) {
+                throw new Error('Invalid Google response');
+            }
+            
             const result = await axios.post(`${API}/auth/google/signup`, {
                 googleToken: response.credential
             });
             console.log(result.data);
+            
+            if (!result.data || !result.data.token || !result.data.user) {
+                throw new Error('Invalid server response');
+            }
+            
             const { token, user } = result.data;
             setUser(user);
             localStorage.setItem('token', token);
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            setUser(user);
+            
+            toast.success('Account created successfully with Google', { position: 'bottom-right' });
             navigate(result.data.user.isVerified ? '/' : '/verify-email');
         }
         catch(error){
-            console.log(error);
+            handleError(error, 'Google signup failed');
+        }
+        finally {
+            setIsLoading(false);
         }
     }
 
     const logout = () => {
-        setUser(null);
-        localStorage.removeItem('token');
-        delete axios.defaults.headers.common['Authorization'];
-        navigate('/login');
+        try {
+            setUser(null);
+            localStorage.removeItem('token');
+            delete axios.defaults.headers.common['Authorization'];
+            toast.success('Logged out successfully', { position: 'bottom-right' });
+            navigate('/login');
+        } catch (error) {
+            handleError(error, 'Logout failed');
+        }
     }
 
     const verifyEmail = async (code) => {
         setIsLoading(true);
         setError(null);
         try{
+            if (!code || code.length < 4) {
+                const msg = 'Please enter a valid verification code';
+                setError(msg);
+                toast.error(msg, { position: 'bottom-right' });
+                return;
+            }
+            
             const response = await axios.post(`${API}/auth/verify-email`, {code});
             console.log('verify email', response);
             if(response.data.success){
                 setUser(response.data.user);
+                toast.success('Email verified successfully', { position: 'bottom-right' });
                 navigate('/');
             }
             else{
                 console.log('email not verified');
                 setError(response.data.message || 'Email verification failed');
+                toast.error(response.data.message || 'Email verification failed', { position: 'bottom-right' });
             }
         }
         catch(error){
-            console.error('Verifying email failed', error);
-            setError(error.response?.data?.message || 'An error occurred while verifying email');
+            handleError(error, 'Email verification failed');
         }
-        setIsLoading(false);
+        finally {
+            setIsLoading(false);
+        }
     }
 
     const updateUserData = async (data) => {
         setIsLoading(true);
         setError(null);
         try{
+            if (!data.userName) {
+                const msg = 'Username is required';
+                setError(msg);
+                toast.error(msg, { position: 'bottom-right' });
+                return;
+            }
+            
             axios.defaults.withCredentials = true;
-            const response = await axios.put(`${API}/auth/update-user`, data);
+            const response = await axios.put(`${API}/auth/update-user`, data, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            
             setUser(response.data.user);
-            toast.success('Profile Updated',{
+            toast.success('Profile Updated', {
                 position: 'bottom-right'
             });
         }
         catch(error){
-            console.error('Update user data failed', error);
-            setError(error.response?.data?.message || 'An error occurred while updating profile');
+            handleError(error, 'Failed to update profile');
         }
-        setIsLoading(false);
+        finally {
+            setIsLoading(false);
+        }
     }
 
     return(
@@ -188,7 +292,7 @@ export const AuthProvider = ({children}) => {
             logout, 
             verifyAuth, 
             verifyEmail, 
-            updateUserData , 
+            updateUserData, 
             setIsLoading, 
             setError}
             }>

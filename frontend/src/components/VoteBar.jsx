@@ -4,11 +4,13 @@ import { usePostService } from "../context/PostContext";
 import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
 
-function VoteBar({ id }) {
-
-  const [post, setPost] = useState(null);
-  const [votes, setVotes] = useState({upVoted: false, downVoted: false});
-  const [isLoading, setIsLoading] = useState(true);
+function VoteBar({ id, initialVotes = 0, initialUpVoted = false, initialDownVoted = false }) {
+  const [voteCount, setVoteCount] = useState(initialVotes);
+  const [votes, setVotes] = useState({
+    upVoted: initialUpVoted, 
+    downVoted: initialDownVoted
+  });
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const { upVotePost, downVotePost, getPost } = usePostService();
 
@@ -16,112 +18,138 @@ function VoteBar({ id }) {
   const { user } = useAuth();
 
   useEffect(() => {
-  
-    const fetchPost = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const response = await getPost(id);
-        setPost(response.post);
-        const upVoted = response.post.upVotedUsers.includes(user._id);
-        const downVoted = response.post.downVotedUsers.includes(user._id);
-        setVotes({ upVoted, downVoted });
-      } catch (err) {
-        setError(err.message || "Failed to load post");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (id) {
-      fetchPost();
-    } else {
-      setError("No post ID provided");
-      setIsLoading(false);
+    if (user && id) {
+      const fetchVoteStatus = async () => {
+        try {
+          const response = await getPost(id);
+          if (response && response.post) {
+            const upVoted = response.post.upVotedUsers.includes(user._id);
+            const downVoted = response.post.downVotedUsers.includes(user._id);
+            setVotes({ upVoted, downVoted });
+            setVoteCount(response.post.upVotes - response.post.downVotes);
+          }
+        } catch (err) {
+          setError(err.message || "Failed to load vote status");
+          console.error("Error fetching vote status:", err);
+        }
+      };
+      
+      fetchVoteStatus();
     }
-  }, [id]);
-
+  }, [id, user]);
 
   const handleUpVote = async (event) => {
     event.stopPropagation();
     try{
-      if(!token){
-        toast.error("login to upvote",{
+      if(!user) {
+        toast.error("Login to upvote", {
           position:"bottom-right"
         });
-        throw new Error("You need to login to upvote a post");
+        return;
       }
+      
+      if (isLoading) {
+        return;
+      }
+      
+      const previousVotes = { ...votes };
+      const previousCount = voteCount;
+      
+      if (votes.upVoted) {
+        setVotes({ upVoted: false, downVoted: false });
+        setVoteCount(voteCount - 1);
+      } else {
+        setVotes({ upVoted: true, downVoted: false });
+        setVoteCount(voteCount + (votes.downVoted ? 2 : 1));
+      }
+      
+      setIsLoading(true);
+      setError(null);
+      
       const response = await upVotePost(token, id);
-      if(!response){
-        toast.error("Failed to upvote post",{
-          position:"bottom-right"
-        });
-        throw new Error("Failed to upvote post");
+      
+      if (!response || !response.success) {
+        setVotes(previousVotes);
+        setVoteCount(previousCount);
+        throw new Error(response?.message || "Failed to upvote post");
       }
-      if(response.success){
-        setPost((prev)=>({...prev, upVotes: response.post.upVotes, downVotes: response.post.downVotes}));
-        setVotes({ upVoted: !votes.upVoted, downVoted: false });
-      }
-      else{
-        alert(response.message);
-      }
-    }
-    catch(err){
+    } catch(err) {
       setError(err.message);
+      toast.error(err.message || "Failed to upvote post", {
+        position: "bottom-right"
+      });
+      console.error("Upvote error:", err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleDownVote = async (event) => {
     event.stopPropagation();
     try{
-      if(!token){
-        toast.error("login to downvote",{
+      if(!user) {
+        toast.error("Login to downvote", {
           position:"bottom-right"
         });
-        throw new Error("You need to login to downvote a post");
+        return;
       }
+      
+      if (isLoading) {
+        return;
+      }
+      
+      const previousVotes = { ...votes };
+      const previousCount = voteCount;
+      
+      if (votes.downVoted) {
+        setVotes({ upVoted: false, downVoted: false });
+        setVoteCount(voteCount + 1);
+      } else {
+        setVotes({ upVoted: false, downVoted: true });
+        setVoteCount(voteCount - (votes.upVoted ? 2 : 1));
+      }
+      
+      setIsLoading(true);
+      setError(null);
+      
       const response = await downVotePost(token, id);
-      if(!response){
-        toast.error("Failed to downvote post",{
-          position:"bottom-right"
-        });
-        throw new Error("Failed to downvote post");
+      
+      if (!response || !response.success) {
+        setVotes(previousVotes);
+        setVoteCount(previousCount);
+        throw new Error(response?.message || "Failed to downvote post");
       }
-      if(response.success){
-        setPost((prev)=>({...prev, upVotes: response.post.upVotes, downVotes: response.post.downVotes}));
-        setVotes({ upVoted: false, downVoted: !votes.downVoted }); 
-      }
-      else{
-        alert(response.message);
-      }
-    }
-    catch(err){
+    } catch(err) {
       setError(err.message);
+      toast.error(err.message || "Failed to downvote post", {
+        position: "bottom-right"
+      });
+      console.error("Downvote error:", err);
+    } finally {
+      setIsLoading(false);
     }
   };
-
-  if(isLoading || !post){
-    return (
-      <div className="text-black dark:text-white font-mono">
-        0
-      </div>
-    );
-  }
 
   return (
     <div className={`flex items-center gap-4 border border-gray-200 text-black dark:text-white dark:bg-slate-700 dark:border-none rounded-xl p-1 ${votes.upVoted ? "bg-[#d93900]" : ""} ${votes.downVoted ? "bg-[#6a5cff]" : ""} transition-all`}>
       <button
-        className={`flex items-center space-x-2 transition-colors`}
+        className={`flex items-center space-x-2 transition-colors ${isLoading ? "opacity-50" : ""}`}
         onClick={handleUpVote}
+        disabled={isLoading}
+        aria-label="Upvote"
+        title={votes.upVoted ? "Remove upvote" : "Upvote"}
       >
         {votes.upVoted ? <BoltSolid /> : <Bolt />}
       </button>
       <p className={`font-mono font-bold text-lg px-1 ${votes.upVoted || votes.downVoted ? "text-white" : ""}`} >
-        {post.upVotes - post.downVotes}
+        {voteCount}
       </p>
       <button
-        className={`flex items-center space-x-2 transition-colors`}
+        className={`flex items-center space-x-2 transition-colors ${isLoading ? "opacity-50" : ""}`}
         onClick={handleDownVote}
+        disabled={isLoading}
+        aria-label="Downvote"
+        title={votes.downVoted ? "Remove downvote" : "Downvote"}
       >
         {votes.downVoted ? <BoltSlashSolid /> : <BoltSlash />}
       </button>

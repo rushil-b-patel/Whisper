@@ -1,10 +1,12 @@
 import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Comment, ChevronDown, ChevronUp } from './Icons';
-import VoteBar from '../components/voteBar';
+import VoteBar from '../components/VoteBar';
+import { useAuth } from '../context/AuthContext';
 
 function PostCard({ post }) {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   if (!post) return (
     <div className="bg-white border-2 border-red-500 p-3 rounded-lg text-red-500 font-mono shadow-sm dark:bg-slate-900">
@@ -17,6 +19,11 @@ function PostCard({ post }) {
       navigate(`/post/${post._id}`);
     }
   }, [post._id, navigate]);
+  
+  // Calculate initial vote values
+  const voteCount = post.upVotes - post.downVotes;
+  const userUpVoted = user && post.upVotedUsers?.includes(user._id);
+  const userDownVoted = user && post.downVotedUsers?.includes(user._id);
   
   return (
     <div className="relative bg-white w-full sm:max-w-xl mx-auto p-4 sm:p-6 mb-4 sm:mb-6 border-y lg:rounded-xl lg:border lg:border-slate-200 hover:border-indigo-500/30hover:shadow-lg sm:hover:shadow-xl hover:shadow-indigo-100 dark:bg-[#0e1113] dark:border-slate-800 dark:hover:border-indigo-500/30 dark:hover:shadow-indigo-900/20 cursor-pointer transform transition-all duration-300"
@@ -65,7 +72,12 @@ function PostCard({ post }) {
 
       <div className="flex justify-between items-center pl-2 sm:pl-3">
         <div className="flex items-center space-x-4 sm:space-x-6">
-            <VoteBar id={post._id} />
+            <VoteBar 
+              id={post._id} 
+              initialVotes={voteCount} 
+              initialUpVoted={userUpVoted} 
+              initialDownVoted={userDownVoted}
+            />
           <button className="group flex items-center border border-gray-200 rounded-xl p-1 px-3 gap-3 text-black dark:text-white dark:border-none dark:bg-slate-700 hover:bg-slate-200  transition-colors">
             <Comment className="w-4 h-4 sm:w-5 sm:h-5 transform group-hover:scale-110 transition-transform" />
             <p className="text-black font-mono font-bold text-lg dark:text-white">

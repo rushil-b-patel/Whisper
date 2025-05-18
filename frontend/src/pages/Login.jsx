@@ -1,25 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { Eye, EyeOff } from '../ui/Icons';
 import { useAuth } from '../context/AuthContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
   const { login, googleLogin, isLoading, setIsLoading } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
     try{
-      const response = await login(email, password);
-      const { user } = response;
-      console.log(user);
-      navigate(user.isVerified ? '/' : '/verify-email');
+      const response = await login(identifier, password);
+      if (response && response.user) {
+        navigate(response.user.isVerified ? '/' : '/verify-email');
+      }
     }
     catch(error){
       setError(error.response?.data?.message || 'An error occurred while logging in');
@@ -30,10 +31,18 @@ const Login = () => {
   };
 
   const handlegoogleLogin = async (response) => {
-    await googleLogin(response);
+    try {
+      console.log("Google login response:", response);
+      await googleLogin(response);
+    } catch (error) {
+      console.error("Google login error:", error);
+      setError("Google login failed. Please try again or use email login.");
+    }
   }
-  const handleError = async (error) => {
-    console.log(error);
+  
+  const handleError = (error) => {
+    console.error("Google login error:", error);
+    setError("Google login failed. Please try again or use email login.");
   }
 
   return ( 
@@ -45,20 +54,20 @@ const Login = () => {
       <div className="dark:bg-[#0e1113] dark:text-[#eef1f3] py-8 px-4 sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium">
-                Email address
+              <label htmlFor="identifier" className="block text-sm font-medium">
+                Username or Email
               </label>
               <div className="mt-1">
                 <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder='Email or Username'
+                  id="identifier"
+                  name="identifier"
+                  type="text"
+                  autoComplete="username email"
+                  placeholder="Enter username or email"
                   required
                   className="appearance-none block w-full px-3 py-2 dark:bg-[#2A3236] bg-slate-200 dark:text-[#eef1f3] outline-none rounded-md sm:text-sm"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
                 />
               </div>
             </div>
@@ -97,7 +106,6 @@ const Login = () => {
               <button
                 type="submit"
                 className="w-full flex justify-center py-2 px-4 rounded-md shadow-sm text-sm font-medium text-white hover:text-black bg-black hover:bg-white border-[2px] border-transparent hover:border-black transition animation duration-500 ease-in-out"
-                onClick={handleSubmit}
                 disabled={isLoading}
               >
               {isLoading ? 'Loading...' : 'Sign in'}

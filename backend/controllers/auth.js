@@ -7,20 +7,35 @@ import { verifyGoogleToken } from '../utils/googleAuth.js';
 import { CLIENT_URI } from '../utils/envVariables.js';
 
 export const login = async (req, res)=>{
+    console.log('Login request received:', req.body);
+    
     const { email, password } = req.body;
+    
     try{
         if(!email || !password){
             return res.status(400).json({message: 'Please fill in all fields'});
         }
         
-        const user = await User.findOne({email});
-        if(!user){
-            return res.status(400).json({message: `User doesn't exist`});
+        let user;
+        user = await User.findOne({ userName: email });
+        
+        if (!user) {
+            user = await User.findOne({email});            
+            if (!user) {
+                const emailHash = computeEmailHash(email);
+                user = await User.findOne({emailHash});
+            }
         }
+        
+        if(!user){
+            return res.status(400).json({message: `User doesn't exist with the provided username or email`});
+        }
+        
         const passwordMatch = await bcrypt.compare(password, user.password);
         if(!passwordMatch){
             return res.status(400).json({message: 'Invalid password'});
         }
+        
         if(!user.isVerified){
             return res.status(403).json({message: 'Email not verified. Please verify your email', redirect: true});
         }
@@ -39,7 +54,6 @@ export const login = async (req, res)=>{
         })
     }
     catch(error){
-        console.error("Error logging in",error);
         res.status(500).json({message: 'Server Error'});
     }
 }

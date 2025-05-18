@@ -21,10 +21,25 @@ export const usePostService = () => {
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
 
+  // Helper function to handle errors consistently
+  const handleError = (error, customMessage) => {
+    const errorMessage = error.response?.data?.message || customMessage || 'An unexpected error occurred';
+    console.error(errorMessage, error);
+    setError(errorMessage);
+    toast.error(errorMessage, { position: 'bottom-right' });
+    return errorMessage;
+  };
+
   const createPost = async (token, formData) => {
     setError(null);
     setIsLoading(true);
     try {
+      if (!token) {
+        const msg = 'Authentication required. Please log in.';
+        toast.error(msg, { position: 'bottom-right' });
+        throw new Error(msg);
+      }
+      
       const response = await axios.post(`${API}/post/create-post`, formData, 
             { 
               headers: 
@@ -33,10 +48,10 @@ export const usePostService = () => {
                   "Content-Type": "multipart/form-data",
                 }
             });
-      toast.success("Post created successfully");
+      toast.success("Post created successfully", { position: 'bottom-right' });
       return response.data;
     } catch (error) {
-      setError(error);
+      handleError(error, 'Failed to create post');
       throw error;
     } finally {
       setIsLoading(false);
@@ -50,8 +65,7 @@ export const usePostService = () => {
       const response = await axios.get(`${API}/post`);
       return response.data;
     } catch (error) {
-      console.log("error getting all posts", error);
-      setError(error);
+      handleError(error, 'Failed to load posts');
       throw error;
     } finally {
       setIsLoading(false);
@@ -62,10 +76,16 @@ export const usePostService = () => {
     setError(null);
     setIsLoading(true);
     try {
+      if (!id) {
+        const msg = 'Post ID is required';
+        toast.error(msg, { position: 'bottom-right' });
+        throw new Error(msg);
+      }
+      
       const response = await axios.get(`${API}/post/${id}`);
       return response.data;
     } catch (error) {
-      setError(error);
+      handleError(error, 'Failed to load post');
       throw error;
     } finally {
       setIsLoading(false);
@@ -76,10 +96,20 @@ export const usePostService = () => {
     setError(null);
     setIsLoading(true);
     try {
-      const response = await axios.put(`${API}/post/upvote/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      if (!token) {
+        const msg = 'Authentication required. Please log in to vote.';
+        toast.error(msg, { position: 'bottom-right' });
+        throw new Error(msg);
+      }
+      
+      const response = await axios.put(
+        `${API}/post/upvote/${id}`, 
+        {}, // Empty data object
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       return response.data;
     } catch (error) {
-      setError(error);
+      handleError(error, 'Failed to upvote post');
       throw error;
     } finally {
       setIsLoading(false);
@@ -90,10 +120,20 @@ export const usePostService = () => {
     setError(null);
     setIsLoading(true);
     try {
-      const response = await axios.put(`${API}/post/downvote/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      if (!token) {
+        const msg = 'Authentication required. Please log in to vote.';
+        toast.error(msg, { position: 'bottom-right' });
+        throw new Error(msg);
+      }
+      
+      const response = await axios.put(
+        `${API}/post/downvote/${id}`, 
+        {}, // Empty data object
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       return response.data;
     } catch (error) {
-      setError(error);
+      handleError(error, 'Failed to downvote post');
       throw error;
     } finally {
       setIsLoading(false);
@@ -104,33 +144,74 @@ export const usePostService = () => {
     setError(null);
     setIsLoading(true);
     try {
-      const response = await axios.post(`${API}/post/add-comment/${id}`, { text }, { headers: { "Authorization": `Bearer ${token}` } });
+      if (!token) {
+        const msg = 'Authentication required. Please log in to comment.';
+        toast.error(msg, { position: 'bottom-right' });
+        throw new Error(msg);
+      }
+      
+      if (!text || !text.trim()) {
+        const msg = 'Comment text is required';
+        toast.error(msg, { position: 'bottom-right' });
+        throw new Error(msg);
+      }
+      
+      const response = await axios.post(`${API}/post/add-comment/${id}`, { text }, 
+        { headers: { "Authorization": `Bearer ${token}` } }
+      );
+      
+      if (response.data.success) {
+        toast.success('Comment added successfully', { position: 'bottom-right' });
+      }
+      
       return response.data;
     } catch (error) {
-      setError(error);
+      handleError(error, 'Failed to add comment');
       throw error;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const deleteComment = async (token, id, commentId) =>{
+  const deleteComment = async (token, id, commentId) => {
     setError(null);
     setIsLoading(true);
     try {
-      const response = await axios.delete(`${API}/post/delete-comment/${id}/${commentId}`, { headers: { "Authorization": `Bearer ${token}` } });
-      if(response.data.success){
-        toast.success(response.data.message || "Comment deleted successfully");
+      if (!token || !id || !commentId) {
+        const msg = 'Missing required information to delete comment';
+        toast.error(msg, { position: 'bottom-right' });
+        throw new Error(msg);
       }
+      
+      const response = await axios.delete(
+        `${API}/post/delete-comment/${id}/${commentId}`, 
+        { headers: { "Authorization": `Bearer ${token}` } }
+      );
+      
+      if (response.data.success) {
+        toast.success(response.data.message || "Comment deleted successfully", { position: 'bottom-right' });
+      }
+      
       return response.data;
     } catch (error) {
-      setError(error);
-      toast.error(error.response?.data?.message || "Error deleting comment");
+      handleError(error, 'Failed to delete comment');
       throw error;
     } finally {
       setIsLoading(false);
     }
   }
-  return{ error, isLoading, setError, setIsLoading, createPost, getAllPosts, getPost, upVotePost, downVotePost, addComment, deleteComment }
 
+  return { 
+    error, 
+    isLoading, 
+    setError, 
+    setIsLoading, 
+    createPost, 
+    getAllPosts, 
+    getPost, 
+    upVotePost, 
+    downVotePost, 
+    addComment, 
+    deleteComment 
+  };
 };

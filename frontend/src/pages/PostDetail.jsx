@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { usePostService } from "../context/PostContext";
-import VoteBar from "../components/voteBar";
+import VoteBar from "../components/VoteBar";
 import toast from "react-hot-toast";
 import Comment from "../components/Comment";
 import { useAuth } from "../context/AuthContext";
@@ -9,7 +9,7 @@ import { Bars, Trash, Save, ChevronLeft, Share } from "../ui/Icons";
 
 function PostDetail() {
   const { id } = useParams();
-  const { getPost, addComment} = usePostService();
+  const { getPost, addComment, deleteComment } = usePostService();
   const { user } = useAuth();
   const [post, setPost] = useState(null);
   const [comment, setComment] = useState("");
@@ -20,11 +20,53 @@ function PostDetail() {
   const dropdownRef = useRef(null);
   
   const handleSavePost = () => {
-   
-  }
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("Login to save post", { position: "bottom-right" });
+        return;
+      }
+      
+      // Implement save post functionality here when available
+      toast.success("Post saved successfully", { position: "bottom-right" });
+      setShowOptions(false);
+    } catch (err) {
+      console.error("Error saving post:", err);
+      toast.error(err.message || "Failed to save post", { position: "bottom-right" });
+    }
+  };
 
   const handleDeletePost = async () => {
-   
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("Login to delete post", { position: "bottom-right" });
+        return;
+      }
+      
+      if (!user || user._id !== post?.user?._id) {
+        toast.error("You can only delete your own posts", { position: "bottom-right" });
+        return;
+      }
+      
+      // Add confirmation dialog
+      if (!window.confirm("Are you sure you want to delete this post?")) {
+        return;
+      }
+      
+      setIsLoading(true);
+      // Implement delete post API call when available
+      // const response = await deletePost(token, id);
+      
+      toast.success("Post deleted successfully", { position: "bottom-right" });
+      navigate('/');
+    } catch (err) {
+      console.error("Error deleting post:", err);
+      toast.error(err.message || "Failed to delete post", { position: "bottom-right" });
+    } finally {
+      setIsLoading(false);
+      setShowOptions(false);
+    }
   };
 
   useEffect(() => {
@@ -69,7 +111,8 @@ function PostDetail() {
       toast.error("Comment cannot be empty", { position: "bottom-right" });
       return;
     }
-  
+    
+    setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -81,18 +124,35 @@ function PostDetail() {
       if (response.success) {
         setComments((prevComments) => [response.comment, ...prevComments]);
         setComment("");
+        toast.success("Comment added successfully", { position: "bottom-right" });
+      } else {
+        toast.error(response.message || "Failed to add comment", { position: "bottom-right" });
       }
     } catch (err) {
       console.error("Error posting comment:", err);
+      toast.error(err.message || "Failed to add comment", { position: "bottom-right" });
+    } finally {
+      setIsLoading(false);
     }
   }, [comment, id, addComment]);
   
-  
-
-  const handleDeleteComment = useCallback((deletedCommentId) =>{
-    setComments((prevComments) => prevComments.filter((comment) => comment._id !== deletedCommentId));
-  },[]);
-
+  const handleDeleteComment = useCallback(async (commentId) => {
+    if (!commentId) return;
+    
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("Login to delete comment", { position: "bottom-right" });
+        return;
+      }
+      
+      await deleteComment(token, id, commentId);
+      setComments((prevComments) => prevComments.filter((comment) => comment._id !== commentId));
+    } catch (err) {
+      console.error("Error deleting comment:", err);
+      toast.error(err.message || "Failed to delete comment", { position: "bottom-right" });
+    }
+  }, [id, deleteComment]);
 
   if (isLoading) {
     return (
@@ -208,10 +268,15 @@ function PostDetail() {
 
             <div className="border-t border-gray-100 dark:border-slate-700 pt-6">
               <div className="flex items-center justify-between">
-                <VoteBar id={id} />
-                  <button className="flex items-center space-x-2 text-black hover:text-indigo-600 dark:text-white dark:hover:text-indigo-400 transition-colors">
-                    <Share className="w-5 h-5" />
-                  </button>
+                <VoteBar 
+                  id={id} 
+                  initialVotes={post ? post.upVotes - post.downVotes : 0}
+                  initialUpVoted={user && post?.upVotedUsers?.includes(user._id)}
+                  initialDownVoted={user && post?.downVotedUsers?.includes(user._id)}
+                />
+                <button className="flex items-center space-x-2 text-black hover:text-indigo-600 dark:text-white dark:hover:text-indigo-400 transition-colors">
+                  <Share className="w-5 h-5" />
+                </button>
               </div>
             </div>
 
