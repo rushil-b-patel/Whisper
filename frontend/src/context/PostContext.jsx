@@ -48,7 +48,11 @@ export const usePostService = () => {
                   "Content-Type": "multipart/form-data",
                 }
             });
-      toast.success("Post created successfully", { position: 'bottom-right' });
+      
+      const isDraft = formData.get('isDraft') === 'true';
+      const successMessage = isDraft ? "Draft saved successfully" : "Post created successfully";
+      toast.success(successMessage, { position: 'bottom-right' });
+      
       return response.data;
     } catch (error) {
       handleError(error, 'Failed to create post');
@@ -199,19 +203,42 @@ export const usePostService = () => {
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
-  return { 
-    error, 
-    isLoading, 
-    setError, 
-    setIsLoading, 
-    createPost, 
-    getAllPosts, 
-    getPost, 
-    upVotePost, 
-    downVotePost, 
-    addComment, 
-    deleteComment 
+  const getDrafts = async (token) => {
+    setError(null);
+    setIsLoading(true);
+    try {
+      if (!token) {
+        const msg = 'Authentication required. Please log in.';
+        toast.error(msg, { position: 'bottom-right' });
+        throw new Error(msg);
+      }
+      
+      const response = await axios.get(
+        `${API}/post/drafts`, 
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      return response.data;
+    } catch (error) {
+      handleError(error, 'Failed to fetch drafts');
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return {
+    createPost,
+    getAllPosts,
+    getPost,
+    upVotePost,
+    downVotePost,
+    addComment,
+    deleteComment,
+    getDrafts,
+    error,
+    isLoading
   };
 };

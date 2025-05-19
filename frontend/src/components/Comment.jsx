@@ -66,14 +66,14 @@ const CommentItem = ({
   const maxDepth = 3;
   
   return (
-    <div className={`comment-item ${depth > 0 ? `ml-${Math.min(depth * 4, 12)}` : ''}`}>
+    <div className={`comment-item ${depth > 0 ? 'pl-4 md:pl-8' : ''}`}>
       <div className={`flex justify-between bg-gray-50 dark:bg-slate-800/50 rounded-lg p-4 ${
         depth > 0 ? 'border-l-2 border-indigo-500/30 dark:border-indigo-500/50' : ''
       }`}>
         <div className="w-full">
           <div className="flex items-center mb-2">
             <img
-              src={comment?.User?.userAvatar || "/api/placeholder/32/32"}
+              src={comment?.User?.userAvatar || "https://ui-avatars.com/api/?name=" + (comment?.User?.userName || "User")}
               alt="Commenter"
               className="w-8 h-8 rounded-full mr-3"
             />
@@ -190,7 +190,7 @@ const CommentItem = ({
       
       {/* Render replies if any */}
       {comment.replies && comment.replies.length > 0 && (
-        <div className="mt-2 space-y-2">
+        <div className="mt-3 space-y-3 pl-2 border-l-2 border-gray-200 dark:border-gray-700">
           {comment.replies.map(reply => (
             <CommentItem
               key={reply._id}

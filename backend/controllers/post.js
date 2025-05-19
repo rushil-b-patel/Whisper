@@ -2,11 +2,41 @@ import { Post } from '../models/post.js';
 
 export const createPost = async (req, res) => {
     try {
-        const { title, description, category } = req.body;
+        const { title, description, category, isDraft, poll } = req.body;
         const imageUrl = req.file ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}` : null;
-        const post = new Post({ title, description, user: req.userId, image: imageUrl, category });
+        
+        // Create post object
+        const postData = { 
+            title, 
+            description, 
+            user: req.userId, 
+            image: imageUrl, 
+            category,
+            isDraft: isDraft === 'true'
+        };
+        
+        // Add poll if it exists
+        if (poll) {
+            try {
+                const pollData = JSON.parse(poll);
+                if (pollData.question && pollData.options && pollData.options.length >= 2) {
+                    postData.poll = {
+                        question: pollData.question,
+                        options: pollData.options.map(option => ({
+                            text: option,
+                            votes: 0,
+                            voters: []
+                        }))
+                    };
+                }
+            } catch (error) {
+                console.error('Error parsing poll data:', error);
+            }
+        }
+        
+        const post = new Post(postData);
         await post.save();
-        res.status(201).json({sucess: true, post});
+        res.status(201).json({success: true, post});
     } catch(error){
         res.status(500).json({success: false, message: error.message });
     }
@@ -143,6 +173,19 @@ export const deleteComment = async (req, res) =>{
         res.status(200).json({success: true, post});
     }
     catch(error){
+        res.status(500).json({success: false, message: error.message });
+    }
+}
+
+export const getDrafts = async (req, res) => {
+    try {
+        const drafts = await Post.find({ 
+            user: req.userId,
+            isDraft: true 
+        }).populate('user', 'userName department').sort({ updatedAt: -1 });
+        
+        res.status(200).json({success: true, drafts});
+    } catch (error) {
         res.status(500).json({success: false, message: error.message });
     }
 }

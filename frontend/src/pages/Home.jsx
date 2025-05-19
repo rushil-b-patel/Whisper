@@ -153,7 +153,7 @@ function Home() {
         
         {/* Middle Content - Posts */}
         <div className="flex-grow max-w-xl mx-auto">
-          <div className="sticky top-16 z-10 bg-white dark:bg-[#0e1113] py-2 mb-4">
+          <div className="sticky top-16 z-10 bg-white dark:bg-[#0e1113] py-3 mb-4 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90 border-b border-gray-100 dark:border-gray-800">
             <div className="flex items-center justify-between">
               <h1 className="font-mono text-2xl font-bold text-black dark:text-white">
                 {activeFilter === "trending" && "Trending Posts"}

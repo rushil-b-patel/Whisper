@@ -285,19 +285,21 @@ function PostDetail() {
                 Comments
               </h3>
               <div className="mb-6 mt-3">
-                <textarea
-                  placeholder="Add a comment..."
-                  className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 transition-all font-mono resize-none"
-                  rows={1}
-                  onChange={(e) => setComment(e.target.value)}
-                  value={comment}
-                />
-                <button
-                  className="mt-3 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all font-sans font-semibold text-sm"
-                  onClick={handleAddComment}
-                >
-                  {isLoading ? "Posting..." : "Post Comment"}
-                </button>
+                <form onSubmit={handleAddComment}>
+                  <textarea
+                    placeholder="Add a comment..."
+                    className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 transition-all font-mono resize-none"
+                    rows={1}
+                    onChange={(e) => setComment(e.target.value)}
+                    value={comment}
+                  />
+                  <button
+                    type="submit"
+                    className="mt-3 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all font-sans font-semibold text-sm"
+                  >
+                    {isLoading ? "Posting..." : "Post Comment"}
+                  </button>
+                </form>
               </div>
               <Comment
                 post={post}
