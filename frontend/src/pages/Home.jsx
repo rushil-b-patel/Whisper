@@ -12,13 +12,12 @@ function Home() {
   const { getAllPosts } = usePostService();
   const { user } = useAuth();
   
-  // Demo communities data
-  const communities = [
-    { id: 1, name: "Software Engineering", members: 23450 },
-    { id: 2, name: "Data Science", members: 18920 },
+  const departments = [
+    { id: 1, name: "Computer Science", members: 23450 },
+    { id: 2, name: "IT", members: 18920 },
     { id: 3, name: "AI & Machine Learning", members: 15600 },
     { id: 4, name: "Web Development", members: 12300 },
-    { id: 5, name: "UI/UX Design", members: 9870 },
+    { id: 5, name: "App Development", members: 9870 },
   ];
   
   // Demo user stats
@@ -124,23 +123,23 @@ function Home() {
           
           <div className="bg-white dark:bg-[#131619] rounded-xl p-4 shadow-sm">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-mono text-lg font-bold text-black dark:text-white">Communities</h2>
+              <h2 className="font-mono text-lg font-bold text-black dark:text-white">Departments</h2>
               <button className="text-indigo-600 dark:text-indigo-400 text-sm font-medium">See All</button>
             </div>
             <ul className="space-y-3">
-              {communities.map(community => (
-                <li key={community.id}>
+              {departments.map(department => (
+                <li key={department.id}>
                   <button className="w-full flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800 p-2 rounded-lg transition-colors">
                     <div className="flex items-center">
                       <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
-                        {community.name.charAt(0)}{community.name.split(' ')[1]?.charAt(0) || ''}
+                        {department.name.charAt(0)}{department.name.split(' ')[1]?.charAt(0) || ''}
                       </div>
                       <div className="ml-3 text-left">
                         <p className="font-mono text-sm font-medium text-gray-900 dark:text-gray-100 truncate max-w-[120px]">
-                          {community.name}
+                          {department.name}
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {community.members.toLocaleString()} members
+                          {department.members.toLocaleString()} members
                         </p>
                       </div>
                     </div>
