@@ -22,7 +22,6 @@ export const sendVerificationEmail = async (email, verificationToken) => {
         html: VERIFICATION_TEMPLATE.replace("{verificationCode}", verificationToken),
         category: "Verification Email"
       });
-      console.log("Message sent: %s", response.messageId);
     }
     catch(error){
       console.error(error);
@@ -39,7 +38,6 @@ export const sendWelcomeEmail = async (email, userName) => {
       html: WELCOME_TEMPLATE.replace("{userName}", userName),
       category: "Welcome Email"
     })
-    console.log("Message sent: %s", response.messageId);
   }
   catch(error){
     console.error(error);
@@ -54,7 +52,6 @@ export const sendPasswordResetEmail = async (email, resetToken) => {
       subject: "Reset your password",
       html: PASSWORD_RESET_REQUEST_TEMPLATE.replace("{resetURL}", resetToken)
     })
-    console.log("Message sent: %s", response.messageId);
   }
   catch(error){
     console.error(error);
@@ -70,7 +67,6 @@ export const sendResetSuccessEmail = async (email) =>{
       subject: "Password Reset Successful",
       html: PASSWORD_RESET_SUCCESS_TEMPLATE,
     })
-    console.log("Message sent: %s", response.messageId);
   }
   catch(error){
     console.error(error);

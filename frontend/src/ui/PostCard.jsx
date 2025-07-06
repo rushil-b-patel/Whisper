@@ -20,7 +20,6 @@ function PostCard({ post }) {
     }
   }, [post._id, navigate]);
   
-  // Calculate initial vote values
   const voteCount = post.upVotes - post.downVotes;
   const userUpVoted = user && post.upVotedUsers?.includes(user._id);
   const userDownVoted = user && post.downVotedUsers?.includes(user._id);

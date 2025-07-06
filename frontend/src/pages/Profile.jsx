@@ -21,15 +21,6 @@ function Profile() {
       <h1 className="text-3xl font-bold mb-8">Your Profile</h1>
       <div className="space-y-5">
         <div>
-          <label className="block font-semibold mb-2">Email</label>
-          <input
-            type="text"
-            value={email}
-            disabled
-            className="w-full p-3 dark:bg-[#2A3236] dark:border-none border border-gray-300 rounded-lg"
-          />
-        </div>
-        <div>
           <label className="block font-semibold mb-2">Username</label>
           <input
             type="text"

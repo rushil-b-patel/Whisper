@@ -14,7 +14,7 @@ const getBaseURI = () =>{
     return BASE_API;
 }
 
-let API = getBaseURI(); 
+let API = getBaseURI();
 const AuthContext = createContext();
 
 export const AuthProvider = ({children}) => {
@@ -39,14 +39,14 @@ export const AuthProvider = ({children}) => {
                 setUser(null);
                 return;
             }
-            
+
             const config = {
                 headers: {
                     Authorization: `Bearer ${token}`
                 },
                 withCredentials: true
             };
-            
+
             const response = await axios.get(`${API}/auth/check-auth`, config);
             setUser(response.data.user);
         }
@@ -73,20 +73,14 @@ export const AuthProvider = ({children}) => {
         setIsLoading(true);
         setError(null);
         try{
-            // Validate inputs
             if (!identifier || !password) {
                 const msg = 'Username/Email and password are required';
                 setError(msg);
                 toast.error(msg, { position: 'bottom-right' });
                 return null;
             }
-            
-            console.log('Login request:', { identifier, password: '****' });
-            
+
             const response = await axios.post(`${API}/auth/login`, { email: identifier, password });
-            
-            console.log('Login response:', response.data);
-            
             if (response.data && response.data.token && response.data.user) {
                 const {token, user} = response.data;
                 setUser(user);
@@ -111,14 +105,13 @@ export const AuthProvider = ({children}) => {
         setIsLoading(true);
         setError(null);
         try{
-            // Validate inputs
             if (!userName || !email || !password) {
                 const msg = 'All fields are required';
                 setError(msg);
                 toast.error(msg, { position: 'bottom-right' });
                 return null;
             }
-            
+
             const response = await axios.post(`${API}/auth/signup`, { userName, email, password});
             const {token, user} = response.data;
             setUser(user);
@@ -140,25 +133,20 @@ export const AuthProvider = ({children}) => {
     const googleLogin = async (response) => {
         setIsLoading(true);
         try{
-            console.log('Google login response data:', response);
-            
             if (!response || !response.credential) {
                 throw new Error('Invalid Google response');
             }
-            
+
             const result = await axios.post(
-                `${API}/auth/google/login`, 
+                `${API}/auth/google/login`,
                 { googleToken: response.credential },
                 { withCredentials: true }
             );
-            
-            console.log('Google login server response:', result.data);
-            
             const { token, user } = result.data;
             setUser(user);
             localStorage.setItem('token', token);
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            
+
             if (user) {
                 toast.success('Logged in successfully with Google', { position: 'bottom-right' });
                 navigate(user.isVerified ? '/' : '/verify-email');
@@ -175,25 +163,22 @@ export const AuthProvider = ({children}) => {
     const googleSignup = async (response) => {
         setIsLoading(true);
         try{
-            console.log(response);
             if (!response || !response.credential) {
                 throw new Error('Invalid Google response');
             }
-            
+
             const result = await axios.post(`${API}/auth/google/signup`, {
                 googleToken: response.credential
             });
-            console.log(result.data);
-            
             if (!result.data || !result.data.token || !result.data.user) {
                 throw new Error('Invalid server response');
             }
-            
+
             const { token, user } = result.data;
             setUser(user);
             localStorage.setItem('token', token);
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            
+
             toast.success('Account created successfully with Google', { position: 'bottom-right' });
             navigate(result.data.user.isVerified ? '/' : '/verify-email');
         }
@@ -227,16 +212,14 @@ export const AuthProvider = ({children}) => {
                 toast.error(msg, { position: 'bottom-right' });
                 return;
             }
-            
+
             const response = await axios.post(`${API}/auth/verify-email`, {code});
-            console.log('verify email', response);
             if(response.data.success){
                 setUser(response.data.user);
                 toast.success('Email verified successfully', { position: 'bottom-right' });
                 navigate('/');
             }
             else{
-                console.log('email not verified');
                 setError(response.data.message || 'Email verification failed');
                 toast.error(response.data.message || 'Email verification failed', { position: 'bottom-right' });
             }
@@ -259,14 +242,14 @@ export const AuthProvider = ({children}) => {
                 toast.error(msg, { position: 'bottom-right' });
                 return;
             }
-            
+
             axios.defaults.withCredentials = true;
             const response = await axios.put(`${API}/auth/update-user`, data, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`
                 }
             });
-            
+
             setUser(response.data.user);
             toast.success('Profile Updated', {
                 position: 'bottom-right'
@@ -282,18 +265,18 @@ export const AuthProvider = ({children}) => {
 
     return(
         <AuthContext.Provider value={
-            {user, 
-            isLoading, 
-            error, 
-            login, 
-            signup, 
-            googleSignup, 
-            googleLogin, 
-            logout, 
-            verifyAuth, 
-            verifyEmail, 
-            updateUserData, 
-            setIsLoading, 
+            {user,
+            isLoading,
+            error,
+            login,
+            signup,
+            googleSignup,
+            googleLogin,
+            logout,
+            verifyAuth,
+            verifyEmail,
+            updateUserData,
+            setIsLoading,
             setError}
             }>
             {!isLoading && children}

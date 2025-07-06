@@ -17,7 +17,7 @@ function ProtectedRoute({children}) {
 
 
 function RedirectRoute({children}) {
-    
+
     const { user, isLoading } = useAuth();
     if(isLoading){
         return <div>Loading...</div>
@@ -31,7 +31,7 @@ function RedirectRoute({children}) {
 }
 
 function VerifyEmailRoute({children}) {
-    
+
     const { user, isLoading } = useAuth();
     if(isLoading){
         return <div>Loading...</div>

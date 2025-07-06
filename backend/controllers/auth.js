@@ -7,35 +7,33 @@ import { verifyGoogleToken } from '../utils/googleAuth.js';
 import { CLIENT_URI } from '../utils/envVariables.js';
 
 export const login = async (req, res)=>{
-    console.log('Login request received:', req.body);
-    
     const { email, password } = req.body;
-    
+
     try{
         if(!email || !password){
             return res.status(400).json({message: 'Please fill in all fields'});
         }
-        
+
         let user;
         user = await User.findOne({ userName: email });
-        
+
         if (!user) {
-            user = await User.findOne({email});            
+            user = await User.findOne({email});
             if (!user) {
                 const emailHash = computeEmailHash(email);
                 user = await User.findOne({emailHash});
             }
         }
-        
+
         if(!user){
             return res.status(400).json({message: `User doesn't exist with the provided username or email`});
         }
-        
+
         const passwordMatch = await bcrypt.compare(password, user.password);
         if(!passwordMatch){
             return res.status(400).json({message: 'Invalid password'});
         }
-        
+
         if(!user.isVerified){
             return res.status(403).json({message: 'Email not verified. Please verify your email', redirect: true});
         }
@@ -69,14 +67,14 @@ export const signup = async (req, res)=>{
         if(userNameExist){
             return res.status(400).json({success:false, message: 'Username already exists'});
         }
-        
+
         const emailHash = computeEmailHash(email);
 
         const userEmailExist = await User.findOne({ emailHash });
         if(userEmailExist){
             return res.status(400).json({success:false, message: 'Email already exists'});
         }
-        
+
         const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = new User({
@@ -124,9 +122,9 @@ export const verifyEmail = async (req, res)=>{
         user.isVerified = true;
         user.verificationToken = undefined;
         user.verificationTokenExpires = undefined;
-        
+
         await user.save();
-        
+
         res.status(200).json({
             success: true,
             message: 'Email verified successfully',
@@ -156,7 +154,7 @@ export const forgotPassword = async (req, res)=>{
             return res.status(400).json({success:false, message: 'User not found'});
         }
         const resetToken = crypto.randomBytes(20).toString('hex');
-        const resetTokenExpires = Date.now() +  15 * 60 * 1000; 
+        const resetTokenExpires = Date.now() +  15 * 60 * 1000;
 
         user.resetPasswordToken = resetToken;
         user.resetPasswordTokenExpires = resetTokenExpires;
@@ -175,7 +173,7 @@ export const resetPassword = async (req, res)=>{
     try{
         const { token } = req.params;
         const { password } = req.body;
-        
+
         const user = await User.findOne({
             resetPasswordToken: token,
             resetPasswordTokenExpires: { $gt: Date.now() }
@@ -262,7 +260,7 @@ export const googleLogin = async (req, res) => {
         }
         const token = generateTokenAndSetCookie(res, user._id);
         await user.save();
-        return res.status(200).json({message: 'Google login success', token, user});        
+        return res.status(200).json({message: 'Google login success', token, user});
     }
     catch(error){
         console.error("Error logging in with google",error);
@@ -290,7 +288,7 @@ export const googleSignup = async (req, res) => {
 
         const token = generateTokenAndSetCookie(res, user._id);
         await sendVerificationEmail(user.email, verificationToken);
-        
+
         res.status(200).json({message: 'User created successfully', user, token});
     }
     catch(error){

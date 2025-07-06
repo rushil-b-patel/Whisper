@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { usePostService } from "../context/PostContext";
 import PostCard from "../ui/PostCard";
 import { useAuth } from "../context/AuthContext";
-import { Fire, Sparkles, Users, User, Clock, Bookmark, Settings, Bell } from "../ui/Icons";
+import { Fire, Sparkles, Clock } from "../ui/Icons";
 
 function Home() {
   const [posts, setPosts] = useState([]);
@@ -11,7 +11,7 @@ function Home() {
   const [activeFilter, setActiveFilter] = useState("trending");
   const { getAllPosts } = usePostService();
   const { user } = useAuth();
-  
+
   const departments = [
     { id: 1, name: "Computer Science", members: 23450 },
     { id: 2, name: "IT", members: 18920 },
@@ -19,8 +19,7 @@ function Home() {
     { id: 4, name: "Web Development", members: 12300 },
     { id: 5, name: "App Development", members: 9870 },
   ];
-  
-  // Demo user stats
+
   const userStats = {
     posts: 12,
     upvotes: 243,
@@ -39,11 +38,9 @@ function Home() {
     const fetchPosts = async () => {
       try {
         const response = await getAllPosts();
-        console.log(response);
         setPosts(response.posts);
         setError(null);
       } catch (error) {
-        console.error("fetch posts failed", error);
         setError(error.response?.data?.message || "An error occurred while fetching posts");
       } finally {
         setIsLoading(false);
@@ -54,7 +51,6 @@ function Home() {
 
   const getFilteredPosts = () => {
     if (!posts || posts.length === 0) return [];
-    
     switch (activeFilter) {
       case "trending":
         return [...posts].sort((a, b) => (b.upVotes - b.downVotes) - (a.upVotes - a.downVotes));
@@ -73,9 +69,8 @@ function Home() {
 
   return (
     <div className="dark:bg-[#0e1113] min-h-screen py-4 px-4 md:px-6">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-6">
-        {/* Left Sidebar */}
-        <div className="md:w-64 lg:w-72 flex-shrink-0 md:sticky md:top-20 h-auto">
+      <div className="max-w-7xl mx-auto h-[calc(100vh-2rem)] flex flex-col md:flex-row gap-6">
+        <div className="md:w-64 lg:w-72 flex-shrink-0 sticky top-4 self-start h-fit">
           <div className="bg-white dark:bg-[#131619] rounded-xl p-4 shadow-sm mb-4">
             <h2 className="font-mono text-lg font-bold mb-4 text-black dark:text-white">Discover</h2>
             <ul className="space-y-1">
@@ -149,10 +144,9 @@ function Home() {
             </ul>
           </div>
         </div>
-        
-        {/* Middle Content - Posts */}
-        <div className="flex-grow max-w-xl mx-auto">
-          <div className="sticky top-16 z-10 bg-white dark:bg-[#0e1113] py-3 mb-4 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90 border-b border-gray-100 dark:border-gray-800">
+
+        <div className="flex-grow max-w-xl mx-auto overflow-y-auto pr-1">
+          <div className="top-16 z-10 bg-white dark:bg-[#0e1113] py-3 mb-4 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90 border-b border-gray-100 dark:border-gray-800">
             <div className="flex items-center justify-between">
               <h1 className="font-mono text-2xl font-bold text-black dark:text-white">
                 {activeFilter === "trending" && "Trending Posts"}
@@ -161,7 +155,7 @@ function Home() {
               </h1>
             </div>
           </div>
-          
+
           {isLoading ? (
             <div className="min-h-[50vh] flex justify-center items-center">
               <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
@@ -184,9 +178,8 @@ function Home() {
             </div>
           )}
         </div>
-        
-        {/* Right Sidebar - User Info */}
-        <div className="md:w-64 lg:w-80 flex-shrink-0 md:sticky md:top-20 h-auto">
+
+        <div className="md:w-64 lg:w-80 flex-shrink-0 sticky top-4 self-start h-fit">
           {user ? (
             <>
               <div className="bg-white dark:bg-[#131619] rounded-xl p-4 shadow-sm mb-4">
@@ -199,7 +192,7 @@ function Home() {
                     <p className="text-sm text-gray-500 dark:text-gray-400">Member since {userStats.joinDate}</p>
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-2 mb-4">
                   <div className="bg-gray-50 dark:bg-slate-800 p-3 rounded-lg">
                     <p className="text-xs text-gray-500 dark:text-gray-400">Posts</p>
@@ -218,7 +211,7 @@ function Home() {
                     <p className="font-mono text-lg font-bold text-black dark:text-white">{userStats.karma}</p>
                   </div>
                 </div>
-                
+
                 <div className="flex gap-2">
                   <button className="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors text-sm font-medium">
                     My Posts
@@ -228,7 +221,7 @@ function Home() {
                   </button>
                 </div>
               </div>
-              
+
               <div className="bg-white dark:bg-[#131619] rounded-xl p-4 shadow-sm">
                 <h2 className="font-mono text-lg font-bold mb-3 text-black dark:text-white">Recent Activity</h2>
                 <ul className="space-y-3">

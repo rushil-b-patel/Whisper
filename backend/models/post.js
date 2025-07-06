@@ -1,22 +1,14 @@
 import mongoose from 'mongoose';
 
 const commentSchema = new mongoose.Schema({
-    text: {
-        type: String,
-        required: true
-    },
-    User: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    }
-}, {timestamps: true});
+    postId: { type: mongoose.Schema.Types.ObjectId, ref: "Post", required: true },
+    parentComment: { type: mongoose.Schema.Types.ObjectId, ref: "Comment", default: null },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    content: { type: String, required: true },
+    upVotedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    downVotedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+}, { timestamps: true });
 
-// Poll option schema
 const pollOptionSchema = new mongoose.Schema({
     text: {
         type: String,
@@ -32,7 +24,6 @@ const pollOptionSchema = new mongoose.Schema({
     }]
 });
 
-// Poll schema
 const pollSchema = new mongoose.Schema({
     question: {
         type: String,
@@ -41,7 +32,7 @@ const pollSchema = new mongoose.Schema({
     options: [pollOptionSchema],
     endDate: {
         type: Date,
-        default: () => new Date(+new Date() + 7*24*60*60*1000) // Default 7 days from now
+        default: () => new Date(+new Date() + 7*24*60*60*1000)
     }
 });
 
@@ -99,3 +90,4 @@ const postSchema = new mongoose.Schema({
 }, {timestamps: true});
 
 export const Post = mongoose.model('Post', postSchema);
+export const Comment = mongoose.model('Comment', commentSchema);
