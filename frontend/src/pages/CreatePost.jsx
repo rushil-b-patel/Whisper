@@ -17,7 +17,7 @@ function CreatePost() {
   const [pollQuestion, setPollQuestion] = useState('');
   const [isDraft, setIsDraft] = useState(false);
   const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
-  
+
   const token = localStorage.getItem('token');
   const { createPost } = usePostService();
 
@@ -49,9 +49,9 @@ function CreatePost() {
       pollOptions,
       showPoll,
       content,
-      isDraft: true
+      isDraft: true,
     };
-    
+
     localStorage.setItem('postDraft', JSON.stringify(draft));
     toast.success('Draft saved successfully', { position: 'bottom-right' });
   };
@@ -75,23 +75,23 @@ function CreatePost() {
       formData.append('title', title);
       formData.append('description', content);
       formData.append('category', category);
-      
+
       if (showPoll) {
         const pollData = {
           question: pollQuestion,
-          options: pollOptions.filter(option => option.trim() !== '')
+          options: pollOptions.filter((option) => option.trim() !== ''),
         };
         formData.append('poll', JSON.stringify(pollData));
       }
-      
+
       if (image) {
         formData.append('image', image);
       }
-      
+
       formData.append('isDraft', isDraft);
-      
+
       await createPost(token, formData);
-      
+
       // Clear form and draft on successful submission
       setTitle('');
       setContent('');
@@ -103,7 +103,7 @@ function CreatePost() {
       setPollQuestion('');
       setIsDraft(false);
       clearDraft();
-      
+
       if (!isDraft) {
         navigate('/');
       }
@@ -156,7 +156,7 @@ function CreatePost() {
     { value: 'Health', label: 'Health & Fitness' },
     { value: 'Travel', label: 'Travel' },
     { value: 'Music', label: 'Music' },
-    { value: 'Gaming', label: 'Gaming' }
+    { value: 'Gaming', label: 'Gaming' },
   ];
 
   return (
@@ -166,7 +166,7 @@ function CreatePost() {
           <h1 className="text-2xl md:text-3xl font-bold mb-8 text-gray-900 dark:text-white font-mono">
             Create Post
           </h1>
-          
+
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Title input */}
             <div>
@@ -186,7 +186,7 @@ function CreatePost() {
                 {title.length}/100
               </p>
             </div>
-            
+
             {/* Category dropdown */}
             <div className="relative">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -198,10 +198,14 @@ function CreatePost() {
                   onClick={() => setCategoryDropdownOpen(!categoryDropdownOpen)}
                   className="w-full flex items-center justify-between px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg dark:bg-slate-800 dark:text-white"
                 >
-                  <span>{category ? categories.find(c => c.value === category)?.label : 'Select a category'}</span>
+                  <span>
+                    {category
+                      ? categories.find((c) => c.value === category)?.label
+                      : 'Select a category'}
+                  </span>
                   <ChevronDown className="w-5 h-5" />
                 </button>
-                
+
                 {categoryDropdownOpen && (
                   <div className="absolute z-10 mt-1 w-full bg-white dark:bg-slate-800 shadow-lg rounded-lg py-1 max-h-60 overflow-auto">
                     {categories.map((cat) => (
@@ -221,7 +225,7 @@ function CreatePost() {
                 )}
               </div>
             </div>
-            
+
             {/* Basic Text Editor */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -237,10 +241,16 @@ function CreatePost() {
                       onClick={() => {
                         // Simple formatting - just add markdown-like symbols
                         let formatChar = '';
-                        switch(format) {
-                          case 'B': formatChar = '**'; break;
-                          case 'I': formatChar = '*'; break;
-                          case 'U': formatChar = '__'; break;
+                        switch (format) {
+                          case 'B':
+                            formatChar = '**';
+                            break;
+                          case 'I':
+                            formatChar = '*';
+                            break;
+                          case 'U':
+                            formatChar = '__';
+                            break;
                         }
                         setContent(content + ' ' + formatChar + 'text' + formatChar + ' ');
                       }}
@@ -248,7 +258,7 @@ function CreatePost() {
                       {format}
                     </button>
                   ))}
-                  
+
                   <button
                     type="button"
                     className="px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-slate-700 text-sm font-medium"
@@ -256,7 +266,7 @@ function CreatePost() {
                   >
                     • List
                   </button>
-                  
+
                   <button
                     type="button"
                     className="px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-slate-700 text-sm font-medium"
@@ -277,7 +287,7 @@ function CreatePost() {
                 Supports basic markdown: **bold**, *italic*, __underline__, ## heading
               </p>
             </div>
-            
+
             {/* Image upload */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -286,11 +296,7 @@ function CreatePost() {
               <div className="flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-6">
                 {imagePreview ? (
                   <div className="relative">
-                    <img 
-                      src={imagePreview} 
-                      alt="Preview" 
-                      className="max-h-48 mx-auto rounded-lg"
-                    />
+                    <img src={imagePreview} alt="Preview" className="max-h-48 mx-auto rounded-lg" />
                     <button
                       type="button"
                       onClick={() => {
@@ -315,12 +321,14 @@ function CreatePost() {
                         onChange={handleImageChange}
                       />
                     </label>
-                    <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">PNG, JPG, GIF up to 5MB</p>
+                    <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                      PNG, JPG, GIF up to 5MB
+                    </p>
                   </div>
                 )}
               </div>
             </div>
-            
+
             {/* Poll toggle */}
             <div className="flex items-center">
               <input
@@ -334,7 +342,7 @@ function CreatePost() {
                 Add a poll to your post
               </label>
             </div>
-            
+
             {/* Poll options (visible only when poll is toggled on) */}
             {showPoll && (
               <div className="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-lg space-y-4">
@@ -351,7 +359,7 @@ function CreatePost() {
                     required={showPoll}
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Poll Options
@@ -377,7 +385,7 @@ function CreatePost() {
                       )}
                     </div>
                   ))}
-                  
+
                   {pollOptions.length < 4 && (
                     <button
                       type="button"
@@ -390,7 +398,7 @@ function CreatePost() {
                 </div>
               </div>
             )}
-            
+
             {/* Buttons */}
             <div className="pt-4 flex flex-col sm:flex-row gap-4 justify-end">
               <button
@@ -400,7 +408,7 @@ function CreatePost() {
               >
                 Save Draft
               </button>
-              
+
               <button
                 type="button"
                 onClick={() => {
@@ -411,7 +419,7 @@ function CreatePost() {
               >
                 Save as Draft
               </button>
-              
+
               <button
                 type="submit"
                 disabled={isLoading}

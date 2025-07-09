@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { EyeOff, Eye } from '../ui/Icons';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
-import toast from 'react-hot-toast';
 import { GoogleLogin } from '@react-oauth/google';
 
 const Signup = () => {
@@ -23,25 +22,20 @@ const Signup = () => {
   };
 
   const handleGoogleSignup = async (response) => {
-      await googleSignup(response);
-  }
+    await googleSignup(response);
+  };
 
   return (
     <div className="dark:bg-[#0e1113] dark:text-[#eef1f3] flex flex-col h-[calc(100vh-4em)] justify-center p-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="text-center text-3xl font-extrabold">
-          Create your account
-        </h2>
+        <h2 className="text-center text-3xl font-extrabold">Create your account</h2>
       </div>
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="py-8 px-4 sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label
-                htmlFor="name"
-                className="block text-sm font-medium"
-              >
+              <label htmlFor="name" className="block text-sm font-medium">
                 User name
               </label>
               <div className="mt-1">
@@ -50,7 +44,7 @@ const Signup = () => {
                   name="userName"
                   type="text"
                   autoComplete="userName"
-                  placeholder='Username'
+                  placeholder="Username"
                   required
                   className="appearance-none block w-full px-3 py-2 dark:bg-[#2A3236] bg-slate-200 dark:text-[#eef1f3] outline-none rounded-md sm:text-sm"
                   value={userName}
@@ -60,10 +54,7 @@ const Signup = () => {
             </div>
 
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium"
-              >
+              <label htmlFor="email" className="block text-sm font-medium">
                 Email address
               </label>
               <div className="mt-1">
@@ -72,7 +63,7 @@ const Signup = () => {
                   name="email"
                   type="email"
                   autoComplete="email"
-                  placeholder='Email'
+                  placeholder="Email"
                   required
                   className="appearance-none block w-full px-3 py-2 dark:bg-[#2A3236] bg-slate-200 dark:text-[#eef1f3] outline-none rounded-md sm:text-sm"
                   value={email}
@@ -82,19 +73,16 @@ const Signup = () => {
             </div>
 
             <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium"
-              >
+              <label htmlFor="password" className="block text-sm font-medium">
                 Password
               </label>
               <div className="mt-1 relative">
                 <input
                   id="password"
                   name="password"
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? 'text' : 'password'}
                   autoComplete="new-password"
-                  placeholder='Password'
+                  placeholder="Password"
                   required
                   className="appearance-none block w-full px-3 py-2 dark:bg-[#2A3236] bg-slate-200 dark:text-[#eef1f3] outline-none rounded-md sm:text-sm"
                   value={password}
@@ -116,11 +104,9 @@ const Signup = () => {
                 className="w-full flex justify-center py-2 px-4 rounded-md text-sm font-medium text-white hover:text-black bg-black hover:bg-white border-[2px] border-transparent hover:border-black transition animation duration-500 ease-in-out"
                 disabled={isLoading}
               >
-                {isLoading ? "loading..." : "Sign up"}
+                {isLoading ? 'loading...' : 'Sign up'}
               </button>
-              {error && (
-                <p className="text-red-500 font-semibold mt-2">{error}</p>
-              )}
+              {error && <p className="text-red-500 font-semibold mt-2">{error}</p>}
             </div>
           </form>
           <div className="text-sm flex justify-center space-x-1 my-4">
@@ -142,7 +128,7 @@ const Signup = () => {
           <div className="mt-6 grid grid-cols-3 gap-3">
             <GoogleLogin
               onSuccess={handleGoogleSignup}
-              onFailure={() => console.log("Google signup failed")}
+              onFailure={() => console.log('Google signup failed')}
               useOneTap
             />
           </div>

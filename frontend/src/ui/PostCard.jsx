@@ -8,42 +8,44 @@ function PostCard({ post }) {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  if (!post) return (
-    <div className="bg-white border-2 border-red-500 p-3 rounded-lg text-red-500 font-mono shadow-sm dark:bg-slate-900">
-      Error: Data is missing...!
-    </div>
-  );
+  if (!post)
+    return (
+      <div className="bg-white border-2 border-red-500 p-3 rounded-lg text-red-500 font-mono shadow-sm dark:bg-slate-900">
+        Error: Data is missing...!
+      </div>
+    );
 
   const handleRedirect = useCallback(() => {
     if (post._id) {
       navigate(`/post/${post._id}`);
     }
   }, [post._id, navigate]);
-  
+
   // Calculate initial vote values
   const voteCount = post.upVotes - post.downVotes;
   const userUpVoted = user && post.upVotedUsers?.includes(user._id);
   const userDownVoted = user && post.downVotedUsers?.includes(user._id);
-  
+
   return (
-    <div className="relative bg-white w-full sm:max-w-xl mx-auto p-4 sm:p-6 mb-4 sm:mb-6 border-y lg:rounded-xl lg:border lg:border-slate-200 hover:border-indigo-500/30hover:shadow-lg sm:hover:shadow-xl hover:shadow-indigo-100 dark:bg-[#0e1113] dark:border-slate-800 dark:hover:border-indigo-500/30 dark:hover:shadow-indigo-900/20 cursor-pointer transform transition-all duration-300"
+    <div
+      className="relative bg-white w-full sm:max-w-xl mx-auto p-4 sm:p-6 mb-4 sm:mb-6 border-y lg:rounded-xl lg:border lg:border-slate-200 hover:border-indigo-500/30hover:shadow-lg sm:hover:shadow-xl hover:shadow-indigo-100 dark:bg-[#0e1113] dark:border-slate-800 dark:hover:border-indigo-500/30 dark:hover:shadow-indigo-900/20 cursor-pointer transform transition-all duration-300"
       onClick={handleRedirect}
     >
       <div className="flex items-start sm:items-center mb-3 sm:mb-5 relative">
         <div className="relative group">
           <div className="absolute inset-0 bg-indigo-200 rounded-full blur-sm opacity-0 group-hover:opacity-30 transition-opacity duration-300 dark:bg-indigo-500" />
           <img
-            src={post.avatar || "/api/placeholder/40/40"}
+            src={post.avatar || '/api/placeholder/40/40'}
             alt={post.author}
             className="w-5 h-5 sm:w-8 sm:h-8 rounded-full object-cover relative z-10 ring-2 ring-slate-100 ring-offset-1 sm:ring-offset-2 group-hover:ring-indigo-200 transition-all duration-300 dark:ring-slate-800 dark:group-hover:ring-indigo-500"
           />
         </div>
         <div className="ml-3 sm:ml-4 max-w-[80%]">
           <h2 className="font-mono text-base sm:text-md font-bold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent truncate dark:from-indigo-400 dark:to-violet-400">
-            {post.user?.userName || "Deleted User"}
+            {post.user?.userName || 'Deleted User'}
           </h2>
           <p className="font-mono text-xs sm:text-sm text-black dark:text-white truncate">
-            {post.user?.department || ""}
+            {post.user?.department || ''}
           </p>
         </div>
       </div>
@@ -72,12 +74,12 @@ function PostCard({ post }) {
 
       <div className="flex justify-between items-center pl-2 sm:pl-3">
         <div className="flex items-center space-x-4 sm:space-x-6">
-            <VoteBar 
-              id={post._id} 
-              initialVotes={voteCount} 
-              initialUpVoted={userUpVoted} 
-              initialDownVoted={userDownVoted}
-            />
+          <VoteBar
+            id={post._id}
+            initialVotes={voteCount}
+            initialUpVoted={userUpVoted}
+            initialDownVoted={userDownVoted}
+          />
           <button className="group flex items-center border border-gray-200 rounded-xl p-1 px-3 gap-3 text-black dark:text-white dark:border-none dark:bg-slate-700 hover:bg-slate-200  transition-colors">
             <Comment className="w-4 h-4 sm:w-5 sm:h-5 transform group-hover:scale-110 transition-transform" />
             <p className="text-black font-mono font-bold text-lg dark:text-white">

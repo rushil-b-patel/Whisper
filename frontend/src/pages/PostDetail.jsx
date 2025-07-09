@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { usePostService } from "../context/PostContext";
-import VoteBar from "../components/VoteBar";
-import toast from "react-hot-toast";
-import Comment from "../components/Comment";
-import { useAuth } from "../context/AuthContext";
-import { Bars, Trash, Save, ChevronLeft, Share } from "../ui/Icons";
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { usePostService } from '../context/PostContext';
+import VoteBar from '../components/VoteBar';
+import toast from 'react-hot-toast';
+import Comment from '../components/Comment';
+import { useAuth } from '../context/AuthContext';
+import { Bars, Trash, Save, ChevronLeft, Share } from '../ui/Icons';
 
 function PostDetail() {
   const { id } = useParams();
@@ -27,7 +27,7 @@ function PostDetail() {
         setPost(response.post);
         setComments(response.post.comments || []);
       } catch (err) {
-        console.error("Error fetching post:", err);
+        console.error('Error fetching post:', err);
       } finally {
         setIsLoading(false);
       }
@@ -41,54 +41,56 @@ function PostDetail() {
         setShowOptions(false);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showOptions]);
 
   const handleSavePost = () => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
     if (!token) {
-      toast.error("Login to save post", { position: "bottom-right" });
+      toast.error('Login to save post', { position: 'bottom-right' });
       return;
     }
-    toast.success("Post saved", { position: "bottom-right" });
+    toast.success('Post saved', { position: 'bottom-right' });
     setShowOptions(false);
   };
 
   const handleDeletePost = async () => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
     if (!token || user?._id !== post?.user?._id) {
-      toast.error("Unauthorized", { position: "bottom-right" });
+      toast.error('Unauthorized', { position: 'bottom-right' });
       return;
     }
 
     try {
       setIsLoading(true);
-      try{
+      try {
         await deletePost(token, id);
-        navigate("/");
-        toast.success("Post deleted", { position: "bottom-right" });
-      }
-      catch(error){
-        toast.error("Failed to delete post", { position: "bottom-right" });
+        navigate('/');
+        toast.success('Post deleted', { position: 'bottom-right' });
+      } catch (error) {
+        toast.error('Failed to delete post', { position: 'bottom-right' });
       }
     } catch (err) {
-      toast.error("Failed to delete post", { position: "bottom-right" });
+      toast.error('Failed to delete post', { position: 'bottom-right' });
     } finally {
       setIsLoading(false);
       setShowOptions(false);
     }
   };
 
-  const handleDeleteComment = useCallback(async (commentId) => {
-    const token = localStorage.getItem("token");
-    try {
-      await deleteComment(token, id, commentId);
-      setComments((prev) => prev.filter((c) => c._id !== commentId));
-    } catch {
-      toast.error("Failed to delete comment", { position: "bottom-right" });
-    }
-  }, [id, deleteComment]);
+  const handleDeleteComment = useCallback(
+    async (commentId) => {
+      const token = localStorage.getItem('token');
+      try {
+        await deleteComment(token, id, commentId);
+        setComments((prev) => prev.filter((c) => c._id !== commentId));
+      } catch {
+        toast.error('Failed to delete comment', { position: 'bottom-right' });
+      }
+    },
+    [id, deleteComment]
+  );
 
   if (isLoading) {
     return (
@@ -125,11 +127,10 @@ function PostDetail() {
           />
           <div className="ml-4">
             <h2 className="text-lg font-semibold font-mono text-gray-900 dark:text-white">
-              {post?.user?.userName || "Unknown"}
+              {post?.user?.userName || 'Unknown'}
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 font-mono">
-              {post.user?.department || "General"} •{" "}
-              {new Date(post.createdAt).toLocaleDateString()}
+              {post.user?.department || 'General'} • {new Date(post.createdAt).toLocaleDateString()}
             </p>
           </div>
           {user?._id === post.user?._id && (
@@ -191,11 +192,7 @@ function PostDetail() {
           </div>
 
           <section className="mt-10">
-            <Comment
-              post={post}
-              comments={comments}
-              onDeleteComment={handleDeleteComment}
-            />
+            <Comment post={post} comments={comments} onDeleteComment={handleDeleteComment} />
           </section>
         </article>
       </div>

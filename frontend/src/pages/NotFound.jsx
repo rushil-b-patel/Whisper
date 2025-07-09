@@ -1,11 +1,9 @@
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
 
 const NotFound = () => {
   return (
     <main className="bg-slate-200 dark:bg-black h-[calc(100vh-4em)] flex flex-col justify-center items-center">
-      <h1 className="font-bold text-black dark:text-white text-center text-5xl">
-        404
-      </h1>
+      <h1 className="font-bold text-black dark:text-white text-center text-5xl">404</h1>
       <p>
         <span className="text-gray-800 dark:text-gray-300 mt-2">
           The page you are looking for does not exist.

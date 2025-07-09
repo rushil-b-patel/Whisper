@@ -1,9 +1,7 @@
-import React from 'react'
+import React from 'react';
 
 function LeftSideBar() {
-  return (
-    <div>LeftSideBar</div>
-  )
+  return <div>LeftSideBar</div>;
 }
 
-export default LeftSideBar
+export default LeftSideBar;
