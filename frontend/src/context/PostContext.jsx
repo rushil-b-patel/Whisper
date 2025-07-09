@@ -17,11 +17,10 @@ const API = getBaseURI();
 
 
 export const usePostService = () => {
-    
+
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
 
-  // Helper function to handle errors consistently
   const handleError = (error, customMessage) => {
     const errorMessage = error.response?.data?.message || customMessage || 'An unexpected error occurred';
     console.error(errorMessage, error);
@@ -39,20 +38,20 @@ export const usePostService = () => {
         toast.error(msg, { position: 'bottom-right' });
         throw new Error(msg);
       }
-      
-      const response = await axios.post(`${API}/post/create-post`, formData, 
-            { 
-              headers: 
+
+      const response = await axios.post(`${API}/post/create-post`, formData,
+            {
+              headers:
                 {
                   "Authorization": `Bearer ${token}`,
                   "Content-Type": "multipart/form-data",
                 }
             });
-      
+
       const isDraft = formData.get('isDraft') === 'true';
       const successMessage = isDraft ? "Draft saved successfully" : "Post created successfully";
       toast.success(successMessage, { position: 'bottom-right' });
-      
+
       return response.data;
     } catch (error) {
       handleError(error, 'Failed to create post');
@@ -85,7 +84,7 @@ export const usePostService = () => {
         toast.error(msg, { position: 'bottom-right' });
         throw new Error(msg);
       }
-      
+
       const response = await axios.get(`${API}/post/${id}`);
       return response.data;
     } catch (error) {
@@ -105,10 +104,10 @@ export const usePostService = () => {
         toast.error(msg, { position: 'bottom-right' });
         throw new Error(msg);
       }
-      
+
       const response = await axios.put(
-        `${API}/post/upvote/${id}`, 
-        {}, // Empty data object
+        `${API}/post/upvote/${id}`,
+        {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
       return response.data;
@@ -129,10 +128,10 @@ export const usePostService = () => {
         toast.error(msg, { position: 'bottom-right' });
         throw new Error(msg);
       }
-      
+
       const response = await axios.put(
-        `${API}/post/downvote/${id}`, 
-        {}, // Empty data object
+        `${API}/post/downvote/${id}`,
+        {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
       return response.data;
@@ -153,21 +152,21 @@ export const usePostService = () => {
         toast.error(msg, { position: 'bottom-right' });
         throw new Error(msg);
       }
-      
+
       if (!text || !text.trim()) {
         const msg = 'Comment text is required';
         toast.error(msg, { position: 'bottom-right' });
         throw new Error(msg);
       }
-      
+
       const response = await axios.post(`${API}/post/add-comment/${id}`, { text }, 
         { headers: { "Authorization": `Bearer ${token}` } }
       );
-      
+
       if (response.data.success) {
         toast.success('Comment added successfully', { position: 'bottom-right' });
       }
-      
+
       return response.data;
     } catch (error) {
       handleError(error, 'Failed to add comment');
@@ -176,6 +175,32 @@ export const usePostService = () => {
       setIsLoading(false);
     }
   };
+
+  const deletePost = async (token, id) => {
+    setError(null);
+    setIsLoading(true);
+    try{
+      if(!token || !id) {
+        const msg = 'Missing required information to delete comment';
+        toast.error(msg, { position: 'bottom-right' });
+        throw new Error(msg);
+      }
+
+      const response = await axios.delete(
+        `${API}/post/delete-post/${id}`,
+        { headers: { "Authorization": `Bearer ${token}` } }
+      );
+      if(response.success){
+        toast.success(response.data.message || "Post deleted successfully", { position: 'bottom-right' });
+      }
+    }
+    catch(error){
+      handleError(error, 'Failed to delete comment');
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   const deleteComment = async (token, id, commentId) => {
     setError(null);
@@ -186,16 +211,16 @@ export const usePostService = () => {
         toast.error(msg, { position: 'bottom-right' });
         throw new Error(msg);
       }
-      
+
       const response = await axios.delete(
-        `${API}/post/delete-comment/${id}/${commentId}`, 
+        `${API}/post/delete-comment/${id}/${commentId}`,
         { headers: { "Authorization": `Bearer ${token}` } }
       );
-      
+
       if (response.data.success) {
         toast.success(response.data.message || "Comment deleted successfully", { position: 'bottom-right' });
       }
-      
+
       return response.data;
     } catch (error) {
       handleError(error, 'Failed to delete comment');
@@ -214,12 +239,12 @@ export const usePostService = () => {
         toast.error(msg, { position: 'bottom-right' });
         throw new Error(msg);
       }
-      
+
       const response = await axios.get(
-        `${API}/post/drafts`, 
+        `${API}/post/drafts`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      
+
       return response.data;
     } catch (error) {
       handleError(error, 'Failed to fetch drafts');
@@ -236,6 +261,7 @@ export const usePostService = () => {
     upVotePost,
     downVotePost,
     addComment,
+    deletePost,
     deleteComment,
     getDrafts,
     error,
