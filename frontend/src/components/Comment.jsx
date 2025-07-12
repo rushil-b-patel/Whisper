@@ -156,7 +156,7 @@ const CommentThread = ({ post, comments: initialComments }) => {
       </form>
 
       {comments.length === 0 ? (
-        <p className="text-gray-500 dark:text-gray-400 text-sm font-mono">No comments yet.</p>
+        <p className="text-gray-500 dark:text-gray-400 text-sm font-mono">No comments yet...</p>
       ) : (
         comments.map((comment) => (
           <CommentItem

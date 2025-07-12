@@ -155,7 +155,7 @@ function Home() {
           </div>
         </div>
 
-        <div className="flex-grow max-w-2xl mx-auto overflow-y-auto h-full px-2">
+        <div className="flex-grow max-w-2xl mx-auto overflow-y-auto h-full px-2 feed-scrollbar-hidden">
           <div className="top-0 z-10 bg-white dark:bg-[#0e1113] py-3 mb-4 border-b border-gray-100 dark:border-gray-800">
             <div className="flex items-center justify-between">
               <h1 className="font-mono text-2xl font-bold text-black dark:text-white">

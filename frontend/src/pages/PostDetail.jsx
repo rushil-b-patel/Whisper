@@ -109,7 +109,7 @@ function PostDetail() {
   }
 
   return (
-    <div className="bg-gray-50 dark:bg-[#0e1113] py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0e1113] py-8 px-4 sm:px-6 lg:px-8">
       <button
         onClick={() => navigate(-1)}
         className="mb-6 flex items-center text-indigo-600 dark:text-indigo-400 hover:underline"
@@ -118,8 +118,8 @@ function PostDetail() {
         <span className="font-mono">Back</span>
       </button>
 
-      <div className="max-w-4xl mx-auto border dark:border-[#2A3236] rounded-lg overflow-hidden shadow-sm">
-        <header className="px-6 py-4 bg-white dark:bg-[#0e1113] flex items-center">
+      <div className="max-w-4xl mx-auto bg-white dark:bg-[#1a1c1f] rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-[#2A2B30]">
+        <header className="flex items-center">
           <img
             src={post?.avatar || `https://ui-avatars.com/api/?name=${post.user.userName}`}
             alt="avatar"
@@ -163,14 +163,14 @@ function PostDetail() {
           )}
         </header>
 
-        <article className="px-6 pt-4 pb-8 bg-white dark:bg-[#0e1113]">
+        <article className="mt-6">
           <h1 className="text-3xl font-bold font-mono text-indigo-600 dark:text-indigo-400 mb-4">
             {post.title}
           </h1>
 
           {post.image && (
             <div className="mb-6 overflow-hidden rounded-xl">
-              <img src={post.image} alt="" className="w-full object-cover" />
+              <img src={post.image} alt="Post attachment" className="w-full object-cover" />
             </div>
           )}
 
