@@ -258,6 +258,10 @@ export const googleLogin = async (req, res) => {
         const userData = await verifyGoogleToken(googleToken);
         let user = await User.findOne({ email: userData.email});
         if(!user){
+            const emailHash = computeEmailHash(userData.email);
+            user = await User.findOne({ emailHash })
+        }
+        if(!user){
             return res.status(400).json({message: 'User not found. Please sign up'});
         }
         const token = generateTokenAndSetCookie(res, user._id);
@@ -274,22 +278,25 @@ export const googleSignup = async (req, res) => {
     const { googleToken } = req.body;
     try{
         const userData = await verifyGoogleToken(googleToken);
+        console.log("userData ----------------------> ", userData);
         let user = await User.findOne({ email: userData.email });
         if(user){
             return res.status(400).json({ message: 'User already exists. Please log in.' });
         }
+        const emailHash = computeEmailHash(userData.email);
         const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
         user = new User({
             userName: userData.name,
-            email: userData.email,
+            emailHash,
             googleId: userData.sub,
             verificationToken,
             verificationTokenExpires: Date.now() + 1 * 60 * 60 * 1000,
         })
+        console.log(user);
         await user.save();
 
         const token = generateTokenAndSetCookie(res, user._id);
-        await sendVerificationEmail(user.email, verificationToken);
+        await sendVerificationEmail(userData.email, verificationToken);
 
         res.status(200).json({message: 'User created successfully', user, token});
     }

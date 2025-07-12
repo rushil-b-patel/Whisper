@@ -134,8 +134,6 @@ export const AuthProvider = ({ children }) => {
   const googleLogin = async (response) => {
     setIsLoading(true);
     try {
-      console.log('Google login response data:', response);
-
       if (!response || !response.credential) {
         throw new Error('Invalid Google response');
       }
