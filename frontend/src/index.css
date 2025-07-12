@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 .feed-scrollbar-hidden::-webkit-scrollbar {
-    display: none;
-  }
-  .feed-scrollbar-hidden {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
+  display: none;
+}
+.feed-scrollbar-hidden {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

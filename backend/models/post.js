@@ -16,7 +16,6 @@ const commentSchema = new mongoose.Schema({
     }
 }, {timestamps: true});
 
-// Poll option schema
 const pollOptionSchema = new mongoose.Schema({
     text: {
         type: String,
@@ -32,7 +31,6 @@ const pollOptionSchema = new mongoose.Schema({
     }]
 });
 
-// Poll schema
 const pollSchema = new mongoose.Schema({
     question: {
         type: String,
@@ -51,7 +49,7 @@ const postSchema = new mongoose.Schema({
         required: true
     },
     description: {
-        type: String,
+        type: Object,
         required: true
     },
     image: {
@@ -87,10 +85,6 @@ const postSchema = new mongoose.Schema({
     poll: {
         type: pollSchema,
         required: false
-    },
-    isDraft: {
-        type: Boolean,
-        default: false
     },
     createdAt: {
         type: Date,

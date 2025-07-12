@@ -5,13 +5,19 @@ export const createPost = async (req, res) => {
         const { title, description, category, isDraft, poll } = req.body;
         const imageUrl = req.file ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}` : null;
 
+        let parsedDescription;
+        try {
+            parsedDescription = JSON.parse(description);
+        } catch (err) {
+            return res.status(400).json({ success: false, message: "Invalid description format" });
+        }
+
         const postData = {
             title,
-            description,
+            description: parsedDescription,
             user: req.userId,
             image: imageUrl,
             category,
-            isDraft: isDraft === 'true'
         };
 
         if (poll) {

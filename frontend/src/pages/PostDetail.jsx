@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import Comment from '../components/Comment';
 import { useAuth } from '../context/AuthContext';
 import { Bars, Trash, Save, ChevronLeft, Share } from '../ui/Icons';
+import { EditorRenderer } from '../components/Editor';
 
 function PostDetail() {
   const { id } = useParams();
@@ -175,7 +176,7 @@ function PostDetail() {
           )}
 
           <p className="text-gray-800 dark:text-gray-200 font-mono mb-6 leading-relaxed">
-            {post.description}
+            <EditorRenderer data={post.description} />
           </p>
 
           <div className="border-t border-gray-100 dark:border-slate-700 pt-6 flex items-center justify-between">

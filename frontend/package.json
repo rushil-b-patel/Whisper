@@ -17,6 +17,13 @@
     }
   },
   "dependencies": {
+    "@editorjs/checklist": "^1.6.0",
+    "@editorjs/editorjs": "^2.30.8",
+    "@editorjs/embed": "^2.7.6",
+    "@editorjs/header": "^2.8.8",
+    "@editorjs/link": "^2.6.2",
+    "@editorjs/list": "^2.0.8",
+    "@editorjs/quote": "^2.7.6",
     "@react-oauth/google": "^0.12.1",
     "axios": "^1.7.7",
     "lucide-react": "^0.441.0",

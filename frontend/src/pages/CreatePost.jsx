@@ -1,11 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { usePostService } from '../context/PostContext';
 import { ChevronDown, ChevronUp } from '../ui/Icons';
 import toast from 'react-hot-toast';
+import Editor from '../components/Editor';
 
 function CreatePost() {
-  const navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
@@ -17,6 +16,7 @@ function CreatePost() {
   const token = localStorage.getItem('token');
   const { createPost } = usePostService();
   const categoryRef = useRef(null);
+  const editorRef = useRef();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -27,7 +27,7 @@ function CreatePost() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
-    }
+    };
   }, []);
 
   const handleSubmit = async (e) => {
@@ -35,15 +35,11 @@ function CreatePost() {
     setIsLoading(true);
 
     try {
-      if (!description.trim()) {
-        toast.error('Please enter description');
-        setIsLoading(false);
-        return;
-      }
+      const editorContent = await editorRef.current.save();
 
       const formData = new FormData();
       formData.append('title', title);
-      formData.append('description', description);
+      formData.append('description', JSON.stringify(editorContent));
       formData.append('category', category);
       if (image) formData.append('image', image);
 
@@ -54,7 +50,6 @@ function CreatePost() {
       setCategory('');
       setImage(null);
       setImagePreview(null);
-
     } catch (err) {
       console.error('Error creating post:', err);
     } finally {
@@ -151,21 +146,15 @@ function CreatePost() {
               </div>
             </div>
 
-
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Description
               </label>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg dark:bg-slate-800 dark:text-white resize-y min-h-[150px]"
-                placeholder="Write something..."
-                required
-              />
+              <div className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg dark:bg-slate-800 dark:text-white resize-y min-h-[150px]">
+                <Editor ref={editorRef} />
+              </div>
             </div>
 
-            {/* Image Upload */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Optional Image
@@ -202,21 +191,21 @@ function CreatePost() {
             </div>
 
             <div className="flex flex-wrap justify-end gap-4 pt-4">
-            <button
-              type="button"
-              onClick={() => {
-                setTitle('');
-                setDescription('');
-                setCategory('');
-                setImage(null);
-                setImagePreview(null);
-                clearDraft();
-                toast.success('Post discarded');
-              }}
-              className="px-5 py-2 bg-gray-600 text-white rounded hover:bg-gray-800"
-            >
-              Discard
-            </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setTitle('');
+                  setDescription('');
+                  setCategory('');
+                  setImage(null);
+                  setImagePreview(null);
+                  clearDraft();
+                  toast.success('Post discarded');
+                }}
+                className="px-5 py-2 bg-gray-600 text-white rounded hover:bg-gray-800"
+              >
+                Discard
+              </button>
               <button
                 type="submit"
                 disabled={isLoading}

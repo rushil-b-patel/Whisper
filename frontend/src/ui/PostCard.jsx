@@ -1,13 +1,13 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Comment, ChevronDown, ChevronUp } from './Icons';
+import { Comment } from './Icons';
 import VoteBar from '../components/VoteBar';
 import { useAuth } from '../context/AuthContext';
+import { EditorRenderer } from '../components/Editor';
 
 function PostCard({ post }) {
   const navigate = useNavigate();
   const { user } = useAuth();
-
   if (!post)
     return (
       <div className="bg-white border-2 border-red-500 p-3 rounded-lg text-red-500 font-mono shadow-sm dark:bg-slate-900">
@@ -21,7 +21,6 @@ function PostCard({ post }) {
     }
   }, [post._id, navigate]);
 
-  // Calculate initial vote values
   const voteCount = post.upVotes - post.downVotes;
   const userUpVoted = user && post.upVotedUsers?.includes(user._id);
   const userDownVoted = user && post.downVotedUsers?.includes(user._id);
@@ -57,9 +56,7 @@ function PostCard({ post }) {
         </p>
       </div>
 
-      <p className="font-mono text-sm sm:text-base text-black mb-3 sm:mb-5 leading-relaxed pl-2 sm:pl-3 dark:text-white line-clamp-3 sm:line-clamp-none">
-        {post.description}
-      </p>
+      <EditorRenderer data={post.description} />
 
       {post.image && (
         <div className="relative mb-3 sm:mb-5 p-0.5 sm:p-1 rounded-xl overflow-hidden group">
