@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { usePostService } from '../context/PostContext';
 import { ChevronDown, ChevronUp } from '../ui/Icons';
 import toast from 'react-hot-toast';
@@ -6,13 +7,12 @@ import Editor from '../components/Editor';
 
 function CreatePost() {
   const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
-
+  const navigate = useNavigate();
   const token = localStorage.getItem('token');
   const { createPost } = usePostService();
   const categoryRef = useRef(null);
@@ -36,20 +36,14 @@ function CreatePost() {
 
     try {
       const editorContent = await editorRef.current.save();
-
       const formData = new FormData();
       formData.append('title', title);
       formData.append('description', JSON.stringify(editorContent));
       formData.append('category', category);
       if (image) formData.append('image', image);
 
-      await createPost(token, formData);
-
-      setTitle('');
-      setDescription('');
-      setCategory('');
-      setImage(null);
-      setImagePreview(null);
+      const post = await createPost(token, formData);
+      navigate('/post/'+post.postId);
     } catch (err) {
       console.error('Error creating post:', err);
     } finally {
@@ -195,11 +189,9 @@ function CreatePost() {
                 type="button"
                 onClick={() => {
                   setTitle('');
-                  setDescription('');
                   setCategory('');
                   setImage(null);
                   setImagePreview(null);
-                  clearDraft();
                   toast.success('Post discarded');
                 }}
                 className="px-5 py-2 bg-gray-600 text-white rounded hover:bg-gray-800"

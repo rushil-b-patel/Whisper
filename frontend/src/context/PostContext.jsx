@@ -45,10 +45,8 @@ export const usePostService = () => {
         },
       });
 
-      const isDraft = formData.get('isDraft') === 'true';
-      const successMessage = isDraft ? 'Draft saved successfully' : 'Post created successfully';
-      toast.success(successMessage, { position: 'bottom-right' });
-
+      toast.success('Post created successfully', { position: 'bottom-right' });
+      console.log(response.data);
       return response.data;
     } catch (error) {
       handleError(error, 'Failed to create post');

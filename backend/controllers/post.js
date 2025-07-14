@@ -40,7 +40,7 @@ export const createPost = async (req, res) => {
 
         const post = new Post(postData);
         await post.save();
-        res.status(201).json({success: true, post});
+        res.status(201).json({ success: true, post, postId: post._id });
     } catch(error){
         res.status(500).json({success: false, message: error.message });
     }
