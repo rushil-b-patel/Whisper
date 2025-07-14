@@ -30,7 +30,6 @@ const Login = () => {
 
   const handlegoogleLogin = async (response) => {
     try {
-      console.log('Google login response:', response);
       await googleLogin(response);
     } catch (error) {
       console.error('Google login error:', error);

@@ -25,36 +25,52 @@ function Profile() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4em)] bg-white dark:bg-[#0e1113] flex justify-center items-start pt-10 text-black dark:text-[#F2F2F2]">
-      <div className="w-full max-w-2xl p-6 font-sans bg-white dark:bg-[#1a1c1f] rounded-xl shadow-md">
-        <h1 className="text-3xl font-bold mb-8 text-center font-mono">Your Profile</h1>
-        <form onSubmit={handleSave} className="space-y-6">
+    <div className="min-h-[calc(100vh-4em)] px-4 sm:px-6 py-10 flex justify-center bg-white dark:bg-[#0e1113]">
+      <div className="w-full max-w-2xl border border-gray-200 dark:border-slate-800 rounded-lg px-6 py-8 sm:px-10 sm:py-12 transition-all duration-300 shadow-sm">
+        <div className="border-l-4 border-indigo-500 pl-4 mb-10">
+          <h1 className="text-3xl sm:text-4xl font-bold font-mono text-black dark:text-white">
+            Edit Profile
+          </h1>
+        </div>
+
+        <form onSubmit={handleSave} className="space-y-10">
+          {/* Username */}
           <div>
-            <label className="block font-semibold mb-2 font-mono">Username</label>
+            <label className="block font-semibold mb-2 font-mono text-black dark:text-white">
+              Username
+            </label>
             <input
               type="text"
               value={userName}
               onChange={(e) => setUserName(e.target.value)}
-              className="w-full p-3 dark:bg-[#2A3236] dark:border-none border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder="Enter your username"
+              className="w-full bg-transparent border-b border-gray-300 dark:border-gray-700 text-black dark:text-white p-2 font-mono transition duration-300"
             />
           </div>
 
+          {/* Bio */}
           <div>
-            <label className="block font-semibold mb-2 font-mono">About Description</label>
+            <label className="block font-semibold mb-2 font-mono text-black dark:text-white">
+              About You
+            </label>
             <textarea
-              placeholder="Tell other users about yourself"
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              className="w-full p-3 dark:bg-[#2A3236] dark:border-none border border-gray-300 rounded-lg resize-none h-24 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder="Tell others about yourself"
+              className="w-full bg-transparent border-b border-gray-300 dark:border-gray-700 text-black dark:text-white p-2 font-mono transition duration-300 resize-none"
+              rows={4}
             />
           </div>
 
+          {/* Department */}
           <div>
-            <label className="block font-semibold mb-2 font-mono">Department</label>
+            <label className="block font-semibold mb-2 font-mono text-black dark:text-white">
+              Department
+            </label>
             <select
               value={department}
               onChange={(e) => setDepartment(e.target.value)}
-              className="w-full p-3 dark:bg-[#2A3236] dark:border-none border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full bg-transparent border-b border-gray-300 dark:border-gray-700 text-black dark:text-white p-2 font-mono transition duration-300 focus:outline-none focus:border-indigo-500"
             >
               <option value="" disabled>
                 Select Department
@@ -65,26 +81,29 @@ function Profile() {
                 </option>
               ))}
             </select>
+
             {department === 'Other...' && (
               <input
                 type="text"
-                placeholder="Enter your department"
                 value={customDept}
                 onChange={(e) => setCustomDept(e.target.value)}
-                className="mt-2 w-full p-3 dark:bg-[#2A3236] dark:border-none border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                placeholder="Enter your department"
+                className="mt-4 w-full bg-transparent border-b border-gray-300 dark:border-gray-700 text-black dark:text-white p-2 font-mono transition duration-300 focus:outline-none focus:border-indigo-500"
               />
             )}
           </div>
 
+          {/* Save Button */}
           <button
             type="submit"
-            className="w-full font-semibold py-3 rounded-lg text-white hover:text-black dark:hover:text-white dark:hover:bg-black bg-black dark:bg-[#2A3236] hover:bg-white border-[2px] border-transparent hover:border-black transition duration-500 ease-in-out"
             disabled={isLoading}
+            className="w-full py-3 font-semibold font-mono bg-black text-white hover:bg-white hover:text-black border border-black transition-all duration-300 rounded"
           >
-            {isLoading ? 'Saving...' : 'Save'}
+            {isLoading ? 'Saving...' : 'Save Changes'}
           </button>
-          <p className="text-sm text-center text-gray-500 mt-4 font-mono">
-            Your email is saved with encryption.
+
+          <p className="text-center text-sm text-gray-500 dark:text-gray-400 font-mono mt-2">
+            Your email is encrypted and stored securely.
           </p>
         </form>
       </div>

@@ -46,7 +46,6 @@ export const usePostService = () => {
       });
 
       toast.success('Post created successfully', { position: 'bottom-right' });
-      console.log(response.data);
       return response.data;
     } catch (error) {
       handleError(error, 'Failed to create post');

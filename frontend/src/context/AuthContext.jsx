@@ -71,7 +71,6 @@ export const AuthProvider = ({ children }) => {
     setIsLoading(true);
     setError(null);
     try {
-      // Validate inputs
       if (!identifier || !password) {
         const msg = 'Username/Email and password are required';
         setError(msg);
@@ -79,12 +78,7 @@ export const AuthProvider = ({ children }) => {
         return null;
       }
 
-      console.log('Login request:', { identifier, password: '****' });
-
       const response = await axios.post(`${API}/auth/login`, { email: identifier, password });
-
-      console.log('Login response:', response.data);
-
       if (response.data && response.data.token && response.data.user) {
         const { token, user } = response.data;
         setUser(user);
@@ -144,8 +138,6 @@ export const AuthProvider = ({ children }) => {
         { withCredentials: true }
       );
 
-      console.log('Google login server response:', result.data);
-
       const { token, user } = result.data;
       setUser(user);
       localStorage.setItem('token', token);
@@ -165,7 +157,6 @@ export const AuthProvider = ({ children }) => {
   const googleSignup = async (response) => {
     setIsLoading(true);
     try {
-      console.log(response);
       if (!response || !response.credential) {
         throw new Error('Invalid Google response');
       }
@@ -173,7 +164,6 @@ export const AuthProvider = ({ children }) => {
       const result = await axios.post(`${API}/auth/google/signup`, {
         googleToken: response.credential,
       });
-      console.log(result.data);
 
       if (!result.data || !result.data.token || !result.data.user) {
         throw new Error('Invalid server response');
@@ -217,13 +207,11 @@ export const AuthProvider = ({ children }) => {
       }
 
       const response = await axios.post(`${API}/auth/verify-email`, { code });
-      console.log('verify email', response);
       if (response.data.success) {
         setUser(response.data.user);
         toast.success('Email verified successfully', { position: 'bottom-right' });
         navigate('/');
       } else {
-        console.log('email not verified');
         setError(response.data.message || 'Email verification failed');
         toast.error(response.data.message || 'Email verification failed', {
           position: 'bottom-right',

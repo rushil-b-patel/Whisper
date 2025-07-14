@@ -7,10 +7,7 @@ import { verifyGoogleToken } from '../utils/googleAuth.js';
 import { CLIENT_URI } from '../utils/envVariables.js';
 
 export const login = async (req, res)=>{
-    console.log('Login request received:', req.body);
-
     const { email, password } = req.body;
-
     try{
         if(!email || !password){
             return res.status(400).json({message: 'Please fill in all fields'});
@@ -278,7 +275,6 @@ export const googleSignup = async (req, res) => {
     const { googleToken } = req.body;
     try{
         const userData = await verifyGoogleToken(googleToken);
-        console.log("userData ----------------------> ", userData);
         let user = await User.findOne({ email: userData.email });
         if(user){
             return res.status(400).json({ message: 'User already exists. Please log in.' });
@@ -292,7 +288,6 @@ export const googleSignup = async (req, res) => {
             verificationToken,
             verificationTokenExpires: Date.now() + 1 * 60 * 60 * 1000,
         })
-        console.log(user);
         await user.save();
 
         const token = generateTokenAndSetCookie(res, user._id);

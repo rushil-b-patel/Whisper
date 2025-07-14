@@ -13,7 +13,6 @@ export const verifyGoogleToken = async (token) => {
         return payload;
     }
     catch(error){
-        console.log(error);
         throw new Error('Google authentication failed');
     }
 }

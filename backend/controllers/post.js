@@ -241,7 +241,6 @@ export const voteComment = async (req, res) => {
         }
 
         await post.save();
-        console.log(comment);
         res.status(200).json({ success: true, comment });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });

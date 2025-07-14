@@ -14,37 +14,15 @@ function Home() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const departments = [
-    { id: 1, name: 'Computer Science', members: 23450 },
-    { id: 2, name: 'IT', members: 18920 },
-    { id: 3, name: 'AI & Machine Learning', members: 15600 },
-    { id: 4, name: 'Web Development', members: 12300 },
-    { id: 5, name: 'App Development', members: 9870 },
-  ];
-
-  const userStats = {
-    posts: 12,
-    upvotes: 243,
-    comments: 56,
-    karma: 512,
-    joinDate: 'Jan 2023',
-    savedPosts: 23,
-    recentActivity: [
-      { type: 'post', title: 'Started learning React...', time: '2 days ago' },
-      { type: 'comment', title: "Commented on 'Best practices for...'", time: '3 days ago' },
-      { type: 'upvote', title: "Upvoted 'How to improve...'", time: '5 days ago' },
-    ],
-  };
-
   useEffect(() => {
     const fetchPosts = async () => {
       try {
         const response = await getAllPosts();
-        setPosts(response.posts);
+        setPosts(response.posts || []);
         setError(null);
-      } catch (error) {
-        console.error('fetch posts failed', error);
-        setError(error.response?.data?.message || 'An error occurred while fetching posts');
+      } catch (err) {
+        console.error('Fetch posts failed', err);
+        setError('Failed to load posts. Try again later.');
       } finally {
         setIsLoading(false);
       }
@@ -53,10 +31,9 @@ function Home() {
   }, []);
 
   const getFilteredPosts = () => {
-    if (!posts || posts.length === 0) return [];
     switch (activeFilter) {
       case 'trending':
-        return [...posts].sort((a, b) => b.upVotes - b.downVotes - (a.upVotes - a.downVotes));
+        return [...posts].sort((a, b) => (b.upVotes - b.downVotes) - (a.upVotes - a.downVotes));
       case 'new':
         return [...posts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       case 'popular':
@@ -66,153 +43,122 @@ function Home() {
     }
   };
 
-  const handleFilterChange = (filter) => {
-    setActiveFilter(filter);
+  const filters = [
+    { id: 'trending', label: 'Trending', icon: <Fire className="w-5 h-5" /> },
+    { id: 'new', label: 'New', icon: <Clock className="w-5 h-5" /> },
+    { id: 'popular', label: 'Popular', icon: <Sparkles className="w-5 h-5" /> },
+  ];
+
+  const userStats = {
+    posts: 12,
+    upvotes: 243,
+    comments: 56,
+    karma: 512,
+    joinDate: 'Jan 2023',
+    recentActivity: [
+      { title: 'Started learning React...', time: '2 days ago' },
+      { title: "Commented on 'Best practices...'", time: '3 days ago' },
+      { title: "Upvoted 'How to improve...'", time: '5 days ago' },
+    ],
   };
 
   return (
-    <div className="h-screen overflow-hidden dark:bg-[#0e1113]">
-      <div className="max-w-7xl mx-auto h-full flex flex-row gap-6">
-        <div className="md:w-64 lg:w-72 flex-shrink-0 sticky top-0 h-screen overflow-y-auto px-2">
-          <div className="bg-white dark:bg-[#131619] rounded-xl p-4 shadow-sm mb-4">
-            <h2 className="font-mono text-lg font-bold mb-4 text-black dark:text-white">
+    <div className="h-screen overflow-hidden bg-gray-50 dark:bg-[#0e1113]">
+      <div className="max-w-7xl mx-auto flex h-full gap-6">
+        <aside className="md:w-64 lg:w-72 h-full overflow-y-auto px-2 py-4">
+          <section className="bg-white dark:bg-[#131619] rounded-xl shadow-sm p-4 mb-4">
+            <h2 className="font-mono text-lg font-semibold text-gray-900 dark:text-white mb-3">
               Discover
             </h2>
-            <ul className="space-y-1">
-              <li>
-                <button
-                  onClick={() => handleFilterChange('trending')}
-                  className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
-                    activeFilter === 'trending'
-                      ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400'
-                      : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-800'
-                  }`}
-                >
-                  <Fire className="w-5 h-5" />
-                  <span className="font-mono font-medium">Trending</span>
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => handleFilterChange('new')}
-                  className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
-                    activeFilter === 'new'
-                      ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400'
-                      : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-800'
-                  }`}
-                >
-                  <Clock className="w-5 h-5" />
-                  <span className="font-mono font-medium">New</span>
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => handleFilterChange('popular')}
-                  className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
-                    activeFilter === 'popular'
-                      ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400'
-                      : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-800'
-                  }`}
-                >
-                  <Sparkles className="w-5 h-5" />
-                  <span className="font-mono font-medium">Popular</span>
-                </button>
-              </li>
-            </ul>
-          </div>
-
-          <div className="bg-white dark:bg-[#131619] rounded-xl p-4 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-mono text-lg font-bold text-black dark:text-white">
-                Departments
-              </h2>
-              <button className="text-indigo-600 dark:text-indigo-400 text-sm font-medium">
-                See All
-              </button>
-            </div>
-            <ul className="space-y-3">
-              {departments.map((department) => (
-                <li key={department.id}>
-                  <button className="w-full flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800 p-2 rounded-lg transition-colors">
-                    <div className="flex items-center">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
-                        {department.name.charAt(0)}
-                        {department.name.split(' ')[1]?.charAt(0) || ''}
-                      </div>
-                      <div className="ml-3 text-left">
-                        <p className="font-mono text-sm font-medium text-gray-900 dark:text-gray-100 truncate max-w-[120px]">
-                          {department.name}
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {department.members.toLocaleString()} members
-                        </p>
-                      </div>
-                    </div>
+            <ul className="space-y-2">
+              {filters.map(({ id, label, icon }) => (
+                <li key={id}>
+                  <button
+                    onClick={() => setActiveFilter(id)}
+                    className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200 ${
+                      activeFilter === id
+                        ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400'
+                        : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    {icon}
+                    <span className="font-mono font-medium">{label}</span>
                   </button>
                 </li>
               ))}
             </ul>
-          </div>
-        </div>
+          </section>
 
-        <div className="flex-grow max-w-2xl mx-auto overflow-y-auto h-full px-2 feed-scrollbar-hidden">
-          <div className="top-0 z-10 bg-white dark:bg-[#0e1113] py-3 mb-4 border-b border-gray-100 dark:border-gray-800">
-            <div className="flex items-center justify-between">
-              <h1 className="font-mono text-2xl font-bold text-black dark:text-white">
-                {activeFilter === 'trending' && 'Trending Posts'}
-                {activeFilter === 'new' && 'New Posts'}
-                {activeFilter === 'popular' && 'Popular Posts'}
-              </h1>
+          <section className="bg-white dark:bg-[#131619] rounded-xl shadow-sm p-4">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-mono text-lg font-semibold text-gray-900 dark:text-white">
+                Departments
+              </h2>
+              <button className="text-indigo-600 dark:text-indigo-400 text-sm">See All</button>
             </div>
-          </div>
+            <ul className="space-y-3">
+              {['CSE', 'IT', 'AI & ML', 'Web', 'App'].map((dept, idx) => (
+                <li key={dept}>
+                  <div className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800 transition">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 text-white font-bold flex items-center justify-center text-xs">
+                      {dept
+                        .split(' ')
+                        .map((w) => w[0])
+                        .join('')}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white font-mono">
+                        {dept}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">+{10000 - idx * 2000} members</p>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </aside>
 
+        <main className="flex-1 max-w-2xl mx-auto px-2 py-4 overflow-y-auto feed-scrollbar-hidden">
           {isLoading ? (
-            <div className="min-h-[50vh] flex justify-center items-center">
+            <div className="h-[40vh] flex items-center justify-center">
               <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
             </div>
           ) : error ? (
-            <div className="bg-white dark:bg-[#131619] rounded-xl p-6 shadow-sm">
-              <p className="text-red-600 text-center">{error}</p>
-            </div>
+            <div className="text-center text-red-500 font-medium">{error}</div>
           ) : (
             <div className="space-y-4 pb-20">
               {getFilteredPosts().length > 0 ? (
                 getFilteredPosts().map((post) => <PostCard key={post._id} post={post} />)
               ) : (
-                <div className="bg-white dark:bg-[#131619] rounded-xl p-6 shadow-sm">
-                  <p className="text-gray-600 dark:text-gray-400 text-center">No posts available</p>
-                </div>
+                <p className="text-center text-gray-500 dark:text-gray-400">No posts to show.</p>
               )}
             </div>
           )}
-        </div>
+        </main>
 
-        <div className="md:w-64 lg:w-80 flex-shrink-0 sticky top-0 h-screen overflow-y-auto px-2">
-          {user ? (
-            <>
-              <div className="bg-white dark:bg-[#131619] rounded-xl p-4 shadow-sm mb-4">
+        <aside className="md:w-64 lg:w-80 h-full overflow-y-auto px-2 py-4">
+          <section className="bg-white dark:bg-[#131619] rounded-xl shadow-sm p-4 mb-4">
+            {user ? (
+              <>
                 <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-lg font-bold">
-                    {user.userName?.charAt(0) || 'U'}
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg">
+                    {user.userName?.[0] || 'U'}
                   </div>
                   <div className="ml-3">
-                    <h2 className="font-mono text-lg font-bold text-black dark:text-white">
-                      {user.userName}
-                    </h2>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Member since {userStats.joinDate}
-                    </p>
+                    <h2 className="font-mono font-semibold text-gray-900 dark:text-white">{user.userName}</h2>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Joined {userStats.joinDate}</p>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 mb-4">
+                <div className="grid grid-cols-2 gap-3 mb-4">
                   {['Posts', 'Upvotes', 'Comments', 'Karma'].map((label, i) => (
                     <div
                       key={label}
                       className="bg-gray-50 dark:bg-slate-800 p-3 rounded-lg text-center"
                     >
                       <p className="text-xs text-gray-500 dark:text-gray-400">{label}</p>
-                      <p className="font-mono text-lg font-bold text-black dark:text-white">
+                      <p className="font-mono font-bold text-lg text-gray-900 dark:text-white">
                         {Object.values(userStats)[i]}
                       </p>
                     </div>
@@ -220,59 +166,53 @@ function Home() {
                 </div>
 
                 <div className="flex gap-2">
-                  <button className="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors text-sm font-medium">
+                  <button className="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition">
                     My Posts
                   </button>
-                  <button className="flex-1 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-lg transition-colors text-sm font-medium">
+                  <button className="flex-1 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-lg text-sm font-medium transition">
                     Saved
                   </button>
                 </div>
-              </div>
 
-              <div className="bg-white dark:bg-[#131619] rounded-xl p-4 shadow-sm">
-                <h2 className="font-mono text-lg font-bold mb-3 text-black dark:text-white">
-                  Recent Activity
-                </h2>
-                <ul className="space-y-3">
-                  {userStats.recentActivity.map((activity, index) => (
-                    <li key={index} className="border-b dark:border-slate-800 pb-2 last:border-0">
-                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                        {activity.title}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{activity.time}</p>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </>
-          ) : (
-            <div className="bg-white dark:bg-[#131619] rounded-xl p-4 shadow-sm">
-              <div className="text-center py-4">
-                <h2 className="font-mono text-lg font-bold mb-2 text-black dark:text-white">
+                <div className="mt-6">
+                  <h3 className="font-mono font-semibold text-gray-900 dark:text-white mb-3">Recent Activity</h3>
+                  <ul className="space-y-2 text-sm">
+                    {userStats.recentActivity.map((activity, i) => (
+                      <li key={i} className="border-b border-dashed dark:border-slate-700 pb-2 last:border-0">
+                        <p className="text-gray-800 dark:text-gray-100 font-medium">{activity.title}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{activity.time}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </>
+            ) : (
+              <div className="text-center">
+                <h2 className="font-mono text-lg font-bold mb-2 text-gray-900 dark:text-white">
                   Join Whisper
                 </h2>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                  Sign up to join discussions and be part of the community
+                  Sign up to share posts and interact.
                 </p>
                 <button
                   onClick={() => navigate('/signup')}
-                  className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors text-sm font-medium"
+                  className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium text-sm transition"
                 >
                   Sign Up
                 </button>
-                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                   Already have an account?{' '}
                   <button
                     onClick={() => navigate('/login')}
-                    className="text-indigo-600 dark:text-indigo-400"
+                    className="text-indigo-600 dark:text-indigo-400 font-semibold"
                   >
                     Log In
                   </button>
                 </p>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </section>
+        </aside>
       </div>
     </div>
   );
