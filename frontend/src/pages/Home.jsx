@@ -33,7 +33,7 @@ function Home() {
   const getFilteredPosts = () => {
     switch (activeFilter) {
       case 'trending':
-        return [...posts].sort((a, b) => (b.upVotes - b.downVotes) - (a.upVotes - a.downVotes));
+        return [...posts].sort((a, b) => b.upVotes - b.downVotes - (a.upVotes - a.downVotes));
       case 'new':
         return [...posts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       case 'popular':
@@ -110,7 +110,9 @@ function Home() {
                       <p className="text-sm font-medium text-gray-900 dark:text-white font-mono">
                         {dept}
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">+{10000 - idx * 2000} members</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        +{10000 - idx * 2000} members
+                      </p>
                     </div>
                   </div>
                 </li>
@@ -146,8 +148,12 @@ function Home() {
                     {user.userName?.[0] || 'U'}
                   </div>
                   <div className="ml-3">
-                    <h2 className="font-mono font-semibold text-gray-900 dark:text-white">{user.userName}</h2>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Joined {userStats.joinDate}</p>
+                    <h2 className="font-mono font-semibold text-gray-900 dark:text-white">
+                      {user.userName}
+                    </h2>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Joined {userStats.joinDate}
+                    </p>
                   </div>
                 </div>
 
@@ -175,11 +181,18 @@ function Home() {
                 </div>
 
                 <div className="mt-6">
-                  <h3 className="font-mono font-semibold text-gray-900 dark:text-white mb-3">Recent Activity</h3>
+                  <h3 className="font-mono font-semibold text-gray-900 dark:text-white mb-3">
+                    Recent Activity
+                  </h3>
                   <ul className="space-y-2 text-sm">
                     {userStats.recentActivity.map((activity, i) => (
-                      <li key={i} className="border-b border-dashed dark:border-slate-700 pb-2 last:border-0">
-                        <p className="text-gray-800 dark:text-gray-100 font-medium">{activity.title}</p>
+                      <li
+                        key={i}
+                        className="border-b border-dashed dark:border-slate-700 pb-2 last:border-0"
+                      >
+                        <p className="text-gray-800 dark:text-gray-100 font-medium">
+                          {activity.title}
+                        </p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">{activity.time}</p>
                       </li>
                     ))}

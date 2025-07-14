@@ -1,11 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from 'react';
-import {
-  Bolt,
-  BoltSlash,
-  BoltSolid,
-  BoltSlashSolid,
-} from '../ui/Icons';
+import { Bolt, BoltSlash, BoltSolid, BoltSlashSolid } from '../ui/Icons';
 import { usePostService } from '../context/PostContext';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
@@ -24,12 +19,7 @@ export default function VoteBar({
     down: initialDownVoted,
   });
   const [busy, setBusy] = useState(false);
-  const {
-    upVotePost,
-    downVotePost,
-    voteComment,
-    getPost,
-  } = usePostService();
+  const { upVotePost, downVotePost, voteComment, getPost } = usePostService();
   const { user } = useAuth();
   const token = localStorage.getItem('token');
 
@@ -41,7 +31,7 @@ export default function VoteBar({
         const res = await getPost(postId || id);
         const p = res.post;
         if (isComment) {
-          const comment = p.comments.find(c => c._id === id);
+          const comment = p.comments.find((c) => c._id === id);
           setState({
             up: comment?.upVotedUsers.includes(user._id),
             down: comment?.downVotedUsers.includes(user._id),
@@ -60,7 +50,7 @@ export default function VoteBar({
     })();
   }, [id, user]);
 
-  const cast = async type => {
+  const cast = async (type) => {
     if (!user) {
       toast.error('Log in to vote', { position: 'bottom-right' });
       return;
@@ -83,9 +73,11 @@ export default function VoteBar({
     setCount(prevCount + delta);
 
     try {
-      const action = isComment ? () => voteComment(token, postId, id, type) : type === 'up'
-        ? () => upVotePost(token, id)
-        : () => downVotePost(token, id);
+      const action = isComment
+        ? () => voteComment(token, postId, id, type)
+        : type === 'up'
+          ? () => upVotePost(token, id)
+          : () => downVotePost(token, id);
 
       const res = await action();
       if (!res.success) throw new Error(res.message);
@@ -106,13 +98,13 @@ export default function VoteBar({
   const bg = state.up
     ? 'bg-gradient-to-r from-orange-400 to-red-500 text-white'
     : state.down
-    ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white'
-    : 'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-gray-100';
+      ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white'
+      : 'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-gray-100';
 
   return (
     <div
       className={`flex items-center justify-center ${base} border border-gray-200 dark:border-gray-700 shadow-sm transition ${bg}`}
-      onClick={e => e.stopPropagation()}
+      onClick={(e) => e.stopPropagation()}
     >
       <button
         onClick={() => cast('up')}

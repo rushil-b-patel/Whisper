@@ -21,20 +21,14 @@ export default function PostCard({ post }) {
       className="bg-white dark:bg-[#0e1113] p-6 rounded-2xl shadow hover:shadow-xl transition cursor-pointer"
       onClick={go}
     >
-      <h3 className="font-mono text-xl font-bold mb-2 text-black dark:text-white">
-        {post.title}
-      </h3>
+      <h3 className="font-mono text-xl font-bold mb-2 text-black dark:text-white">{post.title}</h3>
 
       <div className="text-gray-700 dark:text-gray-300 mb-4 text-sm leading-relaxed">
         <EditorRenderer data={post.description} />
       </div>
 
       {post.image && (
-        <img
-          src={post.image}
-          alt=""
-          className="w-full rounded-lg mb-4 object-cover max-h-48"
-        />
+        <img src={post.image} alt="" className="w-full rounded-lg mb-4 object-cover max-h-48" />
       )}
 
       <div className="flex justify-between items-center">

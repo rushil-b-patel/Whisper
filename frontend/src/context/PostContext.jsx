@@ -228,12 +228,16 @@ export const usePostService = () => {
   };
 
   const voteComment = async (token, postId, commentId, voteType) => {
-    const res = await axios.put(`${API}/post/vote-comment/${postId}`, {
-      voteType,
-      commentId
-    }, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+    const res = await axios.put(
+      `${API}/post/vote-comment/${postId}`,
+      {
+        voteType,
+        commentId,
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
     return res.data;
   };
 

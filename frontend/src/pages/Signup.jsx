@@ -83,7 +83,8 @@ const Signup = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full flex justify-center py-2 px-4 rounded-md text-sm font-medium text-white hover:text-black bg-black hover:bg-white border-[2px] border-transparent hover:border-black transition animation duration-500 ease-in-out"          >
+            className="w-full flex justify-center py-2 px-4 rounded-md text-sm font-medium text-white hover:text-black bg-black hover:bg-white border-[2px] border-transparent hover:border-black transition animation duration-500 ease-in-out"
+          >
             {isLoading ? 'Creating account...' : 'Sign Up'}
           </button>
         </form>
@@ -107,7 +108,10 @@ const Signup = () => {
         </div>
 
         <div className="flex justify-center">
-          <GoogleLogin onSuccess={handleGoogleSignup} onError={() => setError('Google signup failed.')} />
+          <GoogleLogin
+            onSuccess={handleGoogleSignup}
+            onError={() => setError('Google signup failed.')}
+          />
         </div>
       </div>
     </div>

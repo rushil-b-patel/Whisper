@@ -45,7 +45,9 @@ const Login = () => {
         </h2>
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium mb-1 dark:text-gray-300">Username or Email</label>
+            <label className="block text-sm font-medium mb-1 dark:text-gray-300">
+              Username or Email
+            </label>
             <input
               type="text"
               placeholder="example@mail.com"
@@ -82,7 +84,7 @@ const Login = () => {
             type="submit"
             disabled={isLoading}
             className="w-full flex justify-center py-2 px-4 rounded-md text-sm font-medium text-white hover:text-black bg-black hover:bg-white border-[2px] border-transparent hover:border-black transition animation duration-500 ease-in-out"
-            >
+          >
             {isLoading ? 'Logging in...' : 'Sign In'}
           </button>
         </form>
@@ -106,7 +108,10 @@ const Login = () => {
         </div>
 
         <div className="flex justify-center">
-          <GoogleLogin onSuccess={handleGoogleLogin} onError={() => setError('Google login failed.')} />
+          <GoogleLogin
+            onSuccess={handleGoogleLogin}
+            onError={() => setError('Google login failed.')}
+          />
         </div>
       </div>
     </div>

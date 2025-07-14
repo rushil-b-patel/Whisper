@@ -1,36 +1,36 @@
 // src/components/CommentThread.jsx
-import { useState, useEffect, useCallback } from 'react'
-import { Trash, Reply } from '../ui/Icons'
-import { useAuth } from '../context/AuthContext'
-import { usePostService } from '../context/PostContext'
-import VoteBar from './VoteBar'
+import { useState, useEffect, useCallback } from 'react';
+import { Trash, Reply } from '../ui/Icons';
+import { useAuth } from '../context/AuthContext';
+import { usePostService } from '../context/PostContext';
+import VoteBar from './VoteBar';
 
 /** single comment with its own VoteBar + reply/delete UI */
 function CommentItem({ comment, postId, onAddReply, onDeleteComment }) {
-  const [replying, setReplying] = useState(false)
-  const [replyText, setReplyText] = useState('')
-  const { user } = useAuth()
-  const { deleteComment } = usePostService()
-  const token = localStorage.getItem('token')
+  const [replying, setReplying] = useState(false);
+  const [replyText, setReplyText] = useState('');
+  const { user } = useAuth();
+  const { deleteComment } = usePostService();
+  const token = localStorage.getItem('token');
 
-  const handleReply = async e => {
-    e.preventDefault()
-    if (!replyText.trim()) return
-    await onAddReply(null, replyText)
-    setReplyText('')
-    setReplying(false)
-  }
+  const handleReply = async (e) => {
+    e.preventDefault();
+    if (!replyText.trim()) return;
+    await onAddReply(null, replyText);
+    setReplyText('');
+    setReplying(false);
+  };
 
   const handleDelete = async () => {
     if (confirm('Delete this comment?')) {
-      await deleteComment(token, postId, comment._id)
-      onDeleteComment(comment._id)
+      await deleteComment(token, postId, comment._id);
+      onDeleteComment(comment._id);
     }
-  }
+  };
 
-  const voteCount = (comment.upVotes || 0) - (comment.downVotes || 0)
-  const upVoted = comment.upVotedUsers?.includes(user?._id)
-  const downVoted = comment.downVotedUsers?.includes(user?._id)
+  const voteCount = (comment.upVotes || 0) - (comment.downVotes || 0);
+  const upVoted = comment.upVotedUsers?.includes(user?._id);
+  const downVoted = comment.downVotedUsers?.includes(user?._id);
 
   return (
     <div className="bg-white dark:bg-[#1e1f23] border dark:border-[#2A2B30] rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow duration-300">
@@ -58,7 +58,7 @@ function CommentItem({ comment, postId, onAddReply, onDeleteComment }) {
           initialDownVoted={downVoted}
         />
         <div className="space-x-4 text-sm text-gray-500 dark:text-gray-400">
-          <button onClick={() => setReplying(r => !r)} className="hover:text-indigo-500">
+          <button onClick={() => setReplying((r) => !r)} className="hover:text-indigo-500">
             <Reply className="inline w-4 h-4 mr-1" /> Reply
           </button>
           {user?._id === comment.User?._id && (
@@ -74,7 +74,7 @@ function CommentItem({ comment, postId, onAddReply, onDeleteComment }) {
         <form onSubmit={handleReply} className="mt-3 space-y-2">
           <textarea
             value={replyText}
-            onChange={e => setReplyText(e.target.value)}
+            onChange={(e) => setReplyText(e.target.value)}
             rows={2}
             className="w-full p-2 rounded border dark:bg-gray-800 dark:text-white"
             placeholder="Write your reply…"
@@ -98,44 +98,44 @@ function CommentItem({ comment, postId, onAddReply, onDeleteComment }) {
         </form>
       )}
     </div>
-  )
+  );
 }
 
 /** the thread wrapper, top‑level input + list of CommentItem */
 export default function CommentThread({ post, comments: initialComments }) {
-  const [comments, setComments] = useState([])
-  const [newComment, setNewComment] = useState('')
-  const { addComment } = usePostService()
-  const { user } = useAuth()
-  const token = localStorage.getItem('token')
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState('');
+  const { addComment } = usePostService();
+  const { user } = useAuth();
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
-    setComments(initialComments || [])
-  }, [initialComments])
+    setComments(initialComments || []);
+  }, [initialComments]);
 
   const handleAdd = useCallback(
     async (parentId, text) => {
-      const resp = await addComment(token, post._id, text, parentId)
+      const resp = await addComment(token, post._id, text, parentId);
       if (resp.success) {
-        setComments(c => [
+        setComments((c) => [
           { ...resp.comment, User: { _id: user._id, userName: user.userName } },
           ...c,
-        ])
+        ]);
       }
     },
     [addComment, post._id, token, user]
-  )
+  );
 
-  const handleDelete = useCallback(id => {
-    setComments(c => c.filter(x => x._id !== id))
-  }, [])
+  const handleDelete = useCallback((id) => {
+    setComments((c) => c.filter((x) => x._id !== id));
+  }, []);
 
-  const submitTop = async e => {
-    e.preventDefault()
-    if (!newComment.trim()) return
-    await handleAdd(null, newComment.trim())
-    setNewComment('')
-  }
+  const submitTop = async (e) => {
+    e.preventDefault();
+    if (!newComment.trim()) return;
+    await handleAdd(null, newComment.trim());
+    setNewComment('');
+  };
 
   return (
     <div className="space-y-6 mt-8">
@@ -143,7 +143,7 @@ export default function CommentThread({ post, comments: initialComments }) {
       <form onSubmit={submitTop} className="space-y-2">
         <textarea
           value={newComment}
-          onChange={e => setNewComment(e.target.value)}
+          onChange={(e) => setNewComment(e.target.value)}
           rows={3}
           className="w-full p-3 rounded border dark:bg-gray-800 dark:text-white"
           placeholder="Leave a comment…"
@@ -163,7 +163,7 @@ export default function CommentThread({ post, comments: initialComments }) {
       {comments.length === 0 ? (
         <p className="text-gray-500 dark:text-gray-400 text-sm font-mono">No comments yet…</p>
       ) : (
-        comments.map(c => (
+        comments.map((c) => (
           <CommentItem
             key={c._id}
             comment={c}
@@ -174,5 +174,5 @@ export default function CommentThread({ post, comments: initialComments }) {
         ))
       )}
     </div>
-  )
+  );
 }
