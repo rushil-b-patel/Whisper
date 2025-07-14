@@ -18,116 +18,95 @@ const Login = () => {
     setError(null);
     try {
       const response = await login(identifier, password);
-      if (response && response.user) {
+      if (response?.user) {
         navigate(response.user.isVerified ? '/' : '/verify-email');
       }
-    } catch (error) {
-      setError(error.response?.data?.message || 'An error occurred while logging in');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Login failed. Try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handlegoogleLogin = async (response) => {
+  const handleGoogleLogin = async (response) => {
     try {
       await googleLogin(response);
-    } catch (error) {
-      console.error('Google login error:', error);
-      setError('Google login failed. Please try again or use email login.');
+    } catch (err) {
+      console.error('Google login error:', err);
+      setError('Google login failed. Try again.');
     }
   };
 
-  const handleError = (error) => {
-    console.error('Google login error:', error);
-    setError('Google login failed. Please try again or use email login.');
-  };
-
   return (
-    <div className="dark:bg-[#0e1113] flex flex-col h-[calc(100vh-4em)] justify-center p-12 sm:px-6 lg:px-8s">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="text-center text-3xl font-extrabold dark:text-[#eef1f3]">
-          Log into your account
+    <div className="flex items-center justify-center min-h-[calc(100vh-4em)] px-4 py-12 bg-white dark:bg-[#0e1113]">
+      <div className="w-full max-w-md border border-gray-200 dark:border-[#2A2B30] rounded-lg p-8 dark:bg-[#131619]">
+        <h2 className="text-2xl font-bold text-center mb-6 text-black dark:text-white font-mono">
+          Log In
         </h2>
-        <div className="dark:bg-[#0e1113] dark:text-[#eef1f3] py-8 px-4 sm:px-10">
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <div>
-              <label htmlFor="identifier" className="block text-sm font-medium">
-                Username or Email
-              </label>
-              <div className="mt-1">
-                <input
-                  id="identifier"
-                  name="identifier"
-                  type="text"
-                  autoComplete="username email"
-                  placeholder="Enter username or email"
-                  required
-                  className="appearance-none block w-full px-3 py-2 dark:bg-[#2A3236] bg-slate-200 dark:text-[#eef1f3] outline-none rounded-md sm:text-sm"
-                  value={identifier}
-                  onChange={(e) => setIdentifier(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium">
-                Password
-              </label>
-              <div className="mt-1 relative">
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  autoComplete="current-password"
-                  placeholder="Password"
-                  required
-                  className="appearance-none block w-full px-3 py-2 dark:bg-[#2A3236] bg-slate-200 dark:text-[#eef1f3] outline-none rounded-md sm:text-sm"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 p-3 flex items-center"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400" />
-                  ) : (
-                    <Eye className="h-5 w-5 text-gray-400" />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            <div>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label className="block text-sm font-medium mb-1 dark:text-gray-300">Username or Email</label>
+            <input
+              type="text"
+              placeholder="example@mail.com"
+              className="w-full px-3 py-2 rounded-md bg-white dark:bg-[#2A3236] dark:text-[#eef1f3] border border-gray-300 dark:border-[#2A2B30] placeholder-gray-400 focus:outline-none transition"
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1 dark:text-gray-300">Password</label>
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                placeholder="••••••••"
+                className="w-full px-3 py-2 pr-10 rounded-md bg-white dark:bg-[#2A3236] dark:text-[#eef1f3] border border-gray-300 dark:border-[#2A2B30] placeholder-gray-400 focus:outline-none transition"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
               <button
-                type="submit"
-                className="w-full flex justify-center py-2 px-4 rounded-md shadow-sm text-sm font-medium text-white hover:text-black bg-black hover:bg-white border-[2px] border-transparent hover:border-black transition animation duration-500 ease-in-out"
-                disabled={isLoading}
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500"
               >
-                {isLoading ? 'Loading...' : 'Sign in'}
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
-              {error && <p className="text-red-500 font-semibold mt-2 ">{error}</p>}
-            </div>
-          </form>
-          <div className="my-4 text-sm flex justify-center space-x-1">
-            <p>Don't have an account? </p>
-            <Link to="/signup" className="text-blue-500 text-sm hover:underline">
-              Signup
-            </Link>
-          </div>
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 py-1 bg-white rounded text-[#0e1113]">Or continue with</span>
             </div>
           </div>
 
-          <div className="mt-6 grid grid-cols-3 gap-3">
-            <GoogleLogin onSuccess={handlegoogleLogin} onFailure={handleError} />
+          {error && <p className="text-red-500 text-sm font-medium -mt-2">{error}</p>}
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full flex justify-center py-2 px-4 rounded-md text-sm font-medium text-white hover:text-black bg-black hover:bg-white border-[2px] border-transparent hover:border-black transition animation duration-500 ease-in-out"
+            >
+            {isLoading ? 'Logging in...' : 'Sign In'}
+          </button>
+        </form>
+
+        <div className="text-sm text-center mt-5 dark:text-gray-300">
+          Don’t have an account?{' '}
+          <Link to="/signup" className="text-blue-500 hover:underline">
+            Sign up
+          </Link>
+        </div>
+
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-300 dark:border-gray-700" />
           </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="bg-white dark:bg-[#131619] px-2 text-gray-500 dark:text-gray-300">
+              Or continue with
+            </span>
+          </div>
+        </div>
+
+        <div className="flex justify-center">
+          <GoogleLogin onSuccess={handleGoogleLogin} onError={() => setError('Google login failed.')} />
         </div>
       </div>
     </div>
