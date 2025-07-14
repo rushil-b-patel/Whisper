@@ -3,18 +3,16 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 
 const VerifyEmail = () => {
-  const [code, setCode] = useState(Array(6).fill('')); // Simplified initialization
+  const [code, setCode] = useState(Array(6).fill(''));
   const inputRefs = useRef([]);
 
   const { user, error, isLoading, verifyEmail } = useAuth();
 
-  // Handle input change
   const handleChange = (index, value) => {
-    if (!/^\d*$/.test(value)) return; // Only allow numeric input
+    if (!/^\d*$/.test(value)) return;
     const updatedCode = [...code];
 
     if (value.length > 1) {
-      // Handle paste
       const pastedValues = value.slice(0, 6).split('');
       pastedValues.forEach((digit, i) => {
         if (index + i < 6) updatedCode[index + i] = digit;
@@ -23,7 +21,6 @@ const VerifyEmail = () => {
       const nextFocusIndex = Math.min(index + pastedValues.length, 5);
       inputRefs.current[nextFocusIndex].focus();
     } else {
-      // Handle single character input
       updatedCode[index] = value;
       setCode(updatedCode);
       if (value && index < 5) inputRefs.current[index + 1].focus();

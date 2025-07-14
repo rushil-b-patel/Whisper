@@ -1,11 +1,9 @@
-// src/components/CommentThread.jsx
 import { useState, useEffect, useCallback } from 'react';
 import { Trash, Reply } from '../ui/Icons';
 import { useAuth } from '../context/AuthContext';
 import { usePostService } from '../context/PostContext';
 import VoteBar from './VoteBar';
 
-/** single comment with its own VoteBar + reply/delete UI */
 function CommentItem({ comment, postId, onAddReply, onDeleteComment }) {
   const [replying, setReplying] = useState(false);
   const [replyText, setReplyText] = useState('');
@@ -34,7 +32,6 @@ function CommentItem({ comment, postId, onAddReply, onDeleteComment }) {
 
   return (
     <div className="bg-white dark:bg-[#1e1f23] border dark:border-[#2A2B30] rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow duration-300">
-      {/* author + timestamp */}
       <div className="flex justify-between items-center mb-2">
         <div className="font-mono font-semibold text-gray-900 dark:text-white">
           {comment.User?.userName || 'User'}
@@ -44,10 +41,8 @@ function CommentItem({ comment, postId, onAddReply, onDeleteComment }) {
         </time>
       </div>
 
-      {/* text */}
       <p className="text-sm text-gray-800 dark:text-gray-200 mb-3">{comment.text}</p>
 
-      {/* votes + actions */}
       <div className="flex justify-between items-center">
         <VoteBar
           id={comment._id}
@@ -69,7 +64,6 @@ function CommentItem({ comment, postId, onAddReply, onDeleteComment }) {
         </div>
       </div>
 
-      {/* reply form */}
       {replying && (
         <form onSubmit={handleReply} className="mt-3 space-y-2">
           <textarea
@@ -101,7 +95,6 @@ function CommentItem({ comment, postId, onAddReply, onDeleteComment }) {
   );
 }
 
-/** the thread wrapper, top‑level input + list of CommentItem */
 export default function CommentThread({ post, comments: initialComments }) {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
@@ -139,7 +132,6 @@ export default function CommentThread({ post, comments: initialComments }) {
 
   return (
     <div className="space-y-6 mt-8">
-      {/* top‑level comment box */}
       <form onSubmit={submitTop} className="space-y-2">
         <textarea
           value={newComment}
@@ -159,7 +151,6 @@ export default function CommentThread({ post, comments: initialComments }) {
         </div>
       </form>
 
-      {/* list */}
       {comments.length === 0 ? (
         <p className="text-gray-500 dark:text-gray-400 text-sm font-mono">No comments yet…</p>
       ) : (

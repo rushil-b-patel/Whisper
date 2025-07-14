@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import { useEffect, useState } from 'react';
 import { Bolt, BoltSlash, BoltSolid, BoltSlashSolid } from '../ui/Icons';
 import { usePostService } from '../context/PostContext';
@@ -23,7 +22,6 @@ export default function VoteBar({
   const { user } = useAuth();
   const token = localStorage.getItem('token');
 
-  // on mount / user change, re-fetch vote state
   useEffect(() => {
     if (!user || !id) return;
     (async () => {
@@ -58,7 +56,6 @@ export default function VoteBar({
     if (busy) return;
     setBusy(true);
 
-    // optimistic
     const prevState = { ...state };
     const prevCount = count;
     const removing = state[type];
@@ -82,7 +79,6 @@ export default function VoteBar({
       const res = await action();
       if (!res.success) throw new Error(res.message);
     } catch (e) {
-      // rollback
       setState(prevState);
       setCount(prevCount);
       toast.error(e.message || 'Vote failed');
@@ -91,7 +87,6 @@ export default function VoteBar({
     }
   };
 
-  // styles
   const base = isComment
     ? 'text-sm px-2 py-1 space-x-1 rounded-full'
     : 'px-4 py-2 space-x-4 rounded-full';

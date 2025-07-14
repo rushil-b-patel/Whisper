@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 
 const departmentOptions = [
@@ -34,7 +34,6 @@ function Profile() {
         </div>
 
         <form onSubmit={handleSave} className="space-y-10">
-          {/* Username */}
           <div>
             <label className="block font-semibold mb-2 font-mono text-black dark:text-white">
               Username
@@ -48,7 +47,6 @@ function Profile() {
             />
           </div>
 
-          {/* Bio */}
           <div>
             <label className="block font-semibold mb-2 font-mono text-black dark:text-white">
               About You
@@ -62,7 +60,6 @@ function Profile() {
             />
           </div>
 
-          {/* Department */}
           <div>
             <label className="block font-semibold mb-2 font-mono text-black dark:text-white">
               Department
@@ -93,7 +90,6 @@ function Profile() {
             )}
           </div>
 
-          {/* Save Button */}
           <button
             type="submit"
             disabled={isLoading}
