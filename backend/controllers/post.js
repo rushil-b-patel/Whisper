@@ -198,15 +198,52 @@ export const deletePost = async (req, res) => {
     }
 }
 
-export const getDrafts = async (req, res) => {
+export const voteComment = async (req, res) => {
     try {
-        const drafts = await Post.find({
-            user: req.userId,
-            isDraft: true
-        }).populate('user', 'userName department').sort({ updatedAt: -1 });
+        const { commentId, voteType } = req.body;
+        const post = await Post.findById(req.params.id);
+        if (!post) return res.status(404).json({ success: false, message: 'Post not found' });
 
-        res.status(200).json({success: true, drafts});
+        const comment = post.comments.id(commentId);
+        if (!comment) return res.status(404).json({ success: false, message: 'Comment not found' });
+
+        const userId = req.userId;
+
+        const removeFromArray = (arr, val) => {
+            const index = arr.indexOf(val);
+            if (index !== -1) arr.splice(index, 1);
+        };
+
+        if (voteType === 'up') {
+            if (comment.upVotedUsers.includes(userId)) {
+                comment.upVotes -= 1;
+                removeFromArray(comment.upVotedUsers, userId);
+            } else {
+                if (comment.downVotedUsers.includes(userId)) {
+                    comment.downVotes -= 1;
+                    removeFromArray(comment.downVotedUsers, userId);
+                }
+                comment.upVotes += 1;
+                comment.upVotedUsers.push(userId);
+            }
+        } else if (voteType === 'down') {
+            if (comment.downVotedUsers.includes(userId)) {
+                comment.downVotes -= 1;
+                removeFromArray(comment.downVotedUsers, userId);
+            } else {
+                if (comment.upVotedUsers.includes(userId)) {
+                    comment.upVotes -= 1;
+                    removeFromArray(comment.upVotedUsers, userId);
+                }
+                comment.downVotes += 1;
+                comment.downVotedUsers.push(userId);
+            }
+        }
+
+        await post.save();
+        console.log(comment);
+        res.status(200).json({ success: true, comment });
     } catch (error) {
-        res.status(500).json({success: false, message: error.message });
+        res.status(500).json({ success: false, message: error.message });
     }
-}
+};

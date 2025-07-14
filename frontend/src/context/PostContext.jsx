@@ -228,27 +228,14 @@ export const usePostService = () => {
     }
   };
 
-  const getDrafts = async (token) => {
-    setError(null);
-    setIsLoading(true);
-    try {
-      if (!token) {
-        const msg = 'Authentication required. Please log in.';
-        toast.error(msg, { position: 'bottom-right' });
-        throw new Error(msg);
-      }
-
-      const response = await axios.get(`${API}/post/drafts`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      return response.data;
-    } catch (error) {
-      handleError(error, 'Failed to fetch drafts');
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
+  const voteComment = async (token, postId, commentId, voteType) => {
+    const res = await axios.put(`${API}/post/vote-comment/${postId}`, {
+      voteType,
+      commentId
+    }, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return res.data;
   };
 
   return {
@@ -260,7 +247,7 @@ export const usePostService = () => {
     addComment,
     deletePost,
     deleteComment,
-    getDrafts,
+    voteComment,
     error,
     isLoading,
   };
