@@ -39,7 +39,11 @@ const User = () => {
 
   const items = [
     { title: 'Profile', icon: '👤', action: () => navigate('/profile') },
-    { title: theme === 'light' ? 'Dark Theme' : 'Light Theme', icon: theme === 'light' ? '🌙' : '☀️', action: toggleTheme },
+    {
+      title: theme === 'light' ? 'Dark Theme' : 'Light Theme',
+      icon: theme === 'light' ? '🌙' : '☀️',
+      action: toggleTheme,
+    },
     { title: 'Logout', icon: '🚪', action: logout },
   ];
 
@@ -70,7 +74,9 @@ const User = () => {
               onClick={() => handleItemClick(item.action)}
             >
               <span className="text-xl mr-3">{item.icon}</span>
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{item.title}</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                {item.title}
+              </span>
             </li>
           ))}
         </ul>

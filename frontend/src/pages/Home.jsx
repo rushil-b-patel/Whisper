@@ -62,10 +62,31 @@ function Home() {
     ],
   };
 
+  const [showMobileFilter, setShowMobileFilter] = useState(false);
+
   return (
     <div className="h-screen overflow-hidden bg-gray-50 dark:bg-[#0e1113]">
-      <div className="max-w-7xl mx-auto flex h-full gap-6">
-        <aside className="md:w-64 lg:w-72 h-full overflow-y-auto px-2 py-4">
+      {showMobileFilter && (
+        <div className="fixed top-16 left-0 w-full z-40 bg-white dark:bg-[#131619] border-b dark:border-[#2A2B30] md:hidden shadow">
+          {filters.map(({ id, label }) => (
+            <button
+              key={id}
+              className={`w-full flex items-center px-4 py-3 text-left font-mono ${
+                activeFilter === id ? 'text-indigo-600' : ''
+              }`}
+              onClick={() => {
+                setActiveFilter(id);
+                setShowMobileFilter(false);
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row h-full gap-0 md:gap-6 flex-1">
+        <aside className="hidden md:block md:w-64 lg:w-72 h-full overflow-y-auto px-2 py-4">
           <section className="bg-white dark:bg-[#131619] rounded-xl shadow-sm p-4 mb-4">
             <h2 className="font-mono text-lg font-semibold text-gray-900 dark:text-white mb-3">
               Discover
@@ -139,7 +160,7 @@ function Home() {
           )}
         </main>
 
-        <aside className="md:w-64 lg:w-80 h-full overflow-y-auto px-2 py-4">
+        <aside className="hidden md:block md:w-64 lg:w-80 h-full overflow-y-auto px-2 py-4">
           <section className="bg-white dark:bg-[#131619] rounded-xl shadow-sm p-4 mb-4">
             {user ? (
               <>
@@ -227,6 +248,91 @@ function Home() {
           </section>
         </aside>
       </div>
+
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-[#131619] border-t border-gray-200 dark:border-[#2A2B30] flex justify-between items-center px-2 py-1 md:hidden">
+        <button onClick={() => navigate('/')} className="flex flex-col items-center flex-1 py-2">
+          <svg
+            className="w-6 h-6 mx-auto"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M3 12l9-9 9 9M4 10v10a1 1 0 001 1h3m10-11v10a1 1 0 01-1 1h-3m-6 0h6"
+            />
+          </svg>
+          <span className="text-xs mt-1">Home</span>
+        </button>
+        <button
+          onClick={() => navigate('/peers')}
+          className="flex flex-col items-center flex-1 py-2"
+        >
+          <svg
+            className="w-6 h-6 mx-auto"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-4a4 4 0 11-8 0 4 4 0 018 0z"
+            />
+          </svg>
+          <span className="text-xs mt-1">Communities</span>
+        </button>
+        <button
+          onClick={() => navigate('/create-post')}
+          className="flex flex-col items-center flex-1 py-2"
+        >
+          <svg className="w-7 h-7 mx-auto text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" />
+          </svg>
+          <span className="text-xs mt-1">Create</span>
+        </button>
+        <button
+          onClick={() => navigate('/chat')}
+          className="flex flex-col items-center flex-1 py-2"
+        >
+          <svg
+            className="w-6 h-6 mx-auto"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.77 9.77 0 01-4-.8L3 21l1.8-4A8.96 8.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+            />
+          </svg>
+          <span className="text-xs mt-1">Chat</span>
+        </button>
+        <button
+          onClick={() => navigate('/inbox')}
+          className="flex flex-col items-center flex-1 py-2"
+        >
+          <svg
+            className="w-6 h-6 mx-auto"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M21 12.79V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6.79a2 2 0 00.553 1.414l7 7a2 2 0 002.894 0l7-7A2 2 0 0021 12.79z"
+            />
+          </svg>
+          <span className="text-xs mt-1">Inbox</span>
+        </button>
+      </nav>
     </div>
   );
 }
