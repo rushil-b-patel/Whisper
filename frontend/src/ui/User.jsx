@@ -4,122 +4,77 @@ import { useNavigate } from 'react-router-dom';
 
 const User = () => {
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
-  const ms = new Date().getUTCMilliseconds();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isHovering, setIsHovering] = useState(false);
   const menuRef = useRef(null);
-  const isMobileDevice = window.innerWidth <= 768;
-
+  const navigate = useNavigate();
   const { user, logout } = useAuth();
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setMenuOpen(false);
-      }
-    };
-    if (menuOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    } else {
-      document.removeEventListener('mousedown', handleClickOutside);
-    }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [menuOpen]);
+  const isMobileDevice = window.innerWidth <= 768;
 
-  useEffect(() => {
-    localStorage.setItem('theme', theme);
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-      document.documentElement.classList.remove('light');
-    } else {
-      document.documentElement.classList.add('light');
-      document.documentElement.classList.remove('dark');
-    }
-  }, [theme]);
-
-  const onChangeThemeClick = () => {
+  const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
   };
 
-  const navigate = useNavigate();
-  const onSelect = (path) => {
-    navigate(path);
+  useEffect(() => {
+    localStorage.setItem('theme', theme);
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+    document.documentElement.classList.toggle('light', theme === 'light');
+  }, [theme]);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    };
+    if (menuOpen) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [menuOpen]);
+
+  const handleItemClick = (action) => {
+    action();
     setMenuOpen(false);
   };
 
   const items = [
-    {
-      title: 'Profile',
-      icon: '👤',
-      color: 'bg-indigo-300 dark:bg-indigo-800',
-      onclick: () => onSelect('/profile'),
-    },
-    {
-      title: theme === 'light' ? 'Dark theme' : 'Light theme',
-      icon: theme === 'light' ? '🌙' : '☀️',
-      color: 'bg-teal-300 dark:bg-teal-800',
-      onclick: () => onChangeThemeClick(),
-    },
-    {
-      title: 'Settings',
-      icon: '⚙️',
-      color: 'bg-fuchsia-300 dark:bg-fuchsia-800',
-      onclick: () => {},
-    },
-    {
-      title: 'Logout',
-      icon: '🚪',
-      color: 'bg-red-300 dark:bg-red-800',
-      onclick: () => logout(),
-    },
+    { title: 'Profile', icon: '👤', action: () => navigate('/profile') },
+    { title: theme === 'light' ? 'Dark Theme' : 'Light Theme', icon: theme === 'light' ? '🌙' : '☀️', action: toggleTheme },
+    { title: 'Logout', icon: '🚪', action: logout },
   ];
 
   return (
-    <div
-      className="relative group z-50"
-      onMouseEnter={() => {
-        if (!isMobileDevice) setIsHovering(true);
-      }}
-      onMouseLeave={() => {
-        if (!isMobileDevice) setIsHovering(false);
-      }}
-    >
-      <div
-        className="flex items-center h-10 rounded-lg cursor-pointer w-fit hover:bg-slate-200 dark:hover:bg-slate-800"
-        onClick={() => {
-          if (isMobileDevice) setMenuOpen((prev) => !prev);
-        }}
+    <div className="relative z-50" ref={menuRef}>
+      <button
+        className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+        onClick={() => setMenuOpen(!menuOpen)}
       >
         <img
-          src={`https://api.dicebear.com/5.x/bottts-neutral/svg?seed=${ms}`}
-          className="my-auto mx-2 rounded-full w-7 h-7"
+          src={`https://api.dicebear.com/5.x/bottts-neutral/svg?seed=${user.userName}`}
+          alt="avatar"
+          className="w-8 h-8 rounded-full"
         />
-        <p className="hidden lg:block font-mono mr-3 font-bold text-black dark:text-white">
-          {user.userName || user.name}
-        </p>
-      </div>
-      {(menuOpen || isHovering) && (
-        <ul
-          ref={menuRef}
-          className="absolute w-60 p-2 bg-slate-50 dark:bg-[#0e1113] border-[1px] border-gray-200 dark:border-[#2A3236] flex-col -left-[8em] rounded-xl "
-        >
+        <span className="hidden lg:block font-mono font-bold dark:text-white">{user.userName}</span>
+      </button>
+
+      <div
+        className={`absolute right-0 mt-2 w-56 origin-top-right bg-white dark:bg-[#0e1113] border border-gray-200 dark:border-[#2A3236] rounded-xl shadow-lg transition-all duration-200 ease-in-out transform ${
+          menuOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
+        }`}
+      >
+        <ul className="py-2">
           {items.map((item) => (
             <li
               key={item.title}
-              className="flex items-center justify-start h-16 font-bold cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 rounded-xl"
-              onClick={item.onclick}
+              className="flex items-center px-4 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#1f2428] transition"
+              onClick={() => handleItemClick(item.action)}
             >
-              <div
-                className={`h-10 w-10 ml-5 flex items-center justify-center rounded-lg ${item.color}`}
-              >
-                <div className="w-3/5 text-gray-800 h-3/5 dark:text-gray-200">{item.icon}</div>
-              </div>
-              <p className="ml-5 text-gray-600 dark:text-gray-200">{item.title}</p>
+              <span className="text-xl mr-3">{item.icon}</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{item.title}</span>
             </li>
           ))}
         </ul>
-      )}
+      </div>
     </div>
   );
 };

@@ -8,55 +8,53 @@ function Navbar() {
   const { user } = useAuth();
 
   return (
-    <nav className="flex items-center justify-between h-16 px-10 dark:bg-[#0e1113] border-b-[1px] dark:border-[#2A3236]">
+    <nav className="flex items-center justify-between h-16 px-6 md:px-10 dark:bg-[#0e1113] bg-white border-b dark:border-[#2A3236] border-gray-200">
       <div className="flex items-center space-x-4">
-        <div className="flex items-center">
-          <WhisperLogo />
-        </div>
-        <div className="hidden lg:block flex-grow max-w-md">
+        <WhisperLogo />
+        <div className="hidden lg:block w-64">
           <input
             type="text"
-            placeholder="Search"
-            className="w-full p-2 text-sm text-black bg-gray-200 dark:bg-[#2A3236] border rounded-lg focus:outline-none border-none"
+            placeholder="Search..."
+            className="w-full px-3 py-2 text-sm rounded-lg bg-gray-100 dark:bg-[#2A3236] dark:text-white border border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
         </div>
       </div>
 
-      <div className="flex items-center space-x-2 lg:space-x-6 text-black dark:text-[#eef1f3]">
-        <div className="flex space-x-2 md:space-x-4 font-medium lg:text-base">
-          <Link
-            to="/create-post"
-            className="p-2 rounded hover:bg-slate-200 dark:hover:bg-[#2A3236] transition"
-          >
-            Create
-          </Link>
-          <Link
-            to="/peers"
-            className="p-2 rounded hover:bg-slate-200 dark:hover:bg-[#2A3236] transition"
-          >
-            Peers
-          </Link>
-        </div>
+      <div className="flex items-center space-x-2 lg:space-x-4">
+        <Link
+          to="/create-post"
+          className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 dark:text-[#eef1f3] dark:hover:bg-[#2A3236] transition"
+        >
+          Create
+        </Link>
+        <Link
+          to="/peers"
+          className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 dark:text-[#eef1f3] dark:hover:bg-[#2A3236] transition"
+        >
+          Peers
+        </Link>
 
         {user ? (
           <User />
         ) : (
-          <>
+          <div className="flex space-x-2">
             <button
               onClick={() => navigate('/login')}
-              className="hidden lg:block font-semibold dark:text-[#eef1f3] hover:bg-slate-200 rounded-md py-2 px-4 lg:px-6 lg:py-2 transition whitespace-nowrap"
+              className="hidden lg:block text-sm font-semibold text-gray-800 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-[#2A3236] px-4 py-2 rounded transition"
             >
               Log In
             </button>
             <button
-              className="relative inline-block px-4 py-2 font-medium group transition whitespace-nowrap"
               onClick={() => navigate('/signup')}
+              className="relative inline-block px-4 py-2 font-medium group"
             >
-              <span className="absolute inset-0 w-full h-full transition duration-200 ease-out transform translate-x-1 translate-y-1 bg-black group-hover:-translate-x-0 group-hover:-translate-y-0"></span>
-              <span className="absolute inset-0 w-full h-full bg-white border-2 border-black group-hover:bg-[black]"></span>
-              <span className="relative text-black group-hover:text-white">Sign Up</span>
+              <span className="absolute inset-0 bg-black translate-x-1 translate-y-1 group-hover:translate-x-0 group-hover:translate-y-0 transition duration-200 ease-in-out"></span>
+              <span className="absolute inset-0 bg-white border-2 border-black group-hover:bg-black transition duration-200 ease-in-out"></span>
+              <span className="relative text-black group-hover:text-white transition duration-200 ease-in-out">
+                Sign Up
+              </span>
             </button>
-          </>
+          </div>
         )}
       </div>
     </nav>
