@@ -27,7 +27,7 @@ function Profile() {
   return (
     <div className="min-h-[calc(100vh-4em)] px-4 sm:px-6 py-10 flex justify-center bg-white dark:bg-[#0e1113]">
       <div className="w-full max-w-2xl border border-gray-200 dark:border-slate-800 rounded-lg px-6 py-8 sm:px-10 sm:py-12 transition-all duration-300 shadow-sm">
-        <div className="border-l-4 border-indigo-500 pl-4 mb-10">
+        <div className="border-l-4 border-black pl-4 mb-10">
           <h1 className="text-3xl sm:text-4xl font-bold font-mono text-black dark:text-white">
             Edit Profile
           </h1>

@@ -1,4 +1,5 @@
 import { Post } from '../models/post.js';
+import { User } from '../models/user.js';
 
 export const createPost = async (req, res) => {
     try {
@@ -244,5 +245,45 @@ export const voteComment = async (req, res) => {
         res.status(200).json({ success: true, comment });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+export const savePostToUser = async (req, res) => {
+    try{
+        const userId = req.user.id;
+        const postId = req.params.id;
+        const user = await User.findById(userId);
+        if(!user) {
+            return res.status(404).json({ messgae: 'User not found'});
+        }
+        const alreadySaved = user.savedPosts.includes(postId);
+        if (alreadySaved) {
+            return res.status(400).json({ message: 'Post already saved' });
+        }
+
+        user.savedPosts.push(postId);
+        await user.save();
+
+        return res.status(200).json({ success: true, message: 'Post saved successfully' });
+    } catch (error) {
+        return res.status(500).json({ message: 'Failed to save post', error });
+    }
+};
+
+export const getSavedPosts = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).populate({
+            path: 'savedPosts',
+            populate: {
+                path: 'user',
+                select: 'userName department'
+            }
+        });
+
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        return res.status(200).json({ success: true, savedPosts: user.savedPosts });
+    } catch (error) {
+        return res.status(500).json({ message: 'Failed to fetch saved posts', error });
     }
 };

@@ -241,6 +241,22 @@ export const usePostService = () => {
     return res.data;
   };
 
+  const savePost = async (token, postId) => {
+    if (!token) throw new Error('Authentication required');
+    const response = await axios.put(`${API}/post/save/${postId}`, {}, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  };
+
+  const getSavedPosts = async (token) => {
+    if (!token) throw new Error('Authentication required');
+    const response = await axios.get(`${API}/post/saved-posts`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  };
+
   return {
     createPost,
     getAllPosts,
@@ -251,6 +267,8 @@ export const usePostService = () => {
     deletePost,
     deleteComment,
     voteComment,
+    savePost,
+    getSavedPosts,
     error,
     isLoading,
   };

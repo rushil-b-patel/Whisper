@@ -27,7 +27,7 @@ const Editor = forwardRef((props, ref) => {
         holder: holderId,
         logLevel: 'ERROR',
         data: props.initialData || { blocks: [] },
-        autofocus: true,
+        autofocus: false,
         tools: {
           linkTool: LinkTool,
           checklist: Checklist,

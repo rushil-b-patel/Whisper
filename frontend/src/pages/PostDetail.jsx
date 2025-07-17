@@ -5,12 +5,12 @@ import VoteBar from '../components/VoteBar';
 import toast from 'react-hot-toast';
 import Comment from '../components/Comment';
 import { useAuth } from '../context/AuthContext';
-import { Bars, Trash, Save, ChevronLeft, Share } from '../ui/Icons';
+import { Bars, Trash, Save, ChevronLeft, Share, UnSave } from '../ui/Icons';
 import { EditorRenderer } from '../components/Editor';
 
 function PostDetail() {
   const { id } = useParams();
-  const { getPost, deletePost, deleteComment } = usePostService();
+  const { getPost, deletePost, deleteComment, savePost } = usePostService();
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -44,16 +44,20 @@ function PostDetail() {
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showOptions]);
+  }, []);
 
-  const handleSavePost = () => {
+  const handleSavePost = async () => {
     const token = localStorage.getItem('token');
     if (!token) {
       toast.error('Login to save post', { position: 'bottom-right' });
       return;
     }
-    toast.success('Post saved', { position: 'bottom-right' });
-    setShowOptions(false);
+    try {
+      await savePost(token, id);
+      toast.success('Post saved', { position: 'bottom-right' });
+    } catch {
+      toast.error('Failed to save post', { position: 'bottom-right' });
+    }
   };
 
   const handleDeletePost = async () => {
@@ -65,14 +69,10 @@ function PostDetail() {
 
     try {
       setIsLoading(true);
-      try {
-        await deletePost(token, id);
-        navigate('/');
-        toast.success('Post deleted', { position: 'bottom-right' });
-      } catch (error) {
-        toast.error('Failed to delete post', { position: 'bottom-right' });
-      }
-    } catch (err) {
+      await deletePost(token, id);
+      navigate('/');
+      toast.success('Post deleted', { position: 'bottom-right' });
+    } catch {
       toast.error('Failed to delete post', { position: 'bottom-right' });
     } finally {
       setIsLoading(false);
@@ -109,6 +109,9 @@ function PostDetail() {
     );
   }
 
+  const isOwner = user?._id === post?.user?._id;
+  const isSaved = user?.savedPosts?.includes(post._id);
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0e1113] py-8 px-4 sm:px-6 lg:px-8">
       <button
@@ -134,7 +137,8 @@ function PostDetail() {
               {post.user?.department || 'General'} • {new Date(post.createdAt).toLocaleDateString()}
             </p>
           </div>
-          {user?._id === post.user?._id && (
+
+          {isOwner && (
             <div className="ml-auto relative" ref={dropdownRef}>
               <button
                 onClick={() => setShowOptions((prev) => !prev)}
@@ -144,13 +148,6 @@ function PostDetail() {
               </button>
               {showOptions && (
                 <div className="absolute right-0 mt-2 w-36 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded shadow-md z-50">
-                  <button
-                    onClick={handleSavePost}
-                    className="flex items-center px-4 py-2 w-full hover:bg-gray-100 dark:hover:bg-gray-700 text-sm"
-                  >
-                    <Save className="w-4 h-4 mr-2" />
-                    Save
-                  </button>
                   <button
                     onClick={handleDeletePost}
                     className="flex items-center px-4 py-2 w-full hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-red-600"
@@ -175,21 +172,40 @@ function PostDetail() {
             </div>
           )}
 
-          <p className="text-gray-800 dark:text-gray-200 font-mono mb-6 leading-relaxed">
+          <div className="text-gray-800 dark:text-gray-200 font-mono mb-6 leading-relaxed">
             <EditorRenderer data={post.description} />
-          </p>
+          </div>
 
-          <div className="border-t border-gray-100 dark:border-slate-700 pt-6 flex items-center justify-between">
+          <div className="border-t border-gray-100 dark:border-slate-700 pt-6 flex items-center justify-between flex-wrap gap-3">
             <VoteBar
               id={id}
               initialVotes={post.upVotes - post.downVotes}
               initialUpVoted={user && post.upVotedUsers.includes(user._id)}
               initialDownVoted={user && post.downVotedUsers.includes(user._id)}
             />
-            <button className="flex items-center space-x-2 text-gray-600 hover:text-indigo-600 dark:text-white transition-colors">
-              <Share className="w-5 h-5" />
-              <span className="font-mono text-sm">Share</span>
-            </button>
+            <div className="flex items-center gap-3">
+              {user && (
+                <button onClick={handleSavePost}
+                    className="flex items-center space-x-2 text-gray-600 hover:text-indigo-600 dark:text-white transition-colors"
+                >
+                  {isSaved ? (
+                    <>
+                      <UnSave className="w-5 h-5" />
+                      <span className="font-mono text-sm">UnSave</span>
+                    </>
+                  ):(
+                    <>
+                      <Save className="w-5 h-5" />
+                      <span className="font-mono text-sm">Save</span>
+                    </>
+                  )}
+                </button>
+              )}
+              <button className="flex items-center space-x-2 text-gray-600 hover:text-indigo-600 dark:text-white transition-colors">
+                <Share className="w-5 h-5" />
+                <span className="font-mono text-sm">Share</span>
+              </button>
+            </div>
           </div>
 
           <section className="mt-10">

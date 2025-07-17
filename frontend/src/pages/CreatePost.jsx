@@ -17,8 +17,12 @@ function CreatePost() {
   const { createPost } = usePostService();
   const categoryRef = useRef(null);
   const editorRef = useRef();
+  const titleRef = useRef(null);
 
   useEffect(() => {
+    if (titleRef.current) {
+      titleRef.current.focus();
+    }
     const handleClickOutside = (event) => {
       if (categoryRef.current && !categoryRef.current.contains(event.target)) {
         setCategoryDropdownOpen(false);
@@ -82,6 +86,7 @@ function CreatePost() {
           <div>
             <label className="block text-sm font-semibold mb-2 font-mono">Title</label>
             <input
+              ref={titleRef}
               type="text"
               className="w-full px-4 py-2 bg-white dark:bg-[#1e1f23] border border-gray-300 dark:border-gray-700 rounded-md font-mono transition-all"
               value={title}

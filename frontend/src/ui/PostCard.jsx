@@ -8,7 +8,7 @@ import { EditorRenderer } from '../components/Editor';
 export default function PostCard({ post }) {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const go = useCallback(() => post?._id && navigate(`/post/${post._id}`), [post]);
+  const go = useCallback(() => post?._id && navigate(`/post/${post._id}`), [post?._id, navigate]);
 
   const voteCount = post.upVotes - post.downVotes;
   const upVoted = user && post.upVotedUsers.includes(user._id);
@@ -18,17 +18,39 @@ export default function PostCard({ post }) {
 
   return (
     <div
-      className="bg-white dark:bg-[#0e1113] p-6 rounded-2xl shadow hover:shadow-xl transition cursor-pointer"
+      className="bg-white dark:bg-[#0e1113] p-5 sm:p-6 rounded-2xl shadow hover:shadow-xl transition cursor-pointer border border-gray-200 dark:border-slate-800"
       onClick={go}
     >
-      <h3 className="font-mono text-xl font-bold mb-2 text-black dark:text-white">{post.title}</h3>
+      <div className="flex items-center gap-3 mb-4">
+        <img
+          src={post.avatar || `https://ui-avatars.com/api/?name=${post.user?.userName || 'User'}`}
+          alt="User Avatar"
+          className="w-8 h-8 rounded-full object-cover border-2 border-gray-200 dark:border-slate-600"
+        />
+        <div className="flex flex-col font-mono">
+          <span className="text-sm font-semibold text-black dark:text-white truncate">
+            {post.user?.userName || 'Deleted User'}
+          </span>
+          <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
+            {post.user?.department || 'General'} • {new Date(post.createdAt).toLocaleDateString()}
+          </span>
+        </div>
+      </div>
+
+      <h3 className="font-mono text-xl font-bold mb-2 text-black dark:text-white">
+        {post.title}
+      </h3>
 
       <div className="text-gray-700 dark:text-gray-300 mb-4 text-sm leading-relaxed">
         <EditorRenderer data={post.description} />
       </div>
 
       {post.image && (
-        <img src={post.image} alt="" className="w-full rounded-lg mb-4 object-cover max-h-48" />
+        <img
+          src={post.image}
+          alt="Post visual"
+          className="w-full rounded-lg mb-4 object-cover max-h-48"
+        />
       )}
 
       <div className="flex justify-between items-center">

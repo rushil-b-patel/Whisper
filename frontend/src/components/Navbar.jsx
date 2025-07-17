@@ -2,13 +2,34 @@ import { Link, useNavigate } from 'react-router-dom';
 import { WhisperLogo } from './WhisperLogo';
 import User from '../ui/User';
 import { useAuth } from '../context/AuthContext';
+import { useEffect, useRef, useState } from 'react';
+import { Search } from '../ui/Icons';
 
 function Navbar() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  const [showSearch, setShowSearch] = useState(false);
+  const searchRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowSearch(false);
+      }
+    };
+
+    if (showSearch) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showSearch]);
+
   return (
-    <nav className="flex items-center justify-between h-16 px-6 md:px-10 dark:bg-[#0e1113] bg-white border-b dark:border-[#2A3236] border-gray-200">
+    <nav className="flex items-center justify-between h-16 px-4 md:px-10 dark:bg-[#0e1113] bg-white border-b dark:border-[#2A3236] border-gray-200 relative">
       <div className="flex items-center space-x-4">
         <WhisperLogo />
         <div className="hidden lg:block w-64">
@@ -21,18 +42,40 @@ function Navbar() {
       </div>
 
       <div className="flex items-center space-x-2 lg:space-x-4">
-        <Link
-          to="/create-post"
-          className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 dark:text-[#eef1f3] dark:hover:bg-[#2A3236] transition"
-        >
-          Create
-        </Link>
-        <Link
-          to="/peers"
-          className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 dark:text-[#eef1f3] dark:hover:bg-[#2A3236] transition"
-        >
-          Peers
-        </Link>
+        <div ref={searchRef} className="relative block md:hidden">
+          {!showSearch && (
+            <button
+              onClick={() => setShowSearch(true)}
+              className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-[#2A3236] transition"
+              aria-label="Search"
+            >
+              <Search />
+            </button>
+          )}
+          {showSearch && (
+            <input
+              type="text"
+              placeholder="Search..."
+              autoFocus
+              className="right-0 w-48 px-3 py-2 text-sm rounded-lg bg-gray-100 dark:bg-[#2A3236] dark:text-white border border-gray-300 dark:border-slate-700 transition"
+            />
+          )}
+        </div>
+
+        <div className="hidden md:flex space-x-2">
+          <Link
+            to="/create-post"
+            className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 dark:text-[#eef1f3] dark:hover:bg-[#2A3236] transition"
+          >
+            Create
+          </Link>
+          <Link
+            to="/peers"
+            className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 dark:text-[#eef1f3] dark:hover:bg-[#2A3236] transition"
+          >
+            Peers
+          </Link>
+        </div>
 
         {user ? (
           <User />
