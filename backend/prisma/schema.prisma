@@ -1,0 +1,95 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                          String     @id @default(uuid())
+  userName                    String     @unique
+  emailHash                   String     @unique
+  password                    String?
+  googleId                    String?    @unique
+  githubId                    String?    @unique
+  department                  String?
+  bio                         String?
+  profilePicture              String?
+  isVerified                  Boolean    @default(false)
+  savedPosts                  Post[]     @relation("SavedPosts")
+  upvotedPosts                Post[]     @relation("UpvotedPosts")
+  downvotedPosts              Post[]     @relation("DownvotedPosts")
+  upvotedComments             Comment[]  @relation("UpvotedComments")
+  downvotedComments           Comment[]  @relation("DownvotedComments")
+  pollVotes                   PollOption[] @relation("PollVotes")
+  posts                       Post[]     @relation("PostAuthor")
+  comments                    Comment[]
+  resetPasswordToken          String?
+  resetPasswordTokenExpires   DateTime?
+  verificationToken           String?
+  verificationTokenExpires    DateTime?
+
+  createdAt                   DateTime   @default(now())
+  updatedAt                   DateTime   @updatedAt
+}
+
+model Post {
+  id              String     @id @default(uuid())
+  title           String
+  description     Json
+  image           String?
+  category        String
+  userId          String
+  user            User       @relation("PostAuthor", fields: [userId], references: [id])
+  comments        Comment[]
+  poll            Poll?
+  savedBy         User[]     @relation("SavedPosts")
+  upVotedUsers    User[]     @relation("UpvotedPosts")
+  downVotedUsers  User[]     @relation("DownvotedPosts")
+  upVotes         Int        @default(0)
+  downVotes       Int        @default(0)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+}
+
+model Comment {
+  id              String     @id @default(uuid())
+  text            String
+  userId          String
+  user            User       @relation(fields: [userId], references: [id])
+  postId          String
+  post            Post       @relation(fields: [postId], references: [id])
+  upVotes         Int        @default(0)
+  downVotes       Int        @default(0)
+  upVotedUsers    User[]     @relation("UpvotedComments")
+  downVotedUsers  User[]     @relation("DownvotedComments")
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+}
+
+model Poll {
+  id        String       @id @default(uuid())
+  question  String
+  endDate   DateTime     @default(dbgenerated("(now() + interval '7 days')"))
+  postId    String       @unique
+  post      Post         @relation(fields: [postId], references: [id])
+  options   PollOption[]
+}
+
+model PollOption {
+  id        String       @id @default(uuid())
+  text      String
+  pollId    String
+  poll      Poll         @relation(fields: [pollId], references: [id])
+  votes     Int          @default(0)
+  voters    User[]       @relation("PollVotes")
+}
