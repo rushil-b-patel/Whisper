@@ -7,10 +7,7 @@ const BASE_API_MOBILE = import.meta.env.VITE_BASE_API_MOBILE;
 
 const getBaseURI = () => {
   const isMobile = /iphone|ipad|ipod|Android/i.test(navigator.userAgent);
-  if (isMobile) {
-    return BASE_API_MOBILE;
-  }
-  return BASE_API;
+  return isMobile ? BASE_API_MOBILE : BASE_API;
 };
 
 const API = getBaseURI();
@@ -20,8 +17,7 @@ export const usePostService = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleError = (error, customMessage) => {
-    const errorMessage =
-      error.response?.data?.message || customMessage || 'An unexpected error occurred';
+    const errorMessage = error.response?.data?.message || customMessage || 'An unexpected error occurred';
     console.error(errorMessage, error);
     setError(errorMessage);
     toast.error(errorMessage, { position: 'bottom-right' });
@@ -32,11 +28,7 @@ export const usePostService = () => {
     setError(null);
     setIsLoading(true);
     try {
-      if (!token) {
-        const msg = 'Authentication required. Please log in.';
-        toast.error(msg, { position: 'bottom-right' });
-        throw new Error(msg);
-      }
+      if (!token) throw new Error('Authentication required. Please log in.');
 
       const response = await axios.post(`${API}/post/create-post`, formData, {
         headers: {
@@ -73,13 +65,10 @@ export const usePostService = () => {
     setError(null);
     setIsLoading(true);
     try {
-      if (!id) {
-        const msg = 'Post ID is required';
-        toast.error(msg, { position: 'bottom-right' });
-        throw new Error(msg);
-      }
+      const postId = parseInt(id);
+      if (isNaN(postId)) throw new Error('Invalid Post ID');
 
-      const response = await axios.get(`${API}/post/${id}`);
+      const response = await axios.get(`${API}/post/${postId}`);
       return response.data;
     } catch (error) {
       handleError(error, 'Failed to load post');
@@ -93,17 +82,13 @@ export const usePostService = () => {
     setError(null);
     setIsLoading(true);
     try {
-      if (!token) {
-        const msg = 'Authentication required. Please log in to vote.';
-        toast.error(msg, { position: 'bottom-right' });
-        throw new Error(msg);
-      }
+      if (!token) throw new Error('Authentication required. Please log in to vote.');
 
-      const response = await axios.put(
-        `${API}/post/upvote/${id}`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const postId = parseInt(id);
+      const response = await axios.put(`${API}/post/upvote/${postId}`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
       return response.data;
     } catch (error) {
       handleError(error, 'Failed to upvote post');
@@ -117,17 +102,13 @@ export const usePostService = () => {
     setError(null);
     setIsLoading(true);
     try {
-      if (!token) {
-        const msg = 'Authentication required. Please log in to vote.';
-        toast.error(msg, { position: 'bottom-right' });
-        throw new Error(msg);
-      }
+      if (!token) throw new Error('Authentication required. Please log in to vote.');
 
-      const response = await axios.put(
-        `${API}/post/downvote/${id}`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const postId = parseInt(id);
+      const response = await axios.put(`${API}/post/downvote/${postId}`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
       return response.data;
     } catch (error) {
       handleError(error, 'Failed to downvote post');
@@ -141,23 +122,13 @@ export const usePostService = () => {
     setError(null);
     setIsLoading(true);
     try {
-      if (!token) {
-        const msg = 'Authentication required. Please log in to comment.';
-        toast.error(msg, { position: 'bottom-right' });
-        throw new Error(msg);
-      }
+      if (!token) throw new Error('Authentication required. Please log in to comment.');
+      if (!text?.trim()) throw new Error('Comment text is required');
 
-      if (!text || !text.trim()) {
-        const msg = 'Comment text is required';
-        toast.error(msg, { position: 'bottom-right' });
-        throw new Error(msg);
-      }
-
-      const response = await axios.post(
-        `${API}/post/add-comment/${id}`,
-        { text },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const postId = parseInt(id);
+      const response = await axios.post(`${API}/post/add-comment/${postId}`, { text }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       if (response.data.success) {
         toast.success('Comment added successfully', { position: 'bottom-right' });
@@ -176,39 +147,37 @@ export const usePostService = () => {
     setError(null);
     setIsLoading(true);
     try {
-      if (!token || !id) {
-        const msg = 'Missing required information to delete comment';
-        toast.error(msg, { position: 'bottom-right' });
-        throw new Error(msg);
-      }
+      const postId = parseInt(id);
+      if (!token || isNaN(postId)) throw new Error('Missing or invalid post ID');
 
-      const response = await axios.delete(`${API}/post/delete-post/${id}`, {
+      const response = await axios.delete(`${API}/post/delete-post/${postId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (response.success) {
+
+      if (response.data.success) {
         toast.success(response.data.message || 'Post deleted successfully', {
           position: 'bottom-right',
         });
       }
+
+      return response.data;
     } catch (error) {
-      handleError(error, 'Failed to delete comment');
+      handleError(error, 'Failed to delete post');
       throw error;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const deleteComment = async (token, id, commentId) => {
+  const deleteComment = async (token, postId, commentId) => {
     setError(null);
     setIsLoading(true);
     try {
-      if (!token || !id || !commentId) {
-        const msg = 'Missing required information to delete comment';
-        toast.error(msg, { position: 'bottom-right' });
-        throw new Error(msg);
-      }
+      const pid = parseInt(postId);
+      const cid = parseInt(commentId);
+      if (!token || isNaN(pid) || isNaN(cid)) throw new Error('Invalid post or comment ID');
 
-      const response = await axios.delete(`${API}/post/delete-comment/${id}/${commentId}`, {
+      const response = await axios.delete(`${API}/post/delete-comment/${pid}/${cid}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -228,22 +197,21 @@ export const usePostService = () => {
   };
 
   const voteComment = async (token, postId, commentId, voteType) => {
-    const res = await axios.put(
-      `${API}/post/vote-comment/${postId}`,
-      {
-        voteType,
-        commentId,
-      },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    const pid = parseInt(postId);
+    const cid = parseInt(commentId);
+    const res = await axios.put(`${API}/post/vote-comment/${pid}`, {
+      voteType,
+      commentId: cid,
+    }, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
     return res.data;
   };
 
   const savePost = async (token, postId) => {
-    if (!token) throw new Error('Authentication required');
-    const response = await axios.put(`${API}/post/save/${postId}`, {}, {
+    const pid = parseInt(postId);
+    if (!token || isNaN(pid)) throw new Error('Authentication or valid postId required');
+    const response = await axios.put(`${API}/post/save/${pid}`, {}, {
       headers: { Authorization: `Bearer ${token}` }
     });
     return response.data;

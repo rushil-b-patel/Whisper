@@ -1,5 +1,5 @@
-import { PASSWORD_RESET_REQUEST_TEMPLATE, PASSWORD_RESET_SUCCESS_TEMPLATE, VERIFICATION_TEMPLATE, WELCOME_TEMPLATE } from "./emailTemplates.js";
 import nodemailer from "nodemailer";
+import { PASSWORD_RESET_REQUEST_TEMPLATE, PASSWORD_RESET_SUCCESS_TEMPLATE, VERIFICATION_TEMPLATE, WELCOME_TEMPLATE } from "./emailTemplates.js";
 import { GMAIL_USER, GMAIL_PASS } from "../utils/envVariables.js";
 
 const transporter = nodemailer.createTransport({

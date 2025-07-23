@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             Int     @id @default(autoincrement())
+  userName       String  @unique
+  emailHash      String  @unique
+  password       String?
+  googleId       String? @unique
+  githubId       String? @unique
+  department     String?
+  bio            String?
+  profilePicture String?
+  isVerified     Boolean @default(false)
+
+  posts             Post[]    @relation("PostAuthor")
+  savedPosts        Post[]    @relation("SavedPosts")
+  upvotedPosts      Post[]    @relation("UpvotedPosts")
+  downvotedPosts    Post[]    @relation("DownvotedPosts")
+  comments          Comment[]
+  upvotedComments   Comment[] @relation("UpvotedComments")
+  downvotedComments Comment[] @relation("DownvotedComments")
+
+  resetPasswordToken        String?
+  resetPasswordTokenExpires DateTime?
+  verificationToken         String?
+  verificationTokenExpires  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Post {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description Json
+  image       String?
+  category    String
+  comments    Comment[]
+
+  userId Int
+  user   User @relation("PostAuthor", fields: [userId], references: [id])
+
+  upVotes        Int    @default(0)
+  downVotes      Int    @default(0)
+  upVotedUsers   User[] @relation("UpvotedPosts")
+  downVotedUsers User[] @relation("DownvotedPosts")
+  savedBy        User[] @relation("SavedPosts")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Comment {
+  id   Int    @id @default(autoincrement())
+  text String
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  postId Int
+  post   Post @relation(fields: [postId], references: [id])
+
+  upVotes        Int    @default(0)
+  downVotes      Int    @default(0)
+  upVotedUsers   User[] @relation("UpvotedComments")
+  downVotedUsers User[] @relation("DownvotedComments")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

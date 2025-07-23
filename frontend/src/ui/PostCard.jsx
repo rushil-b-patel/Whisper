@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Comment } from '../ui/Icons';
@@ -8,11 +9,11 @@ import { EditorRenderer } from '../components/Editor';
 export default function PostCard({ post }) {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const go = useCallback(() => post?._id && navigate(`/post/${post._id}`), [post?._id, navigate]);
+  const go = useCallback(() => post?.id && navigate(`/post/${post.id}`), [post?.id, navigate]);
 
   const voteCount = post.upVotes - post.downVotes;
-  const upVoted = user && post.upVotedUsers.includes(user._id);
-  const downVoted = user && post.downVotedUsers.includes(user._id);
+  const upVoted = user && post.upVotedUsers?.some(u => u.id === user.id);
+  const downVoted = user && post.downVotedUsers?.some(u => u.id === user.id);
 
   if (!post) return <div className="p-4 text-red-500">Missing post data</div>;
 
@@ -55,7 +56,7 @@ export default function PostCard({ post }) {
 
       <div className="flex justify-between items-center">
         <VoteBar
-          id={post._id}
+          id={post.id}
           initialVotes={voteCount}
           initialUpVoted={upVoted}
           initialDownVoted={downVoted}

@@ -43,7 +43,7 @@ function CreatePost() {
       formData.append('category', category);
       if (image) formData.append('image', image);
       const post = await createPost(token, formData);
-      navigate('/post/' + post.postId);
+      navigate('/post/' + post.id);
     } catch (err) {
       console.error('Error creating post:', err);
     } finally {

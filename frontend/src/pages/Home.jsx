@@ -153,7 +153,7 @@ function Home() {
           ) : (
             <div className="space-y-4 pb-20">
               {getFilteredPosts().length > 0 ? (
-                getFilteredPosts().map((post) => <PostCard key={post._id} post={post} />)
+                getFilteredPosts().map((post) => <PostCard key={post.id} post={post} />)
               ) : (
                 <p className="text-center text-gray-500 dark:text-gray-400">No posts to show.</p>
               )}

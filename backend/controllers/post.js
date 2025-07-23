@@ -1,268 +1,216 @@
-import { Post } from '../models/post.js';
-import { User } from '../models/user.js';
+import { prisma } from "../db/prismaClient.js";
 
 export const createPost = async (req, res) => {
     try {
-        const { title, description, category, isDraft, poll } = req.body;
-        const imageUrl = req.file ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}` : null;
+        const { title, description, category } = req.body;
 
-        let parsedDescription;
-        try {
-            parsedDescription = JSON.parse(description);
-        } catch (err) {
-            return res.status(400).json({ success: false, message: "Invalid description format" });
-        }
+        const parsedDescription = typeof description === 'string'
+            ? JSON.parse(description)
+            : description;
 
-        const postData = {
-            title,
-            description: parsedDescription,
-            user: req.userId,
-            image: imageUrl,
-            category,
-        };
+        const imageUrl = req.file
+            ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`
+            : null;
 
-        if (poll) {
-            try {
-                const pollData = JSON.parse(poll);
-                if (pollData.question && pollData.options && pollData.options.length >= 2) {
-                    postData.poll = {
-                        question: pollData.question,
-                        options: pollData.options.map(option => ({
-                            text: option,
-                            votes: 0,
-                            voters: []
-                        }))
-                    };
-                }
-            } catch (error) {
-                console.error('Error parsing poll data:', error);
-            }
-        }
+        const post = await prisma.post.create({
+            data: {
+                title,
+                description: parsedDescription,
+                image: imageUrl,
+                category,
+                userId: req.userId,
+            },
+        });
 
-        const post = new Post(postData);
-        await post.save();
-        res.status(201).json({ success: true, post, postId: post._id });
-    } catch(error){
-        res.status(500).json({success: false, message: error.message });
+        res.status(201).json({ success: true, post });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
     }
 };
 
 export const getAllPosts = async (req, res) => {
     try {
-        const posts = await Post.find().populate('user', 'userName department').sort({ createdAt: -1 });
-        res.status(200).json({success: true, posts});
+        const posts = await prisma.post.findMany({
+            orderBy: { createdAt: 'desc' },
+            include: {
+                user: {
+                    select: { userName: true, department: true },
+                },
+            },
+        });
+
+        res.status(200).json({ success: true, posts });
     } catch (error) {
-        res.status(500).json({success: false, message: error.message });
+        res.status(500).json({ success: false, message: error.message });
     }
-}
+};
 
 export const getUserPosts = async (req, res) => {
     try {
-        const posts = await Post.find({ user: req.userId }).populate('user', 'username').sort({ createdAt: -1 });
-        res.status(200).json({success: true, posts});
+        const posts = await prisma.post.findMany({
+            where: { userId: req.userId },
+            include: {
+                user: {
+                    select: { userName: true },
+                },
+            },
+            orderBy: { createdAt: 'desc' },
+        });
+        res.status(200).json({ success: true, posts });
     } catch (error) {
-        res.status(500).json({success: false, message: error.message });
+        res.status(500).json({ success: false, message: error.message });
     }
-}
+};
 
 export const upVotePost = async (req, res) => {
+    const postId = parseInt(req.params.id);
+    const userId = req.userId;
     try {
-        const post = await Post.findById(req.params.id);
-        if(!post) {
-            return res.status(404).json({success: false, message: 'Post not found'});
-        }
-        const upVoteIndex = post.upVotedUsers.indexOf(req.user.id);
-        if(upVoteIndex > -1){
-            post.upVotes -= 1;
-            post.upVotedUsers.splice(upVoteIndex, 1);
-        }
-        else{
-            const downVoteIndex = post.downVotedUsers.indexOf(req.user.id);
-            if(downVoteIndex > -1){
-                post.downVotes -= 1;
-                post.downVotedUsers.splice(downVoteIndex, 1);
+        const post = await prisma.post.findUnique({
+            where: { id: postId },
+            include: { upVotedUsers: true, downVotedUsers: true },
+        });
+
+        if (!post) return res.status(404).json({ success: false, message: 'Post not found' });
+
+        const hasUpvoted = post.upVotedUsers.some((user) => user.id === userId);
+        const hasDownvoted = post.downVotedUsers.some((user) => user.id === userId);
+
+        if (hasUpvoted) {
+            await prisma.post.update({
+                where: { id: postId },
+                data: {
+                    upVotedUsers: { disconnect: { id: userId } },
+                    upVotes: { decrement: 1 },
+                },
+            });
+        } else {
+            const updates = {
+                upVotedUsers: { connect: { id: userId } },
+                upVotes: { increment: 1 },
+            };
+            if (hasDownvoted) {
+                updates.downVotedUsers = { disconnect: { id: userId } };
+                updates.downVotes = { decrement: 1 };
             }
-            post.upVotes += 1;
-            post.upVotedUsers.push(req.user.id);
+            await prisma.post.update({ where: { id: postId }, data: updates });
         }
-        await post.save();
-        res.status(200).json({success: true, post});
+
+        const updated = await prisma.post.findUnique({ where: { id: postId } });
+        res.status(200).json({ success: true, post: updated });
     } catch (error) {
-        res.status(500).json({success: false, message: error.message });
+        res.status(500).json({ success: false, message: error.message });
     }
-}
+};
 
 export const downVotePost = async (req, res) => {
+    const postId = parseInt(req.params.id);
+    const userId = req.userId;
     try {
-        const post = await Post.findById(req.params.id);
-        if(!post) {
-            return res.status(404).json({success: false, message: 'Post not found'});
-        }
-        const downVoteIndex = post.downVotedUsers.indexOf(req.user.id);
-        if(downVoteIndex > -1){
-            post.downVotes -= 1;
-            post.downVotedUsers.splice(downVoteIndex, 1);
-        }
-        else{
-            const upVoteIndex = post.upVotedUsers.indexOf(req.user.id);
-            if(upVoteIndex > -1){
-                post.upVotes -= 1;
-                post.upVotedUsers.splice(upVoteIndex, 1);
+        const post = await prisma.post.findUnique({
+            where: { id: postId },
+            include: { upVotedUsers: true, downVotedUsers: true },
+        });
+
+        if (!post) return res.status(404).json({ success: false, message: 'Post not found' });
+
+        const hasUpvoted = post.upVotedUsers.some((user) => user.id === userId);
+        const hasDownvoted = post.downVotedUsers.some((user) => user.id === userId);
+
+        if (hasDownvoted) {
+            await prisma.post.update({
+                where: { id: postId },
+                data: {
+                    downVotedUsers: { disconnect: { id: userId } },
+                    downVotes: { decrement: 1 },
+                },
+            });
+        } else {
+            const updates = {
+                downVotedUsers: { connect: { id: userId } },
+                downVotes: { increment: 1 },
+            };
+            if (hasUpvoted) {
+                updates.upVotedUsers = { disconnect: { id: userId } };
+                updates.upVotes = { decrement: 1 };
             }
-            post.downVotes += 1;
-            post.downVotedUsers.push(req.user.id);
+            await prisma.post.update({ where: { id: postId }, data: updates });
         }
-        await post.save();
-        res.status(200).json({success: true, post});
+
+        const updated = await prisma.post.findUnique({ where: { id: postId } });
+        res.status(200).json({ success: true, post: updated });
     } catch (error) {
-        res.status(500).json({success: false, message: error.message });
+        res.status(500).json({ success: false, message: error.message });
     }
-}
-
-export const addComment = async (req, res) => {
-    try {
-        const post = await Post.findById(req.params.id);
-        if(!post) {
-            return res.status(404).json({success: false, message: 'Post not found'});
-        }
-        const { text } = req.body;
-        if(!text) {
-            return res.status(400).json({success: false, message: 'Content is required'});
-        }
-        const comment = { text, User: req.userId, createdAt: new Date() };
-        post.comments.push(comment);
-        await post.save();
-
-        const populatedPost = await Post.findById(post._id).populate('comments.User', 'userName');
-        const addedComment = populatedPost.comments[populatedPost.comments.length - 1];
-
-        res.status(200).json({success: true, comment: addedComment});
-    } catch (error) {
-        res.status(500).json({success: false, message: error.message });
-    }
-}
+};
 
 export const getPost = async (req, res) => {
     try {
-        const post = await Post.findById(req.params.id).populate('user', 'userName department').populate('comments.User' , 'userName');
-        if(!post){
-            return res.status(404).json({success: false, message: 'Post not found'});
-        }
-        res.status(200).json({success: true, post});
-    }
-    catch(error){
-        res.status(500).json({success: false, message: error.message });
-    }
-}
+        const post = await prisma.post.findUnique({
+            where: { id: parseInt(req.params.id) },
+            include: {
+                user: {
+                    select: { userName: true, department: true },
+                },
+                comments: {
+                    include: {
+                        user: {
+                            select: { userName: true },
+                        },
+                    },
+                },
+                upVotedUsers: {
+                    select: { id: true },
+                },
+                downVotedUsers: {
+                    select: { id: true },
+                },
+            },
+        });
 
-export const deleteComment = async (req, res) =>{
-    try{
-        const post = await Post.findById(req.params.id);
-        if(!post){
-            return res.status(404).json({success: false, message: 'Post not found'});
-        }
-        const comment = post.comments.find((comment) => comment._id.toString() === req.params.commentId);
-        if(!comment){
-            return res.status(404).json({success: false, message: 'Comment not found'});
-        }
-        if(comment.User.toString() !== req.userId){
-            return res.status(401).json({success: false, message: 'Unauthorized'});
-        }
-        await Post.updateOne(
-            { _id: req.params.id },
-            { $pull: { comments: { _id: req.params.commentId } } }
-          );
-        res.status(200).json({success: true, post});
-    }
-    catch(error){
-        res.status(500).json({success: false, message: error.message });
-    }
-}
-
-
-export const deletePost = async (req, res) => {
-    try{
-        const post = await Post.findById(req.params.id);
-        if(!post){
-            return res.status(404).json({success: false, message: 'Post not found'})
-        }
-        if (post.user.toString() !== req.userId) {
-            return res.status(403).json({ success: false, message: 'Unauthorized to delete this post' });
-        }
-
-        await Post.deleteOne({ _id: req.params.id });
-
-        res.status(200).json({ success: true, message: 'Post deleted successfully' });
-    }
-    catch(error){
-        res.status(500).json({ success: false, message: error.message });
-    }
-}
-
-export const voteComment = async (req, res) => {
-    try {
-        const { commentId, voteType } = req.body;
-        const post = await Post.findById(req.params.id);
         if (!post) return res.status(404).json({ success: false, message: 'Post not found' });
 
-        const comment = post.comments.id(commentId);
-        if (!comment) return res.status(404).json({ success: false, message: 'Comment not found' });
+        res.status(200).json({ success: true, post });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
 
-        const userId = req.userId;
+export const deletePost = async (req, res) => {
+    try {
+        const post = await prisma.post.findUnique({ where: { id: req.params.id } });
 
-        const removeFromArray = (arr, val) => {
-            const index = arr.indexOf(val);
-            if (index !== -1) arr.splice(index, 1);
-        };
+        if (!post) return res.status(404).json({ success: false, message: 'Post not found' });
+        if (post.userId !== req.userId) return res.status(403).json({ success: false, message: 'Unauthorized' });
 
-        if (voteType === 'up') {
-            if (comment.upVotedUsers.includes(userId)) {
-                comment.upVotes -= 1;
-                removeFromArray(comment.upVotedUsers, userId);
-            } else {
-                if (comment.downVotedUsers.includes(userId)) {
-                    comment.downVotes -= 1;
-                    removeFromArray(comment.downVotedUsers, userId);
-                }
-                comment.upVotes += 1;
-                comment.upVotedUsers.push(userId);
-            }
-        } else if (voteType === 'down') {
-            if (comment.downVotedUsers.includes(userId)) {
-                comment.downVotes -= 1;
-                removeFromArray(comment.downVotedUsers, userId);
-            } else {
-                if (comment.upVotedUsers.includes(userId)) {
-                    comment.upVotes -= 1;
-                    removeFromArray(comment.upVotedUsers, userId);
-                }
-                comment.downVotes += 1;
-                comment.downVotedUsers.push(userId);
-            }
-        }
+        await prisma.post.delete({ where: { id: req.params.id } });
 
-        await post.save();
-        res.status(200).json({ success: true, comment });
+        res.status(200).json({ success: true, message: 'Post deleted successfully' });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 };
 
 export const savePostToUser = async (req, res) => {
-    try{
-        const userId = req.user.id;
-        const postId = req.params.id;
-        const user = await User.findById(userId);
-        if(!user) {
-            return res.status(404).json({ messgae: 'User not found'});
-        }
-        const alreadySaved = user.savedPosts.includes(postId);
-        if (alreadySaved) {
-            return res.status(400).json({ message: 'Post already saved' });
-        }
+    const userId = req.userId;
+    const postId = req.params.id;
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: { savedPosts: true },
+        });
 
-        user.savedPosts.push(postId);
-        await user.save();
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        const alreadySaved = user.savedPosts.some((post) => post.id === postId);
+        if (alreadySaved) return res.status(400).json({ message: 'Post already saved' });
+
+        await prisma.user.update({
+            where: { id: userId },
+            data: {
+                savedPosts: { connect: { id: postId } },
+            },
+        });
 
         return res.status(200).json({ success: true, message: 'Post saved successfully' });
     } catch (error) {
@@ -272,12 +220,17 @@ export const savePostToUser = async (req, res) => {
 
 export const getSavedPosts = async (req, res) => {
     try {
-        const user = await User.findById(req.user.id).populate({
-            path: 'savedPosts',
-            populate: {
-                path: 'user',
-                select: 'userName department'
-            }
+        const user = await prisma.user.findUnique({
+            where: { id: req.userId },
+            include: {
+                savedPosts: {
+                    include: {
+                        user: {
+                            select: { userName: true, department: true },
+                        },
+                    },
+                },
+            },
         });
 
         if (!user) return res.status(404).json({ message: 'User not found' });
@@ -285,5 +238,124 @@ export const getSavedPosts = async (req, res) => {
         return res.status(200).json({ success: true, savedPosts: user.savedPosts });
     } catch (error) {
         return res.status(500).json({ message: 'Failed to fetch saved posts', error });
+    }
+};
+
+export const addComment = async (req, res) => {
+    try {
+        const { text } = req.body;
+        const postId = req.params.id;
+
+        if (!text) {
+            return res.status(400).json({ success: false, message: 'Content is required' });
+        }
+
+        const post = await prisma.post.findUnique({ where: { id: postId } });
+        if (!post) {
+            return res.status(404).json({ success: false, message: 'Post not found' });
+        }
+
+        const comment = await prisma.comment.create({
+            data: {
+                text,
+                postId,
+                userId: req.userId,
+            },
+            include: {
+                user: {
+                    select: { userName: true },
+                },
+            },
+        });
+
+        res.status(200).json({ success: true, comment });
+    } catch (error) {
+        console.error('Error adding comment:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+export const deleteComment = async (req, res) => {
+    try {
+        const { id: postId, commentId } = req.params;
+
+        const comment = await prisma.comment.findUnique({ where: { id: commentId } });
+
+        if (!comment) {
+            return res.status(404).json({ success: false, message: 'Comment not found' });
+        }
+
+        if (comment.userId !== req.userId) {
+            return res.status(403).json({ success: false, message: 'Unauthorized' });
+        }
+
+        await prisma.comment.delete({ where: { id: commentId } });
+
+        res.status(200).json({ success: true, message: 'Comment deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting comment:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+export const voteComment = async (req, res) => {
+    try {
+        const { commentId, voteType } = req.body;
+        const userId = req.userId;
+
+        const comment = await prisma.comment.findUnique({
+            where: { id: commentId },
+            include: {
+                upVotedUsers: true,
+                downVotedUsers: true,
+            },
+        });
+
+        if (!comment) {
+            return res.status(404).json({ success: false, message: 'Comment not found' });
+        }
+
+        const hasUpvoted = comment.upVotedUsers.some(user => user.id === userId);
+        const hasDownvoted = comment.downVotedUsers.some(user => user.id === userId);
+
+        if (voteType === 'up') {
+            const updateData = {
+                upVotedUsers: hasUpvoted
+                    ? { disconnect: { id: userId } }
+                    : { connect: { id: userId } },
+                downVotedUsers: hasDownvoted ? { disconnect: { id: userId } } : undefined,
+                upVotes: hasUpvoted ? { decrement: 1 } : { increment: 1 },
+                downVotes: hasDownvoted ? { decrement: 1 } : undefined,
+            };
+
+            await prisma.comment.update({ where: { id: commentId }, data: updateData });
+        } else if (voteType === 'down') {
+            const updateData = {
+                downVotedUsers: hasDownvoted
+                    ? { disconnect: { id: userId } }
+                    : { connect: { id: userId } },
+                upVotedUsers: hasUpvoted ? { disconnect: { id: userId } } : undefined,
+                downVotes: hasDownvoted ? { decrement: 1 } : { increment: 1 },
+                upVotes: hasUpvoted ? { decrement: 1 } : undefined,
+            };
+
+            await prisma.comment.update({ where: { id: commentId }, data: updateData });
+        } else {
+            return res.status(400).json({ success: false, message: 'Invalid vote type' });
+        }
+
+        const updatedComment = await prisma.comment.findUnique({
+            where: { id: commentId },
+            include: {
+                user: { select: { userName: true } },
+                upVotedUsers: true,
+                downVotedUsers: true,
+            },
+        });
+
+        res.status(200).json({ success: true, comment: updatedComment });
+    } catch (error) {
+        console.error('Error voting comment:', error);
+        res.status(500).json({ success: false, message: error.message });
     }
 };

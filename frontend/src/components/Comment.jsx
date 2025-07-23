@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useState, useEffect, useCallback } from 'react';
 import { Trash, Reply } from '../ui/Icons';
 import { useAuth } from '../context/AuthContext';
@@ -21,14 +22,14 @@ function CommentItem({ comment, postId, onAddReply, onDeleteComment }) {
 
   const handleDelete = async () => {
     if (confirm('Delete this comment?')) {
-      await deleteComment(token, postId, comment._id);
-      onDeleteComment(comment._id);
+      await deleteComment(token, postId, comment.id);
+      onDeleteComment(comment.id);
     }
   };
 
   const voteCount = (comment.upVotes || 0) - (comment.downVotes || 0);
-  const upVoted = comment.upVotedUsers?.includes(user?._id);
-  const downVoted = comment.downVotedUsers?.includes(user?._id);
+  const upVoted = comment.upVotedUsers?.includes(user?.id);
+  const downVoted = comment.downVotedUsers?.includes(user?.id);
 
   return (
     <div className="bg-white dark:bg-[#1e1f23] border dark:border-[#2A2B30] rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow duration-300">
@@ -45,7 +46,7 @@ function CommentItem({ comment, postId, onAddReply, onDeleteComment }) {
 
       <div className="flex justify-between items-center">
         <VoteBar
-          id={comment._id}
+          id={comment.id}
           postId={postId}
           isComment
           initialVotes={voteCount}
@@ -56,7 +57,7 @@ function CommentItem({ comment, postId, onAddReply, onDeleteComment }) {
           <button onClick={() => setReplying((r) => !r)} className="hover:text-indigo-500">
             <Reply className="inline w-4 h-4 mr-1" /> Reply
           </button>
-          {user?._id === comment.User?._id && (
+          {user?.id === comment.User?.id && (
             <button onClick={handleDelete} className="hover:text-red-500">
               <Trash className="inline w-4 h-4 mr-1" /> Delete
             </button>
@@ -108,19 +109,19 @@ export default function CommentThread({ post, comments: initialComments }) {
 
   const handleAdd = useCallback(
     async (parentId, text) => {
-      const resp = await addComment(token, post._id, text, parentId);
+      const resp = await addComment(token, post.id, text, parentId);
       if (resp.success) {
         setComments((c) => [
-          { ...resp.comment, User: { _id: user._id, userName: user.userName } },
+          { ...resp.comment, User: { id: user.id, userName: user.userName } },
           ...c,
         ]);
       }
     },
-    [addComment, post._id, token, user]
+    [addComment, post.id, token, user]
   );
 
   const handleDelete = useCallback((id) => {
-    setComments((c) => c.filter((x) => x._id !== id));
+    setComments((c) => c.filter((x) => x.id !== id));
   }, []);
 
   const submitTop = async (e) => {
@@ -156,9 +157,9 @@ export default function CommentThread({ post, comments: initialComments }) {
       ) : (
         comments.map((c) => (
           <CommentItem
-            key={c._id}
+            key={c.id}
             comment={c}
-            postId={post._id}
+            postId={post.id}
             onAddReply={handleAdd}
             onDeleteComment={handleDelete}
           />

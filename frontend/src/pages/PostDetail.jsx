@@ -62,7 +62,7 @@ function PostDetail() {
 
   const handleDeletePost = async () => {
     const token = localStorage.getItem('token');
-    if (!token || user?._id !== post?.user?._id) {
+    if (!token || user?.id !== post?.user?.id) {
       toast.error('Unauthorized', { position: 'bottom-right' });
       return;
     }
@@ -85,7 +85,7 @@ function PostDetail() {
       const token = localStorage.getItem('token');
       try {
         await deleteComment(token, id, commentId);
-        setComments((prev) => prev.filter((c) => c._id !== commentId));
+        setComments((prev) => prev.filter((c) => c.id !== commentId));
       } catch {
         toast.error('Failed to delete comment', { position: 'bottom-right' });
       }
@@ -109,8 +109,8 @@ function PostDetail() {
     );
   }
 
-  const isOwner = user?._id === post?.user?._id;
-  const isSaved = user?.savedPosts?.includes(post._id);
+  const isOwner = user?.id === post?.user?.id;
+  const isSaved = user?.savedPosts?.includes(post.id);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0e1113] py-8 px-4 sm:px-6 lg:px-8">
@@ -180,8 +180,8 @@ function PostDetail() {
             <VoteBar
               id={id}
               initialVotes={post.upVotes - post.downVotes}
-              initialUpVoted={user && post.upVotedUsers.includes(user._id)}
-              initialDownVoted={user && post.downVotedUsers.includes(user._id)}
+              initialUpVoted={user && post.upVotedUsers.includes(user.id)}
+              initialDownVoted={user && post.downVotedUsers.includes(user.id)}
             />
             <div className="flex items-center gap-3">
               {user && (

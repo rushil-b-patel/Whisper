@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useEffect, useState } from 'react';
 import { Bolt, BoltSlash, BoltSolid, BoltSlashSolid } from '../ui/Icons';
 import { usePostService } from '../context/PostContext';
@@ -29,16 +30,16 @@ export default function VoteBar({
         const res = await getPost(postId || id);
         const p = res.post;
         if (isComment) {
-          const comment = p.comments.find((c) => c._id === id);
+          const comment = p.comments.find((c) => c.id === id);
           setState({
-            up: comment?.upVotedUsers.includes(user._id),
-            down: comment?.downVotedUsers.includes(user._id),
+            up: comment?.upVotedUsers.includes(user.id),
+            down: comment?.downVotedUsers.includes(user.id),
           });
           setCount(comment.upVotes - comment.downVotes);
         } else {
           setState({
-            up: p.upVotedUsers.includes(user._id),
-            down: p.downVotedUsers.includes(user._id),
+            up: p.upVotedUsers.includes(user.id),
+            down: p.downVotedUsers.includes(user.id),
           });
           setCount(p.upVotes - p.downVotes);
         }

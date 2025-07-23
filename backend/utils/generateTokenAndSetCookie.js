@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
-import { JWT_SECRET, NODE_ENV, SECRET_KEY } from './envVariables.js';
 import crypto from 'crypto';
+import { JWT_SECRET, NODE_ENV, SECRET_KEY } from './envVariables.js';
 
 export const generateTokenAndSetCookie = (res, id) =>{
     const token = jwt.sign({id}, JWT_SECRET, {expiresIn: '7d'});

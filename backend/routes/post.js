@@ -1,8 +1,7 @@
 import express from 'express';
-import { createPost, getAllPosts, getUserPosts, getPost, upVotePost,
-    downVotePost, addComment, deleteComment, deletePost,
-    voteComment, savePostToUser, getSavedPosts} from '../controllers/post.js';
-import { verifyToken } from '../middlewares/postVerifyToken.js';
+import { createPost, getAllPosts, getUserPosts, getPost, upVotePost, downVotePost, addComment,
+    deleteComment, deletePost, voteComment, savePostToUser, getSavedPosts} from '../controllers/post.js';
+import { verifyToken } from '../middlewares/authVerifyToken.js';
 import upload from '../utils/multer.js';
 
 const router = express.Router();
