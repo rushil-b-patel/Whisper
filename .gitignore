@@ -3,5 +3,8 @@ backend/node_modules/
 
 frontend/.env
 backend/.env
+
 Todo.md
 .vscode/
+
+/generated/prisma

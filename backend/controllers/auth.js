@@ -1,92 +1,47 @@
-import { sendPasswordResetEmail, sendResetSuccessEmail, sendVerificationEmail, sendWelcomeEmail } from '../nodeMailer/email.js';
-import { User } from '../models/user.js';
+import { sendPasswordResetEmail, sendResetSuccessEmail, sendVerificationEmail } from '../nodeMailer/email.js';
 import { computeEmailHash, generateTokenAndSetCookie } from '../utils/generateTokenAndSetCookie.js';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { verifyGoogleToken } from '../utils/googleAuth.js';
 import { CLIENT_URI } from '../utils/envVariables.js';
+import { prisma } from "../db/prismaClient.js";
 
-export const login = async (req, res)=>{
-    const { email, password } = req.body;
-    try{
-        if(!email || !password){
-            return res.status(400).json({message: 'Please fill in all fields'});
-        }
-
-        let user;
-        user = await User.findOne({ userName: email });
-
-        if (!user) {
-            user = await User.findOne({email});
-            if (!user) {
-                const emailHash = computeEmailHash(email);
-                user = await User.findOne({emailHash});
-            }
-        }
-
-        if(!user){
-            return res.status(400).json({message: `User doesn't exist with the provided username or email`});
-        }
-
-        const passwordMatch = await bcrypt.compare(password, user.password);
-        if(!passwordMatch){
-            return res.status(400).json({message: 'Invalid password'});
-        }
-
-        if(!user.isVerified){
-            return res.status(403).json({message: 'Email not verified. Please verify your email', redirect: true});
-        }
-
-        const token = generateTokenAndSetCookie(res, user._id);
-        await user.save();
-
-        res.status(200).json({
-            success: true,
-            message: 'Logged in successfully',
-            token,
-            user: {
-                ...user._doc,
-                password: null
-            }
-        })
-    }
-    catch(error){
-        res.status(500).json({message: 'Server Error'});
-    }
-}
-
-export const signup = async (req, res)=>{
+export const signup = async (req, res) => {
     const { userName, email, password } = req.body;
-    try{
-        if(!userName || !email || !password){
-            return res.status(400).json({message: 'Please fill in all fields'});
-        }
+    if (!userName || !email || !password) {
+        return res.status(400).json({ message: 'Please fill in all fields' });
+    }
 
-        const userNameExist = await User.findOne({userName});
-        if(userNameExist){
-            return res.status(400).json({success:false, message: 'Username already exists'});
-        }
-
+    try {
         const emailHash = computeEmailHash(email);
 
-        const userEmailExist = await User.findOne({ emailHash });
-        if(userEmailExist){
-            return res.status(400).json({success:false, message: 'Email already exists'});
+        const userExists = await prisma.user.findFirst({
+            where: {
+                OR: [
+                    { userName },
+                    { emailHash }
+                ]
+            }
+        });
+
+        if (userExists) {
+            return res.status(400).json({ message: 'Username or Email already exists' });
         }
 
-        const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = new User({
-            userName,
-            emailHash,
-            password: hashedPassword,
-            verificationToken,
-            verificationTokenExpires: Date.now() + 1 * 60 * 60 * 1000,
-        })
+        const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
 
-        await user.save();
+        const user = await prisma.user.create({
+            data: {
+                userName,
+                emailHash,
+                password: hashedPassword,
+                verificationToken,
+                verificationTokenExpires: new Date(Date.now() + 1 * 60 * 60 * 1000),
+            }
+        });
 
-        const token = generateTokenAndSetCookie(res, user._id);
+        const token = generateTokenAndSetCookie(res, user.id);
         await sendVerificationEmail(email, verificationToken);
 
         res.status(201).json({
@@ -94,210 +49,295 @@ export const signup = async (req, res)=>{
             message: 'User created successfully',
             token,
             user: {
-                ...user._doc,
+                ...user,
                 password: null,
                 email: undefined,
             }
-        })
-
-    }catch(error){
-        res.status(500).json({message: 'Server Error'});
-        console.error(error);
+        });
+    } catch (error) {
+        console.error('Signup error:', error);
+        res.status(500).json({ message: 'Server error' });
     }
-}
+};
 
-export const verifyEmail = async (req, res)=>{
-    const {code} = req.body;
-    try{
-        const user = await User.findOne({
-            verificationToken: code,
-            verificationTokenExpires: { $gt: Date.now() }
-        })
-
-        if(!user){
-            return res.status(400).json({success: false, message: 'Invalid or expired code. Please try again...', redirect: false});
+export const login = async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Please fill in all fields' });
         }
 
-        user.isVerified = true;
-        user.verificationToken = undefined;
-        user.verificationTokenExpires = undefined;
+        let user = await prisma.user.findFirst({
+            where: {
+                OR: [
+                    { userName: email },
+                    { emailHash: computeEmailHash(email) }
+                ]
+            }
+        });
 
-        await user.save();
+        if (!user) return res.status(400).json({ message: 'User does not exist' });
+
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) return res.status(400).json({ message: 'Invalid password' });
+
+        if (!user.isVerified) {
+            return res.status(403).json({ message: 'Email not verified. Please verify your email', redirect: true });
+        }
+
+        const token = generateTokenAndSetCookie(res, user.id);
+        res.status(200).json({
+            success: true,
+            message: 'Logged in successfully',
+            token,
+            user: {
+                ...user,
+                password: null
+            }
+        });
+    } catch (error) {
+        console.error('Login error:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+export const verifyEmail = async (req, res) => {
+    const { code } = req.body;
+    try {
+        const user = await prisma.user.findFirst({
+            where: {
+                verificationToken: code,
+                verificationTokenExpires: {
+                    gt: new Date()
+                }
+            }
+        });
+
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid or expired code', redirect: false });
+        }
+
+        const updated = await prisma.user.update({
+            where: { id: user.id },
+            data: {
+                isVerified: true,
+                verificationToken: null,
+                verificationTokenExpires: null
+            }
+        });
 
         res.status(200).json({
             success: true,
             message: 'Email verified successfully',
             user: {
-                ...user._doc,
+                ...updated,
                 password: null
             },
             redirect: true
         });
+    } catch (error) {
+        console.error('Verify email error:', error);
+        res.status(500).json({ message: 'Server error' });
     }
-    catch(error){
-        console.error("Error verifying email",error);
-        res.status(500).json({message: 'Server Error'});
-    }
-}
+};
 
-export const logout = async (req, res)=>{
+export const logout = (req, res) => {
     res.clearCookie('token');
-    res.status(200).json({message: 'Logged out successfully'});
-}
+    res.status(200).json({ message: 'Logged out successfully' });
+};
 
-export const forgotPassword = async (req, res)=>{
-    const {email} = req.body;
-    try{
-        const user = await User.findOne({email});
-        if(!user){
-            return res.status(400).json({success:false, message: 'User not found'});
+export const forgotPassword = async (req, res) => {
+    const { email } = req.body;
+    try {
+        const emailHash = computeEmailHash(email);
+
+        const user = await prisma.user.findFirst({
+            where: { emailHash }
+        });
+
+        if (!user) {
+            return res.status(400).json({ success: false, message: 'User not found' });
         }
+
         const resetToken = crypto.randomBytes(20).toString('hex');
-        const resetTokenExpires = Date.now() +  15 * 60 * 1000;
+        const resetTokenExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
 
-        user.resetPasswordToken = resetToken;
-        user.resetPasswordTokenExpires = resetTokenExpires;
-        await user.save();
-        await sendPasswordResetEmail(user.email, `${CLIENT_URI}/reset-password/${resetToken}`);
+        await prisma.user.update({
+            where: { id: user.id },
+            data: {
+                resetPasswordToken: resetToken,
+                resetPasswordTokenExpires: resetTokenExpires
+            }
+        });
 
-        res.status(200).json({success: true, message: 'Password reset email sent'});
+        await sendPasswordResetEmail(email, `${CLIENT_URI}/reset-password/${resetToken}`);
+
+        res.status(200).json({ success: true, message: 'Password reset email sent' });
+    } catch (error) {
+        console.error('Error during forgot password:', error);
+        res.status(500).json({ message: 'Server Error' });
     }
-    catch(error){
-        console.error("Error forgetting password",error);
-        res.status(500).json({message: 'Server Error'});
-    }
-}
+};
 
-export const resetPassword = async (req, res)=>{
-    try{
-        const { token } = req.params;
-        const { password } = req.body;
+export const resetPassword = async (req, res) => {
+    const { token } = req.params;
+    const { password } = req.body;
 
-        const user = await User.findOne({
-            resetPasswordToken: token,
-            resetPasswordTokenExpires: { $gt: Date.now() }
-        })
-        if(!user){
-            return res.status(400).json({message: 'Invalid or expired token'});
+    try {
+        const user = await prisma.user.findFirst({
+            where: {
+                resetPasswordToken: token,
+                resetPasswordTokenExpires: {
+                    gt: new Date()
+                }
+            }
+        });
+
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid or expired token' });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        user.password = hashedPassword;
-        user.resetPasswordToken = undefined;
-        user.resetPasswordTokenExpires = undefined;
-        await user.save();
+
+        await prisma.user.update({
+            where: { id: user.id },
+            data: {
+                password: hashedPassword,
+                resetPasswordToken: null,
+                resetPasswordTokenExpires: null
+            }
+        });
 
         await sendResetSuccessEmail(user.email);
 
-        res.status(200).json({success: true, message: 'Password reset successfully'});
+        res.status(200).json({ success: true, message: 'Password reset successfully' });
+    } catch (error) {
+        console.error('Error during reset password:', error);
+        res.status(500).json({ message: 'Server Error' });
     }
-    catch(error){
-        console.error("Error resetting password",error);
-        res.status(500).json({message: 'Server Error'});
-    }
-}
+};
 
 export const checkAuth = async (req, res) => {
-    try{
-        const user = await User.findById(req.userId);
-        if(!user){
-            return res.status(400).json({message: 'User not found'});
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: req.userId },
+            include: { savedPosts: true },
+        });
+
+        if (!user) {
+            return res.status(400).json({ message: 'User not found' });
         }
-        const { _id, userName, email, bio, department, savedPosts, isVerified } = user;
+
+        const { id, userName, bio, department, savedPosts, isVerified } = user;
+
         res.status(200).json({
             success: true,
             user: {
-                _id,
+                _id: id,
                 userName,
-                email,
                 bio,
                 department,
                 savedPosts,
                 isVerified,
-                password: null
-            }
-        })
+                password: null,
+            },
+        });
+    } catch (error) {
+        console.error('Error checking auth', error);
+        res.status(500).json({ message: 'Server Error' });
     }
-    catch(error){
-        console.error("Error checking auth",error);
-        res.status(500).json({message: 'Server Error'});
-    }
-}
+};
 
 export const updateUser = async (req, res) => {
-    try{
-        const user = await User.findById(req.userId);
-        if(!user){
-            return res.status(400).json({message: 'User not found', success: false});
-        }
-        const { userName, department, bio } = req.body;
-        user.userName = userName;
-        user.department = department;
-        user.bio = bio;
-        await user.save();
+    const { userName, department, bio } = req.body;
+
+    try {
+        const updatedUser = await prisma.user.update({
+            where: { id: req.userId },
+            data: { userName, department, bio },
+        });
+
         res.status(200).json({
             success: true,
             message: 'User updated successfully',
             user: {
-                ...user._doc,
-                password: null
-            }
-        })
+                ...updatedUser,
+                password: null,
+            },
+        });
+    } catch (error) {
+        console.error('Error updating user', error);
+        res.status(500).json({ message: 'Server Error' });
     }
-    catch(error){
-        console.error("Error updating user",error);
-        res.status(500).json({message: 'Server Error'});
-    }
-}
+};
 
 export const googleLogin = async (req, res) => {
     const { googleToken } = req.body;
-    try{
+
+    try {
         const userData = await verifyGoogleToken(googleToken);
-        let user = await User.findOne({ email: userData.email});
-        if(!user){
-            const emailHash = computeEmailHash(userData.email);
-            user = await User.findOne({ emailHash })
+
+        const emailHash = computeEmailHash(userData.email);
+        const user = await prisma.user.findFirst({
+            where: {
+                OR: [
+                    { emailHash },
+                    { googleId: userData.sub },
+                ],
+            },
+        });
+
+        if (!user) {
+            return res.status(400).json({ message: 'User not found. Please sign up' });
         }
-        if(!user){
-            return res.status(400).json({message: 'User not found. Please sign up'});
-        }
-        const token = generateTokenAndSetCookie(res, user._id);
-        await user.save();
-        return res.status(200).json({message: 'Google login success', token, user});
+
+        const token = generateTokenAndSetCookie(res, user.id);
+
+        return res.status(200).json({ message: 'Google login success', token, user });
+    } catch (error) {
+        console.error('Error logging in with Google', error);
+        res.status(500).json({ message: 'Server Error' });
     }
-    catch(error){
-        console.error("Error logging in with google",error);
-        res.status(500).json({message: 'Server Error'});
-    }
-}
+};
 
 export const googleSignup = async (req, res) => {
     const { googleToken } = req.body;
-    try{
+
+    try {
         const userData = await verifyGoogleToken(googleToken);
-        let user = await User.findOne({ email: userData.email });
-        if(user){
+        const emailHash = computeEmailHash(userData.email);
+
+        const existingUser = await prisma.user.findFirst({
+            where: {
+                OR: [
+                    { emailHash },
+                    { googleId: userData.sub },
+                ],
+            },
+        });
+
+        if (existingUser) {
             return res.status(400).json({ message: 'User already exists. Please log in.' });
         }
-        const emailHash = computeEmailHash(userData.email);
-        const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
-        user = new User({
-            userName: userData.name,
-            emailHash,
-            googleId: userData.sub,
-            verificationToken,
-            verificationTokenExpires: Date.now() + 1 * 60 * 60 * 1000,
-        })
-        await user.save();
 
-        const token = generateTokenAndSetCookie(res, user._id);
+        const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
+
+        const newUser = await prisma.user.create({
+            data: {
+                userName: userData.name,
+                emailHash,
+                googleId: userData.sub,
+                verificationToken,
+                verificationTokenExpires: new Date(Date.now() + 60 * 60 * 1000),
+            },
+        });
+
+        const token = generateTokenAndSetCookie(res, newUser.id);
         await sendVerificationEmail(userData.email, verificationToken);
 
-        res.status(200).json({message: 'User created successfully', user, token});
+        res.status(200).json({ message: 'User created successfully', user: newUser, token });
+    } catch (error) {
+        console.error('Error signing up with Google', error);
+        res.status(500).json({ message: 'Server Error' });
     }
-    catch(error){
-        console.error("Error signing up with google",error);
-        res.status(500).json({message: 'Server Error'});
-    }
-}
+};
