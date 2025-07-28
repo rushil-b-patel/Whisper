@@ -37,9 +37,7 @@ export default function PostCard({ post }) {
         </div>
       </div>
 
-      <h3 className="font-mono text-xl font-bold mb-2 text-black dark:text-white">
-        {post.title}
-      </h3>
+      <h3 className="font-mono text-xl font-bold mb-2 text-black dark:text-white">{post.title}</h3>
 
       <div className="text-gray-700 dark:text-gray-300 mb-4 text-sm leading-relaxed">
         <EditorRenderer data={post.description} />

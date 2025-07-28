@@ -248,25 +248,29 @@ export const voteComment = async (req, res) => {
     }
 };
 
-export const savePostToUser = async (req, res) => {
-    try{
+export const toggleSavePost = async (req, res) => {
+    try {
         const userId = req.user.id;
         const postId = req.params.id;
+
         const user = await User.findById(userId);
-        if(!user) {
-            return res.status(404).json({ messgae: 'User not found'});
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
         }
+
         const alreadySaved = user.savedPosts.includes(postId);
+
         if (alreadySaved) {
-            return res.status(400).json({ message: 'Post already saved' });
+            user.savedPosts = user.savedPosts.filter(id => id.toString() !== postId);
+            await user.save();
+            return res.status(200).json({ success: true, message: 'Post unsaved', isSaved: false });
+        } else {
+            user.savedPosts.push(postId);
+            await user.save();
+            return res.status(200).json({ success: true, message: 'Post saved', isSaved: true });
         }
-
-        user.savedPosts.push(postId);
-        await user.save();
-
-        return res.status(200).json({ success: true, message: 'Post saved successfully' });
     } catch (error) {
-        return res.status(500).json({ message: 'Failed to save post', error });
+        return res.status(500).json({ message: 'Something went wrong', error });
     }
 };
 

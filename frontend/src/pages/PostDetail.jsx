@@ -19,6 +19,7 @@ function PostDetail() {
   const [isLoading, setIsLoading] = useState(true);
   const [showOptions, setShowOptions] = useState(false);
   const dropdownRef = useRef(null);
+  const [isSaved, setIsSaved] = useState(false);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -27,24 +28,27 @@ function PostDetail() {
         const response = await getPost(id);
         setPost(response.post);
         setComments(response.post.comments || []);
+        setIsSaved(response.post && user?.savedPosts?.includes(response.post._id));
       } catch (err) {
         console.error('Error fetching post:', err);
       } finally {
         setIsLoading(false);
       }
     };
-    if (id) fetchPost();
-  }, [id, getPost]);
 
-  useEffect(() => {
+    if (id) fetchPost();
+
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowOptions(false);
       }
     };
+
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [id, getPost, user?.savedPosts]);
 
   const handleSavePost = async () => {
     const token = localStorage.getItem('token');
@@ -52,11 +56,24 @@ function PostDetail() {
       toast.error('Login to save post', { position: 'bottom-right' });
       return;
     }
+
     try {
-      await savePost(token, id);
-      toast.success('Post saved', { position: 'bottom-right' });
+      const res = await savePost(token, id);
+      setIsSaved(res.isSaved);
+      toast.success(res.message, { position: 'bottom-right' });
     } catch {
-      toast.error('Failed to save post', { position: 'bottom-right' });
+      toast.error('Failed to save/unsave post', { position: 'bottom-right' });
+    }
+  };
+
+  const handleShare = async () => {
+    const shareUrl = window.location.href;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success('Link copied to clipboard!', { position: 'bottom-right' });
+    } catch (err) {
+      toast.error('Failed to copy link', { position: 'bottom-right' });
+      throw new Error('Failed to copy link', err);
     }
   };
 
@@ -110,7 +127,6 @@ function PostDetail() {
   }
 
   const isOwner = user?._id === post?.user?._id;
-  const isSaved = user?.savedPosts?.includes(post._id);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0e1113] py-8 px-4 sm:px-6 lg:px-8">
@@ -185,15 +201,16 @@ function PostDetail() {
             />
             <div className="flex items-center gap-3">
               {user && (
-                <button onClick={handleSavePost}
-                    className="flex items-center space-x-2 text-gray-600 hover:text-indigo-600 dark:text-white transition-colors"
+                <button
+                  onClick={handleSavePost}
+                  className="flex items-center space-x-2 text-gray-600 hover:text-indigo-600 dark:text-white transition-colors"
                 >
                   {isSaved ? (
                     <>
                       <UnSave className="w-5 h-5" />
-                      <span className="font-mono text-sm">UnSave</span>
+                      <span className="font-mono text-sm">Unsave</span>
                     </>
-                  ):(
+                  ) : (
                     <>
                       <Save className="w-5 h-5" />
                       <span className="font-mono text-sm">Save</span>
@@ -201,7 +218,10 @@ function PostDetail() {
                   )}
                 </button>
               )}
-              <button className="flex items-center space-x-2 text-gray-600 hover:text-indigo-600 dark:text-white transition-colors">
+              <button
+                onClick={handleShare}
+                className="flex items-center space-x-2 text-gray-600 hover:text-indigo-600 dark:text-white transition-colors"
+              >
                 <Share className="w-5 h-5" />
                 <span className="font-mono text-sm">Share</span>
               </button>

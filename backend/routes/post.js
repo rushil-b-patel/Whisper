@@ -1,7 +1,7 @@
 import express from 'express';
 import { createPost, getAllPosts, getUserPosts, getPost, upVotePost,
     downVotePost, addComment, deleteComment, deletePost,
-    voteComment, savePostToUser, getSavedPosts} from '../controllers/post.js';
+    voteComment, toggleSavePost, getSavedPosts} from '../controllers/post.js';
 import { verifyToken } from '../middlewares/postVerifyToken.js';
 import upload from '../utils/multer.js';
 
@@ -11,7 +11,7 @@ router.get('/', getAllPosts);
 router.get('/user-posts', verifyToken, getUserPosts);
 router.get('/:id', getPost);
 router.put('/vote-comment/:id', verifyToken, voteComment);
-router.put('/save/:id', verifyToken, savePostToUser);
+router.put('/save/:id', verifyToken, toggleSavePost);
 router.get('/saved-posts', verifyToken, getSavedPosts);
 
 router.post('/create-post', upload.single('image'), verifyToken, createPost);
