@@ -4,7 +4,6 @@ import mongoose from 'mongoose';
 
 export const getDepartments = async (req, res) => {
     try {
-        console.log("departments")
         const departments = await User.aggregate([
             {
                 $match: {
@@ -47,7 +46,6 @@ export const getDepartments = async (req, res) => {
 
 export const getUserStats = async (req, res) => {
     try {
-        console.log("user's stats")
         const userId = req.userId;
 
         const user = await User.findById(userId).select('createdAt');

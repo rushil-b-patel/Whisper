@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { usePostService } from '../context/PostContext';
 import PostCard from '../ui/PostCard';
 import { useAuth } from '../context/AuthContext';
@@ -106,25 +106,28 @@ function Home() {
   }, [user, getUserStats]);
 
   useEffect(() => {
-    if (initialLoadRef.current) return;
+    if (initialLoadRef.current) {
+      if (user) fetchUserStats();
+      return;
+    }
 
     initialLoadRef.current = true;
     fetchPosts();
     fetchDepartments();
-  }, []);
 
-  useEffect(() => {
-    if (!initialLoadRef.current) return;
-
-    fetchUserStats();
+    if (user) fetchUserStats();
   }, [user]);
 
-  const filteredPosts = useCallback(() => {
-    if (!posts.length) return [];
+  const filteredPosts = useMemo(() => {
+    if (!posts || posts.length === 0) return [];
+
+    const safeUpvotes = (p) => Number(p.upVotes || 0);
+    const safeDownvotes = (p) => Number(p.downVotes || 0);
+    const voteScore = (p) => safeUpvotes(p) - safeDownvotes(p);
 
     switch (activeFilter) {
       case 'trending':
-        return [...posts].sort((a, b) => b.upVotes - b.downVotes - (a.upVotes - a.downVotes));
+        return [...posts].sort((a, b) => voteScore(b) - voteScore(a));
       case 'new':
         return [...posts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       case 'popular':
@@ -134,11 +137,14 @@ function Home() {
     }
   }, [posts, activeFilter]);
 
-  const filters = [
-    { id: 'trending', label: 'Trending', icon: <Fire className="w-5 h-5" /> },
-    { id: 'new', label: 'New', icon: <Clock className="w-5 h-5" /> },
-    { id: 'popular', label: 'Popular', icon: <Sparkles className="w-5 h-5" /> },
-  ];
+  const filters = useMemo(
+    () => [
+      { id: 'trending', label: 'Trending', icon: <Fire className="w-5 h-5" /> },
+      { id: 'new', label: 'New', icon: <Clock className="w-5 h-5" /> },
+      { id: 'popular', label: 'Popular', icon: <Sparkles className="w-5 h-5" /> },
+    ],
+    []
+  );
 
   const handleFilterChange = useCallback((filterId) => {
     setActiveFilter(filterId);
@@ -146,15 +152,20 @@ function Home() {
   }, []);
 
   const handleRefresh = useCallback(() => {
+    if (
+      isPostsFetchingRef.current ||
+      isDepartmentsFetchingRef.current ||
+      isStatsFetchingRef.current
+    )
+      return;
+
     isPostsFetchingRef.current = false;
     isDepartmentsFetchingRef.current = false;
     isStatsFetchingRef.current = false;
 
     fetchPosts();
     fetchDepartments();
-    if (user) {
-      fetchUserStats();
-    }
+    if (user) fetchUserStats();
   }, [fetchPosts, fetchDepartments, fetchUserStats, user]);
 
   return (
@@ -334,8 +345,8 @@ function Home() {
             </div>
           ) : (
             <div className="space-y-4 pb-20">
-              {filteredPosts().length > 0 ? (
-                filteredPosts().map((post) => <PostCard key={post._id} post={post} />)
+              {filteredPosts.length > 0 ? (
+                filteredPosts.map((post) => <PostCard key={post._id} post={post} />)
               ) : (
                 <div className="text-center py-12">
                   <div className="text-gray-400 dark:text-gray-500 mb-4">
@@ -446,21 +457,6 @@ function Home() {
                         </p>
                       </div>
                     ))}
-                  </div>
-
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => navigate('/user-posts')}
-                      className="flex-1 py-2 bg-gray-800 hover:bg-gray-900 text-white rounded-lg text-sm font-medium transition"
-                    >
-                      My Posts
-                    </button>
-                    <button
-                      onClick={() => navigate('/saved-posts')}
-                      className="flex-1 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-lg text-sm font-medium transition border border-gray-200 dark:border-gray-700"
-                    >
-                      Saved
-                    </button>
                   </div>
 
                   {userStats.recentActivity && userStats.recentActivity.length > 0 ? (

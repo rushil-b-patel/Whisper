@@ -56,7 +56,7 @@ function Profile() {
               onChange={(e) => setBio(e.target.value)}
               placeholder="Tell others about yourself"
               className="w-full bg-transparent border-b border-gray-300 dark:border-gray-700 text-black dark:text-white p-2 font-mono transition duration-300 resize-none"
-              rows={4}
+              rows={2}
             />
           </div>
 
@@ -67,7 +67,7 @@ function Profile() {
             <select
               value={department}
               onChange={(e) => setDepartment(e.target.value)}
-              className="w-full bg-transparent border-b border-gray-300 dark:border-gray-700 text-black dark:text-white p-2 font-mono transition duration-300 focus:outline-none focus:border-indigo-500"
+              className="w-full bg-transparent border-gray-300 dark:border-gray-700 text-black dark:text-white p-2 font-mono transition duration-300"
             >
               <option value="" disabled>
                 Select Department
