@@ -3,7 +3,7 @@ import { User } from '../models/user.js';
 
 export const createPost = async (req, res) => {
     try {
-        const { title, description, category, isDraft, poll } = req.body;
+        const { title, description, category } = req.body;
         const imageUrl = req.file ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}` : null;
 
         let parsedDescription;
@@ -20,24 +20,6 @@ export const createPost = async (req, res) => {
             image: imageUrl,
             category,
         };
-
-        if (poll) {
-            try {
-                const pollData = JSON.parse(poll);
-                if (pollData.question && pollData.options && pollData.options.length >= 2) {
-                    postData.poll = {
-                        question: pollData.question,
-                        options: pollData.options.map(option => ({
-                            text: option,
-                            votes: 0,
-                            voters: []
-                        }))
-                    };
-                }
-            } catch (error) {
-                console.error('Error parsing poll data:', error);
-            }
-        }
 
         const post = new Post(postData);
         await post.save();

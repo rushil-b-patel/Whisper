@@ -10,18 +10,6 @@ const commentSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 }, {timestamps: true});
 
-const pollOptionSchema = new mongoose.Schema({
-    text: { type: String, required: true },
-    votes: { type: Number, default: 0 },
-    voters: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
-});
-
-const pollSchema = new mongoose.Schema({
-    question: { type: String, required: true },
-    options: [pollOptionSchema],
-    endDate: { type: Date, default: () => new Date(+new Date() + 7*24*60*60*1000) }
-});
-
 const postSchema = new mongoose.Schema({
     title: {
         type: String,
@@ -61,10 +49,6 @@ const postSchema = new mongoose.Schema({
         required: true
     },
     comments: [commentSchema],
-    poll: {
-        type: pollSchema,
-        required: false
-    },
     createdAt: {
         type: Date,
         default: Date.now
