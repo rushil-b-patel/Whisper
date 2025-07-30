@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Comment } from '../ui/Icons';
+import { Comment } from './Icons';
 import VoteBar from '../components/VoteBar';
 import { useAuth } from '../context/AuthContext';
 import { EditorRenderer } from '../components/Editor';

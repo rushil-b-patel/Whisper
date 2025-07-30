@@ -195,7 +195,7 @@ export const usePostService = () => {
 
   const getDepartments = async () => {
     try {
-      const response = await axios.get(`${API}/stats/departments`);
+      const response = await axios.get(`${API}/departments`);
       return response.data;
     } catch (error) {
       handleError(error, 'Failed to load departments');
@@ -215,6 +215,20 @@ export const usePostService = () => {
     }
   };
 
+  const saveDepartment = async (token, departmentName) => {
+    try {
+       const response = await axios.post(
+                `${API}/departments/add`,
+                { name: departmentName },
+                { headers: { Authorization: `Bearer ${token}` } }
+              );
+       return response.data;
+    } catch (error) {
+      handleError(error, 'Failed to save department');
+      throw error;
+    }
+  };
+
   return {
     createPost,
     getAllPosts,
@@ -229,6 +243,7 @@ export const usePostService = () => {
     getSavedPosts,
     getDepartments,
     getUserStats,
+    saveDepartment,
     error,
     isLoading,
   };

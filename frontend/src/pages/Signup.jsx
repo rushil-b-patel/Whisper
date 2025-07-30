@@ -78,8 +78,6 @@ const Signup = () => {
             </div>
           </div>
 
-          {error && <p className="text-red-500 text-sm font-medium -mt-2">{error}</p>}
-
           <button
             type="submit"
             disabled={isLoading}

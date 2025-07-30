@@ -2,48 +2,6 @@ import { Post } from '../models/post.js';
 import { User } from '../models/user.js';
 import mongoose from 'mongoose';
 
-export const getDepartments = async (req, res) => {
-    try {
-        const departments = await User.aggregate([
-            {
-                $match: {
-                    department: { $exists: true, $ne: null, $ne: "" }
-                }
-            },
-            {
-                $group: {
-                    _id: "$department",
-                    count: { $sum: 1 }
-                }
-            },
-            {
-                $sort: { count: -1 }
-            },
-            {
-                $limit: 10
-            },
-            {
-                $project: {
-                    name: "$_id",
-                    memberCount: "$count",
-                    _id: 0
-                }
-            }
-        ]);
-
-        res.status(200).json({
-            success: true,
-            departments
-        });
-    } catch (error) {
-        console.error('Error fetching departments:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to fetch departments'
-        });
-    }
-};
-
 export const getUserStats = async (req, res) => {
     try {
         const userId = req.userId;

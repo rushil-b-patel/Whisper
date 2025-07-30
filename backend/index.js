@@ -5,9 +5,8 @@ import { connectDb } from './db/connectDb.js';
 import authRoutes from './routes/auth.js';
 import postRoutes from './routes/post.js';
 import statsRoutes from './routes/stats.js';
-import { PORT } from './utils/envVariables.js';
-import { CLIENT_URI } from './utils/envVariables.js';
-import { CLIENT_URI_MOBILE } from './utils/envVariables.js';
+import departmentRoutes from './routes/department.js';
+import { PORT, CLIENT_URI, CLIENT_URI_MOBILE } from './utils/envVariables.js';
 
 const app = express();
 
@@ -21,7 +20,7 @@ app.use('/uploads', express.static('uploads'));
 app.use('/auth', authRoutes);
 app.use('/post', postRoutes);
 app.use('/stats', statsRoutes);
-
+app.use('/departments', departmentRoutes);
 
 app.get('/', (req, res) =>{
     res.send("Backend is running");
