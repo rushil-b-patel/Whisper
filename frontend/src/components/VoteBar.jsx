@@ -91,10 +91,10 @@ export default function VoteBar({
     ? 'text-sm px-2 py-1 space-x-1 rounded-full'
     : 'px-4 py-2 space-x-4 rounded-full';
   const bg = state.up
-    ? 'bg-gradient-to-r from-orange-400 to-red-500 text-white'
+    ? 'bg-[#799EFF] text-white'
     : state.down
-      ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white'
-      : 'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-gray-100';
+      ? 'bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-100'
+      : 'bg-gray-100 text-gray-800 dark:bg-slate-700 dark:text-gray-100';
 
   return (
     <div
