@@ -10,7 +10,7 @@ import { EditorRenderer } from '../components/Editor';
 
 function PostDetail() {
   const { id } = useParams();
-  const { getPost, deletePost, deleteComment, savePost } = usePostService();
+  const { getPost, deletePost, savePost } = usePostService();
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -96,19 +96,6 @@ function PostDetail() {
       setShowOptions(false);
     }
   };
-
-  const handleDeleteComment = useCallback(
-    async (commentId) => {
-      const token = localStorage.getItem('token');
-      try {
-        await deleteComment(token, id, commentId);
-        setComments((prev) => prev.filter((c) => c._id !== commentId));
-      } catch {
-        toast.error('Failed to delete comment', { position: 'bottom-right' });
-      }
-    },
-    [id, deleteComment]
-  );
 
   if (isLoading) {
     return (
@@ -229,7 +216,7 @@ function PostDetail() {
           </div>
 
           <section className="mt-10">
-            <Comment post={post} comments={comments} onDeleteComment={handleDeleteComment} />
+            <Comment post={post} comments={comments} />
           </section>
         </article>
       </div>

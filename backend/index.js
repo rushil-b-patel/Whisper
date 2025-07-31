@@ -4,6 +4,7 @@ import cors from 'cors';
 import { connectDb } from './db/connectDb.js';
 import authRoutes from './routes/auth.js';
 import postRoutes from './routes/post.js';
+import commentRoutes from './routes/comment.js';
 import statsRoutes from './routes/stats.js';
 import departmentRoutes from './routes/department.js';
 import { PORT, CLIENT_URI, CLIENT_URI_MOBILE } from './utils/envVariables.js';
@@ -19,6 +20,7 @@ app.use('/uploads', express.static('uploads'));
 
 app.use('/auth', authRoutes);
 app.use('/post', postRoutes);
+app.use('/comment', commentRoutes);
 app.use('/stats', statsRoutes);
 app.use('/departments', departmentRoutes);
 

@@ -52,13 +52,22 @@ function CommentItem({ comment, postId, onAddReply, onDeleteComment }) {
           initialUpVoted={upVoted}
           initialDownVoted={downVoted}
         />
-        <div className="space-x-4 text-sm text-gray-500 dark:text-gray-400">
-          <button onClick={() => setReplying((r) => !r)} className="hover:text-indigo-500">
-            <Reply className="inline w-4 h-4 mr-1" /> Reply
+        <div className="flex items-center gap-6 text-sm text-gray-500 dark:text-gray-400">
+          <button
+            onClick={() => setReplying((r) => !r)}
+            className="flex items-center gap-1 hover:text-indigo-500"
+          >
+            <Reply className="w-4 h-4" />
+            <span>Reply</span>
           </button>
+
           {user?._id === comment.User?._id && (
-            <button onClick={handleDelete} className="hover:text-red-500">
-              <Trash className="inline w-4 h-4 mr-1" /> Delete
+            <button
+              onClick={handleDelete}
+              className="flex items-center gap-1 hover:text-red-500"
+            >
+              <Trash className="w-4 h-4" />
+              <span>Delete</span>
             </button>
           )}
         </div>

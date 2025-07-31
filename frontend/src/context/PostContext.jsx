@@ -69,6 +69,48 @@ export const usePostService = () => {
     }
   }, []);
 
+  const deletePost = async (token, id) => {
+    setIsLoading(true);
+    try {
+      const response = await axios.delete(`${API}/post/delete-post/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      toast.success('Post deleted');
+      return response.data;
+    } catch (error) {
+      handleError(error, 'Failed to delete post');
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const savePost = async (token, postId) => {
+    try {
+      const response = await axios.put(
+        `${API}/post/save/${postId}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      return response.data;
+    } catch (error) {
+      handleError(error, 'Failed to save post');
+      throw error;
+    }
+  };
+
+  const getSavedPosts = async (token) => {
+    try {
+      const response = await axios.get(`${API}/post/saved-posts`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return response.data;
+    } catch (error) {
+      handleError(error, 'Failed to get saved posts');
+      throw error;
+    }
+  };
+
   const upVotePost = async (token, id) => {
     setIsLoading(true);
     try {
@@ -107,7 +149,7 @@ export const usePostService = () => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        `${API}/post/add-comment/${id}`,
+        `${API}/comment/${id}`,
         { text },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -124,7 +166,7 @@ export const usePostService = () => {
   const deleteComment = async (token, id, commentId) => {
     setIsLoading(true);
     try {
-      const response = await axios.delete(`${API}/post/delete-comment/${id}/${commentId}`, {
+      const response = await axios.delete(`${API}/comment/${id}/${commentId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       toast.success('Comment deleted');
@@ -137,26 +179,10 @@ export const usePostService = () => {
     }
   };
 
-  const deletePost = async (token, id) => {
-    setIsLoading(true);
-    try {
-      const response = await axios.delete(`${API}/post/delete-post/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      toast.success('Post deleted');
-      return response.data;
-    } catch (error) {
-      handleError(error, 'Failed to delete post');
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const voteComment = async (token, postId, commentId, voteType) => {
     try {
       const response = await axios.put(
-        `${API}/post/vote-comment/${postId}`,
+        `${API}/comment/${postId}`,
         { voteType, commentId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -167,50 +193,12 @@ export const usePostService = () => {
     }
   };
 
-  const savePost = async (token, postId) => {
-    try {
-      const response = await axios.put(
-        `${API}/post/save/${postId}`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      return response.data;
-    } catch (error) {
-      handleError(error, 'Failed to save post');
-      throw error;
-    }
-  };
-
-  const getSavedPosts = async (token) => {
-    try {
-      const response = await axios.get(`${API}/post/saved-posts`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      return response.data;
-    } catch (error) {
-      handleError(error, 'Failed to get saved posts');
-      throw error;
-    }
-  };
-
   const getDepartments = async () => {
     try {
       const response = await axios.get(`${API}/departments`);
       return response.data;
     } catch (error) {
       handleError(error, 'Failed to load departments');
-      throw error;
-    }
-  };
-
-  const getUserStats = async (token) => {
-    try {
-      const response = await axios.get(`${API}/stats/user-stats`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      return response.data;
-    } catch (error) {
-      handleError(error, 'Failed to load user stats');
       throw error;
     }
   };
@@ -228,6 +216,19 @@ export const usePostService = () => {
       throw error;
     }
   };
+
+  const getUserStats = async (token) => {
+    try {
+      const response = await axios.get(`${API}/stats/user-stats`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return response.data;
+    } catch (error) {
+      handleError(error, 'Failed to load user stats');
+      throw error;
+    }
+  };
+
 
   return {
     createPost,
