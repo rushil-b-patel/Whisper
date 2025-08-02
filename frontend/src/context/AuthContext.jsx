@@ -188,6 +188,7 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
       localStorage.removeItem('token');
       delete axios.defaults.headers.common['Authorization'];
+      google.accounts.id.disableAutoSelect();
       toast.success('Logged out successfully', { position: 'bottom-right' });
       navigate('/login');
     } catch (error) {
