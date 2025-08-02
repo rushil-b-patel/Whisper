@@ -87,14 +87,13 @@ export default function VoteBar({
     }
   };
 
-  const base = isComment
-    ? 'text-sm px-2 py-1 space-x-1 rounded-full'
-    : 'px-4 py-2 space-x-4 rounded-full';
-  const bg = state.up
-    ? 'bg-[#799EFF] text-white'
-    : state.down
-      ? 'bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-100'
-      : 'bg-gray-100 text-gray-800 dark:bg-slate-700 dark:text-gray-100';
+const base = 'px-4 py-2 space-x-4 rounded-full text-sm';
+const bg = state.up
+  ? 'bg-[#3DB2FF] text-blue-100'
+  : state.down
+    ? 'bg-[#DA1212] text-black'
+    : 'bg-white text-gray-800 dark:bg-slate-800 dark:text-white';
+
 
   return (
     <div
@@ -104,7 +103,7 @@ export default function VoteBar({
       <button
         onClick={() => cast('up')}
         disabled={busy}
-        className="p-1 hover:scale-110 transition"
+        className="p-1 hover:scale-110 hover:opacity-90 transition"
         title={state.up ? 'Remove upvote' : 'Upvote'}
       >
         {state.up ? <BoltSolid /> : <Bolt />}
