@@ -38,12 +38,13 @@ const User = () => {
   };
 
   const items = [
-    { title: 'Profile', icon: '👤', action: () => navigate('/profile') },
+    { title: 'Profile', icon: '', action:() => navigate('/user/'+user.userName) },
     {
       title: theme === 'light' ? 'Dark Theme' : 'Light Theme',
       icon: theme === 'light' ? '🌙' : '☀️',
       action: toggleTheme,
     },
+    { title: 'Settings', icon: '👤', action: () => navigate('/settings') },
     { title: 'Logout', icon: '🚪', action: logout },
   ];
 

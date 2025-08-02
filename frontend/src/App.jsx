@@ -5,7 +5,7 @@ import NotFound from './pages/NotFound';
 import Login from './pages/Login';
 import { ProtectedRoute, RedirectRoute, VerifyEmailRoute } from './context/ProtectedRoutes';
 import VerifyEmail from './pages/VerifyEmail';
-import Profile from './pages/Profile';
+import Settings from './pages/Settings';
 import { Toaster } from 'react-hot-toast';
 import CreatePost from './pages/CreatePost';
 import PostDetail from './pages/PostDetail.jsx';
@@ -20,10 +20,10 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/departments" element={<Department />} />
         <Route
-          path="/profile"
+          path="/Settings"
           element={
             <ProtectedRoute>
-              <Profile />
+              <Settings />
             </ProtectedRoute>
           }
         />

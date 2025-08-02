@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { usePostService } from '../context/PostContext';
 
-function Profile() {
+function Settings() {
   const { user, updateUserData, isLoading } = useAuth();
   const { getDepartments, saveDepartment } = usePostService();
   const [userName, setUserName] = useState(user.userName || user?.name || '');
@@ -124,4 +124,4 @@ function Profile() {
   );
 }
 
-export default Profile;
+export default Settings;

@@ -36,7 +36,7 @@ function Navbar() {
           <input
             type="text"
             placeholder="Search..."
-            className="w-full px-3 py-2 text-sm rounded-lg bg-gray-100 dark:bg-[#2A3236] dark:text-white border border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-3 py-2 text-sm rounded-lg bg-gray-100 dark:bg-[#2A3236] dark:text-white"
           />
         </div>
       </div>
