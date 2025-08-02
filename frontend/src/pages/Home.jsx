@@ -41,7 +41,6 @@ function Home() {
       setPosts(response.posts || []);
       setError(null);
     } catch (err) {
-      console.error('Fetch posts failed', err);
       setError('Failed to load posts. Try again later.');
     } finally {
       setIsLoading(false);
@@ -64,7 +63,6 @@ function Home() {
         setDepartmentsError('No departments found');
       }
     } catch (err) {
-      console.error('Fetch departments failed', err);
       setDepartmentsError('Failed to load departments');
       setDepartments([]);
     } finally {
@@ -100,7 +98,6 @@ function Home() {
         setStatsError('Authentication required');
       }
     } catch (err) {
-      console.error('Fetch user stats failed', err);
       setStatsError('Failed to load user statistics');
       setUserStats(null);
     } finally {

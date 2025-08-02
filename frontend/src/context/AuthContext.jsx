@@ -1,282 +1,112 @@
-import { createContext, useState, useContext, useEffect } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import { useRequest } from '../utils/useRequest.jsx';
+import { showSuccess } from '../utils/toast.jsx';
 
 const BASE_API = import.meta.env.VITE_BASE_API;
 const BASE_API_MOBILE = `http://${window.location.hostname}:8080`;
 
-const getBaseURI = () => {
-  const isMobile = /iphone|ipad|ipod|Android/i.test(navigator.userAgent);
-  if (isMobile) {
-    return BASE_API_MOBILE;
-  }
-  return BASE_API;
-};
-
+const getBaseURI = () => /iphone|ipad|ipod|Android/i.test(navigator.userAgent) ? BASE_API_MOBILE : BASE_API;
 let API = getBaseURI();
+
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { execute, isLoading, error, setError, setIsLoading } = useRequest();
   const navigate = useNavigate();
 
-  const handleError = (error, customMessage) => {
-    const errorMessage =
-      error.response?.data?.message || customMessage || 'An unexpected error occurred';
-    console.error(errorMessage, error);
-    setError(errorMessage);
-    toast.error(errorMessage, { position: 'bottom-right' });
-    return errorMessage;
-  };
-
   const verifyAuth = async () => {
-    try {
+    await execute(async () => {
       const token = localStorage.getItem('token');
-      if (!token) {
-        setUser(null);
-        return;
-      }
+      if (!token) return setUser(null);
 
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const res = await axios.get(`${API}/auth/check-auth`, {
+        headers: { Authorization: `Bearer ${token}` },
         withCredentials: true,
-      };
-
-      const response = await axios.get(`${API}/auth/check-auth`, config);
-      setUser(response.data.user);
-    } catch (error) {
-      console.error('verify auth failed', error);
-      setUser(null);
-      setError(error.response?.data?.message || 'An error occurred while verifying auth');
-      localStorage.removeItem('token');
-    } finally {
-      setIsLoading(false);
-    }
+      });
+      setUser(res.data.user);
+    }, 'Failed to verify user');
   };
 
   useEffect(() => {
-    const checkTokenAndVerifyAuth = async () => {
-      await verifyAuth();
-    };
     API = getBaseURI();
-    checkTokenAndVerifyAuth();
+    verifyAuth();
   }, []);
 
   const login = async (identifier, password) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      if (!identifier || !password) {
-        const msg = 'Username/Email and password are required';
-        setError(msg);
-        toast.error(msg, { position: 'bottom-right' });
-        return null;
-      }
-
-      const response = await axios.post(`${API}/auth/login`, { email: identifier, password });
-      if (response.data && response.data.token && response.data.user) {
-        const { token, user } = response.data;
-        setUser(user);
-        localStorage.setItem('token', token);
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        toast.success('Logged in successfully', { position: 'bottom-right' });
-        return response.data;
-      } else {
-        throw new Error('Invalid response format');
-      }
-    } catch (error) {
-      handleError(error, 'Login failed. Please check your credentials.');
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
+    return await execute(async () => {
+      const res = await axios.post(`${API}/auth/login`, { email: identifier, password });
+      const { token, user } = res.data;
+      setUser(user);
+      localStorage.setItem('token', token);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      showSuccess('Logged in successfully');
+      return res.data;
+    }, 'Login failed');
   };
 
   const signup = async (userName, email, password) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      // Validate inputs
-      if (!userName || !email || !password) {
-        const msg = 'All fields are required';
-        setError(msg);
-        toast.error(msg, { position: 'bottom-right' });
-        return null;
-      }
-
-      const response = await axios.post(`${API}/auth/signup`, { userName, email, password });
-      const { token, user } = response.data;
+    return await execute(async () => {
+      const res = await axios.post(`${API}/auth/signup`, { userName, email, password });
+      const { token, user } = res.data;
       setUser(user);
       localStorage.setItem('token', token);
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      toast.success('Account created successfully', { position: 'bottom-right' });
+      showSuccess('Account created');
       navigate(user.isVerified ? '/' : '/verify-email');
-      return response.data;
-    } catch (error) {
-      handleError(error, 'Signup failed. Please try again.');
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
+    }, 'Signup failed');
   };
 
   const googleLogin = async (response) => {
-    setIsLoading(true);
-    try {
-      if (!response || !response.credential) {
-        throw new Error('Invalid Google response');
-      }
-
-      const result = await axios.post(
-        `${API}/auth/google/login`,
-        { googleToken: response.credential },
-        { withCredentials: true }
-      );
-
-      const { token, user } = result.data;
+    return await execute(async () => {
+      const res = await axios.post(`${API}/auth/google/login`, { googleToken: response.credential });
+      const { token, user } = res.data;
       setUser(user);
       localStorage.setItem('token', token);
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
-      if (user) {
-        toast.success('Logged in successfully with Google', { position: 'bottom-right' });
-        navigate(user.isVerified ? '/' : '/verify-email');
-      }
-    } catch (error) {
-      handleError(error, 'Google authentication failed');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const googleSignup = async (response) => {
-    setIsLoading(true);
-    try {
-      if (!response || !response.credential) {
-        throw new Error('Invalid Google response');
-      }
-
-      const result = await axios.post(`${API}/auth/google/signup`, {
-        googleToken: response.credential,
-      });
-
-      if (!result.data || !result.data.token || !result.data.user) {
-        throw new Error('Invalid server response');
-      }
-
-      const { token, user } = result.data;
-      setUser(user);
-      localStorage.setItem('token', token);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
-      toast.success('Account created successfully with Google', { position: 'bottom-right' });
-      navigate(result.data.user.isVerified ? '/' : '/verify-email');
-    } catch (error) {
-      handleError(error, 'Google signup failed');
-    } finally {
-      setIsLoading(false);
-    }
+      showSuccess('Logged in with Google');
+      navigate(user.isVerified ? '/' : '/verify-email');
+    }, 'Google login failed');
   };
 
   const logout = () => {
-    try {
-      setUser(null);
-      localStorage.removeItem('token');
-      delete axios.defaults.headers.common['Authorization'];
-      google.accounts.id.disableAutoSelect();
-      toast.success('Logged out successfully', { position: 'bottom-right' });
-      navigate('/login');
-    } catch (error) {
-      handleError(error, 'Logout failed');
-    }
+    setUser(null);
+    localStorage.removeItem('token');
+    delete axios.defaults.headers.common['Authorization'];
+    showSuccess('Logged out');
+    navigate('/login');
   };
 
   const verifyEmail = async (code) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      if (!code || code.length < 4) {
-        const msg = 'Please enter a valid verification code';
-        setError(msg);
-        toast.error(msg, { position: 'bottom-right' });
-        return;
-      }
-
-      const response = await axios.post(`${API}/auth/verify-email`, { code });
-      if (response.data.success) {
-        setUser(response.data.user);
-        toast.success('Email verified successfully', { position: 'bottom-right' });
-        navigate('/');
-      } else {
-        setError(response.data.message || 'Email verification failed');
-        toast.error(response.data.message || 'Email verification failed', {
-          position: 'bottom-right',
-        });
-      }
-    } catch (error) {
-      handleError(error, 'Email verification failed');
-    } finally {
-      setIsLoading(false);
-    }
+    return await execute(async () => {
+      const res = await axios.post(`${API}/auth/verify-email`, { code });
+      setUser(res.data.user);
+      showSuccess('Email verified');
+      navigate('/');
+    }, 'Email verification failed');
   };
 
   const updateUserData = async (data) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      if (!data.userName) {
-        const msg = 'Username is required';
-        setError(msg);
-        toast.error(msg, { position: 'bottom-right' });
-        return;
-      }
-
-      axios.defaults.withCredentials = true;
-      const response = await axios.put(`${API}/auth/update-user`, data, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
+    return await execute(async () => {
+      const res = await axios.put(`${API}/auth/update-user`, data, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
-
-      setUser(response.data.user);
-      toast.success('Profile Updated', {
-        position: 'bottom-right',
-      });
-    } catch (error) {
-      handleError(error, 'Failed to update profile');
-    } finally {
-      setIsLoading(false);
-    }
+      setUser(res.data.user);
+      showSuccess('Profile updated');
+    }, 'Update failed');
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isLoading,
-        error,
-        login,
-        signup,
-        googleSignup,
-        googleLogin,
-        logout,
-        verifyAuth,
-        verifyEmail,
-        updateUserData,
-        setIsLoading,
-        setError,
-      }}
-    >
+    <AuthContext.Provider value={{
+      user, isLoading, error,
+      setIsLoading, setError,
+      login, signup, googleLogin, logout, verifyAuth, verifyEmail, updateUserData,
+    }}>
       {!isLoading && children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+export const useAuth = () => useContext(AuthContext);
