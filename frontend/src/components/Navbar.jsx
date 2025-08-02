@@ -70,10 +70,10 @@ function Navbar() {
             Create
           </Link>
           <Link
-            to="/peers"
+            to="/departments"
             className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 dark:text-[#eef1f3] dark:hover:bg-[#2A3236] transition"
           >
-            Peers
+            Departments
           </Link>
         </div>
 

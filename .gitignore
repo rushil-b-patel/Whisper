@@ -4,4 +4,5 @@ backend/node_modules/
 frontend/.env
 backend/.env
 ToDo's.md
+whisper.txt
 .vscode/

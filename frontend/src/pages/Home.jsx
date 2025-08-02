@@ -3,7 +3,7 @@ import { usePostService } from '../context/PostContext';
 import { useAuth } from '../context/AuthContext';
 import { Fire, Sparkles, Clock } from '../ui/Icons';
 import { useNavigate } from 'react-router-dom';
-import { HomeIcon, Chat, Inbox, Create, Communities } from '../ui/Icons';
+import { HomeIcon, Chat, Inbox, Create, Departments } from '../ui/Icons';
 import LeftLayout from './LeftLayout';
 import RightLayout from './RightLayout';
 import Feed from './Feed';
@@ -222,10 +222,10 @@ function Home() {
           <HomeIcon />
         </button>
         <button
-          onClick={() => navigate('/peers')}
+          onClick={() => navigate('/departments')}
           className="flex flex-col items-center flex-1 py-2"
         >
-          <Communities />
+          <Departments />
         </button>
         <button
           onClick={() => navigate('/create-post')}

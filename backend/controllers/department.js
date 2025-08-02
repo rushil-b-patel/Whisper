@@ -1,5 +1,6 @@
 import { Department } from '../models/department.js';
 import { User } from '../models/user.js';
+import { Post } from '../models/post.js';
 
 export const getDepartments = async (req, res) => {
   try {
@@ -54,5 +55,31 @@ export const addDepartment = async (req, res) => {
     res.status(201).json({ success: true, department });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Error adding department' });
+  }
+};
+
+export const getPostsByDepartment = async (req, res) => {
+  try {
+    const { name } = req.params;
+
+    let usersInDepartment;
+    try {
+      usersInDepartment = await User.find({ department: name }).select('_id');
+    } catch (err) {
+      return res.status(500).json({ success: false, message: 'Error fetching users' });
+    }
+
+    let posts;
+    try {
+      posts = await Post.find({ user: { $in: usersInDepartment.map((u) => u._id) } })
+        .populate('user', 'userName department avatar')
+        .sort({ createdAt: -1 });
+    } catch (err) {
+      return res.status(500).json({ success: false, message: 'Error fetching posts' });
+    }
+
+    res.status(200).json({ success: true, posts });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Failed to fetch posts for department' });
   }
 };

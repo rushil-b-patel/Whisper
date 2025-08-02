@@ -193,6 +193,18 @@ export const usePostService = () => {
     }
   };
 
+  const getUserStats = async (token) => {
+    try {
+      const response = await axios.get(`${API}/stats/user-stats`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return response.data;
+    } catch (error) {
+      handleError(error, 'Failed to load user stats');
+      throw error;
+    }
+  };
+
   const getDepartments = async () => {
     try {
       const response = await axios.get(`${API}/departments`);
@@ -217,18 +229,16 @@ export const usePostService = () => {
     }
   };
 
-  const getUserStats = async (token) => {
+
+  const getPostsByDepartment = async (departmentName) => {
     try {
-      const response = await axios.get(`${API}/stats/user-stats`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.get(`${API}/departments/${departmentName}/posts`);
       return response.data;
     } catch (error) {
-      handleError(error, 'Failed to load user stats');
+      handleError(error, 'Failed to load posts by department');
       throw error;
     }
   };
-
 
   return {
     createPost,
@@ -245,6 +255,7 @@ export const usePostService = () => {
     getDepartments,
     getUserStats,
     saveDepartment,
+    getPostsByDepartment,
     error,
     isLoading,
   };

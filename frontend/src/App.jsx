@@ -10,6 +10,7 @@ import { Toaster } from 'react-hot-toast';
 import CreatePost from './pages/CreatePost';
 import PostDetail from './pages/PostDetail.jsx';
 import Navbar from './components/Navbar.jsx';
+import Department from './pages/Department.jsx';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/departments" element={<Department />} />
         <Route
           path="/profile"
           element={
