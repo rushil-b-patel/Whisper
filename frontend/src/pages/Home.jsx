@@ -20,6 +20,8 @@ function Home() {
   const [departmentsError, setDepartmentsError] = useState(null);
   const [statsError, setStatsError] = useState(null);
   const [showMobileFilter, setShowMobileFilter] = useState(false);
+  const [activeDepartment, setActiveDepartment] = useState(null);
+
 
   const isPostsFetchingRef = useRef(false);
   const isDepartmentsFetchingRef = useRef(false);
@@ -127,17 +129,23 @@ function Home() {
     const safeDownvotes = (p) => Number(p.downVotes || 0);
     const voteScore = (p) => safeUpvotes(p) - safeDownvotes(p);
 
+    let filtered = [...posts];
+    if (activeDepartment) {
+      filtered = filtered.filter((post) => post.user?.department === activeDepartment);
+    }
+
     switch (activeFilter) {
       case 'trending':
-        return [...posts].sort((a, b) => voteScore(b) - voteScore(a));
+        return filtered.sort((a, b) => voteScore(b) - voteScore(a));
       case 'new':
-        return [...posts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        return filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       case 'popular':
-        return [...posts].sort((a, b) => (b.comments?.length || 0) - (a.comments?.length || 0));
+        return filtered.sort((a, b) => (b.comments?.length || 0) - (a.comments?.length || 0));
       default:
-        return posts;
+        return filtered;
     }
-  }, [posts, activeFilter]);
+  }, [posts, activeFilter, activeDepartment]);
+
 
   const filters = useMemo(
     () => [
@@ -199,6 +207,8 @@ function Home() {
           departmentsLoading={departmentsLoading}
           departmentsError={departmentsError}
           fetchDepartments={_fetchDepartments}
+          setActiveDepartment={setActiveDepartment}
+          activeDepartment={activeDepartment}
         />
 
         <Feed
