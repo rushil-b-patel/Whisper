@@ -1,4 +1,4 @@
-import { Post } from '../models/post.js';
+import { Post, Comment } from '../models/post.js';
 import { User } from '../models/user.js';
 
 export const createPost = async (req, res) => {
@@ -30,22 +30,33 @@ export const createPost = async (req, res) => {
 };
 
 export const getPost = async (req, res) => {
-    try {
-        const post = await Post.findById(req.params.id).populate('user', 'userName department').populate('comments.User' , 'userName');
-        if(!post){
-            return res.status(404).json({success: false, message: 'Post not found'});
-        }
-        res.status(200).json({success: true, post});
+  try {
+    const post = await Post.findById(req.params.id).populate('user', 'userName department');
+    if (!post) {
+      return res.status(404).json({ success: false, message: 'Post not found' });
     }
-    catch(error){
-        res.status(500).json({success: false, message: error.message });
-    }
+    const comments = await Comment.find({ post: req.params.id }).populate('user', 'userName').sort({ createdAt: -1 });
+
+    res.status(200).json({ success: true, post, comments });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
 
 export const getAllPosts = async (req, res) => {
     try {
         const posts = await Post.find().populate('user', 'userName department').sort({ createdAt: -1 });
-        res.status(200).json({success: true, posts});
+        const postsWithCommentCount = await Promise.all(
+        posts.map(async (post) => {
+            const count = await Comment.countDocuments({ post: post._id });
+            return {
+            ...post.toObject(),
+            commentCount: count,
+            };
+        })
+        );
+
+    res.json({ posts: postsWithCommentCount });
     } catch (error) {
         res.status(500).json({success: false, message: error.message });
     }

@@ -24,29 +24,32 @@ export default function VoteBar({
 
   useEffect(() => {
     if (!user || !id) return;
-    (async () => {
-      try {
-        const res = await getPost(postId || id);
-        const p = res.post;
-        if (isComment) {
-          const comment = p.comments.find((c) => c._id === id);
-          setState({
-            up: comment?.upVotedUsers.includes(user._id),
-            down: comment?.downVotedUsers.includes(user._id),
-          });
-          setCount(comment.upVotes - comment.downVotes);
-        } else {
+
+    if (isComment) {
+      setState({
+        up: initialUpVoted,
+        down: initialDownVoted,
+      });
+      setCount(initialVotes);
+    } else {
+      (async () => {
+        try {
+          const res = await getPost(postId || id);
+          const p = res.post;
+          if (!p) return;
+
           setState({
             up: p.upVotedUsers.includes(user._id),
             down: p.downVotedUsers.includes(user._id),
           });
           setCount(p.upVotes - p.downVotes);
+        } catch (e) {
+          console.warn('VoteBar fetch error (post)', e);
         }
-      } catch (e) {
-        console.error('VoteBar fetch error', e);
-      }
-    })();
-  }, [id, user]);
+      })();
+    }
+  }, [id, user, isComment, initialUpVoted, initialDownVoted, initialVotes]);
+
 
   const cast = async (type) => {
     if (!user) {

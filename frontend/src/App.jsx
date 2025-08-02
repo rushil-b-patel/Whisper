@@ -11,6 +11,7 @@ import CreatePost from './pages/CreatePost';
 import PostDetail from './pages/PostDetail.jsx';
 import Navbar from './components/Navbar.jsx';
 import Department from './pages/Department.jsx';
+import UserProfile from './pages/UserProfile.jsx';
 
 function App() {
   return (
@@ -19,8 +20,9 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/departments" element={<Department />} />
+        <Route path="/user/:username" element={<UserProfile />} />
         <Route
-          path="/Settings"
+          path="/settings"
           element={
             <ProtectedRoute>
               <Settings />

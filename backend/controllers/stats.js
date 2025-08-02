@@ -24,7 +24,7 @@ export const getUserStats = async (req, res) => {
 
         const commentsCount = await Post.aggregate([
             { $unwind: "$comments" },
-            { $match: { "comments.User": new mongoose.Types.ObjectId(userId) } },
+            { $match: { "comments.user": new mongoose.Types.ObjectId(userId) } },
             { $count: "totalComments" }
         ]);
         const totalComments = commentsCount[0]?.totalComments || 0;
@@ -38,7 +38,7 @@ export const getUserStats = async (req, res) => {
 
         const recentComments = await Post.aggregate([
             { $unwind: "$comments" },
-            { $match: { "comments.User": new mongoose.Types.ObjectId(userId) } },
+            { $match: { "comments.user": new mongoose.Types.ObjectId(userId) } },
             { $sort: { "comments.createdAt": -1 } },
             { $limit: 2 },
             {

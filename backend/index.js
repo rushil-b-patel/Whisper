@@ -7,6 +7,7 @@ import postRoutes from './routes/post.js';
 import commentRoutes from './routes/comment.js';
 import statsRoutes from './routes/stats.js';
 import departmentRoutes from './routes/department.js';
+import usersRoutes from './routes/users.js';
 import { PORT, CLIENT_URI, CLIENT_URI_MOBILE } from './utils/envVariables.js';
 
 const app = express();
@@ -23,6 +24,7 @@ app.use('/post', postRoutes);
 app.use('/comment', commentRoutes);
 app.use('/stats', statsRoutes);
 app.use('/departments', departmentRoutes);
+app.use('/users', usersRoutes);
 
 app.get('/', (req, res) =>{
     res.send("Backend is running");

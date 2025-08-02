@@ -28,13 +28,13 @@ function CommentItem({ comment, postId, onAddReply, onDeleteComment }) {
 
   const voteCount = (comment.upVotes || 0) - (comment.downVotes || 0);
   const upVoted = comment.upVotedUsers?.includes(user?._id);
-  const downVoted = comment.downVotedUsers?.includes(user?._id);
+  const downVoted = comment.downVotedUsers?.includes(user ?._id);
 
   return (
     <div className="bg-white dark:bg-[#1e1f23] border dark:border-[#2A2B30] rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow duration-300">
       <div className="flex justify-between items-center mb-2">
         <div className="font-mono font-semibold text-gray-900 dark:text-white">
-          {comment.User?.userName || 'User'}
+          {comment.user?.userName || 'User'}
         </div>
         <time className="text-xs text-gray-400 dark:text-gray-500">
           {new Date(comment.createdAt).toLocaleString()}

@@ -2,7 +2,8 @@ import mongoose from 'mongoose';
 
 const commentSchema = new mongoose.Schema({
     text: { type: String, required: true },
-    User: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    post: { type: mongoose.Schema.Types.ObjectId, ref: 'Post', required: true },
     upVotes: { type: Number, default: 0 },
     downVotes: { type: Number, default: 0 },
     upVotedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', }],
@@ -48,7 +49,6 @@ const postSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    comments: [commentSchema],
     createdAt: {
         type: Date,
         default: Date.now
@@ -56,3 +56,4 @@ const postSchema = new mongoose.Schema({
 }, {timestamps: true});
 
 export const Post = mongoose.model('Post', postSchema);
+export const Comment = mongoose.model('Comment', commentSchema);
