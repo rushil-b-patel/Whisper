@@ -147,7 +147,7 @@ function PostDetail() {
 
         <div className="flex justify-between items-center border-t pt-6 dark:border-gray-700">
           <VoteBar
-            id={post._id}
+            postId={post._id}
             initialVotes={post.upVotes - post.downVotes}
             initialUpVoted={post.upVotedUsers.includes(user?._id)}
             initialDownVoted={post.downVotedUsers.includes(user?._id)}

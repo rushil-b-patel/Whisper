@@ -45,7 +45,7 @@ function CommentItem({ comment, postId, onAddReply, onDeleteComment }) {
 
       <div className="flex justify-between items-center">
         <VoteBar
-          id={comment._id}
+          commentId={comment._id}
           postId={postId}
           isComment
           initialVotes={voteCount}

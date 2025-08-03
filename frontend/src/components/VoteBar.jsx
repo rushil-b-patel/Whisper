@@ -5,8 +5,8 @@ import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 
 export default function VoteBar({
-  id,
   postId,
+  commentId,
   isComment = false,
   initialVotes = 0,
   initialUpVoted = false,
@@ -23,7 +23,7 @@ export default function VoteBar({
   const token = localStorage.getItem('token');
 
   useEffect(() => {
-    if (!user || !id) return;
+    if (!user || !postId) return;
 
     if (isComment) {
       setState({
@@ -34,7 +34,7 @@ export default function VoteBar({
     } else {
       (async () => {
         try {
-          const res = await getPost(postId || id);
+          const res = await getPost(postId);
           const p = res.post;
           if (!p) return;
 
@@ -48,7 +48,7 @@ export default function VoteBar({
         }
       })();
     }
-  }, [id, user, isComment, initialUpVoted, initialDownVoted, initialVotes]);
+  }, [postId, user, isComment, initialUpVoted, initialDownVoted, initialVotes]);
 
 
   const cast = async (type) => {
@@ -74,10 +74,10 @@ export default function VoteBar({
 
     try {
       const action = isComment
-        ? () => voteComment(token, postId, id, type)
+        ? () => voteComment(token, postId, commentId, type)
         : type === 'up'
-          ? () => upVotePost(token, id)
-          : () => downVotePost(token, id);
+          ? () => upVotePost(token, postId)
+          : () => downVotePost(token, postId);
 
       const res = await action();
       if (!res.success) throw new Error(res.message);
