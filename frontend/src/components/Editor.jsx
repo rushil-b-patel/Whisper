@@ -101,10 +101,10 @@ export const EditorRenderer = ({ data }) => {
             {(Array.isArray(data?.items) ? data.items : []).map((item, idx) => (
               <li
                 key={idx}
-                className={`pl-6 relative before:absolute before:left-0 before:top-1 before:w-4 before:h-4 before:rounded before:border ${
+                className={`pl-6 relative before:absolute before:left-0 before:top-1 before:w-5 before:h-5 before:rounded before:border before:flex before:items-center before:justify-center font-mono ${
                   item.checked
-                    ? 'before:bg-indigo-500 before:border-indigo-600'
-                    : 'before:bg-white before:border-gray-400 dark:before:bg-gray-700'
+                    ? 'before:border-indigo-600 before:bg-indigo-500 before:content-["✓"] before:text-white before:text-xs'
+                    : 'before:border-gray-400 dark:before:border-gray-500 before:bg-white dark:before:bg-gray-800'
                 }`}
               >
                 {typeof item.text === 'string' ? item.text : '[Invalid checklist item]'}
