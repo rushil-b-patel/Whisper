@@ -106,11 +106,14 @@ export default function CreatePost() {
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              maxLength={100}
+              maxLength={300}
               required
               placeholder="Give your post a title"
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-[#1e1f23] font-mono"
             />
+            <p className="text-sm text-gray-400 text-right font-mono mt-1">
+              {title.length} / 300 characters
+            </p>
           </div>
 
           <div ref={dropdownRef} className="relative">
