@@ -25,6 +25,7 @@ export default function CreatePost() {
   const [imagePreview, setImagePreview] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [allowComments, setAllowComments] = useState(true);
 
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
@@ -69,6 +70,7 @@ export default function CreatePost() {
       formData.append('title', title);
       formData.append('description', JSON.stringify(content));
       formData.append('category', category);
+      formData.append('allowComments', allowComments);
       if (image) formData.append('image', image);
 
       const res = await createPost(token, formData);
@@ -173,6 +175,19 @@ export default function CreatePost() {
                 </label>
               )}
             </div>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="allowComments"
+              checked={allowComments}
+              onChange={() => setAllowComments((prev) => !prev)}
+              className="w-4 h-4 bg-black rounded dark:bg-gray-700"
+            />
+            <label htmlFor="allowComments" className="text-sm font-mono">
+              Allow comments on this post
+            </label>
           </div>
 
           <div className="flex justify-end gap-4 pt-6">

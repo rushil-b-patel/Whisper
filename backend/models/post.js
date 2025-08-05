@@ -49,6 +49,10 @@ const postSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    allowComments: {
+        type: Boolean,
+        default: true,
+    },
     createdAt: {
         type: Date,
         default: Date.now

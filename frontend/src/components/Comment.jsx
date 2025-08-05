@@ -139,7 +139,7 @@ export default function CommentThread({ post, comments: initialComments }) {
     setNewComment('');
   };
 
-  return (
+  return post.allowComments ? (
     <div className="space-y-6 mt-8">
       <form onSubmit={submitTop} className="space-y-2">
         <textarea
@@ -174,5 +174,10 @@ export default function CommentThread({ post, comments: initialComments }) {
         ))
       )}
     </div>
+  ) : (
+    <p className="text-gray-500 dark:text-gray-400 text-sm font-mono mt-8">
+      Comments are disabled for this post.
+    </p>
   );
 }
+

@@ -5,6 +5,10 @@ export const addComment = async (req, res) => {
     const post = await Post.findById(req.params.id);
     if (!post) return res.status(404).json({ message: 'Post not found' });
 
+    if(!post.allowComments) {
+      return res.status(403).json({ message: 'Commenting is disabled for this post' });
+    }
+
     const { text } = req.body;
     if (!text) return res.status(400).json({ message: 'Content is required' });
 

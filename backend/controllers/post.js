@@ -3,8 +3,9 @@ import { User } from '../models/user.js';
 
 export const createPost = async (req, res) => {
     try {
-        const { title, description, category } = req.body;
+        const { title, description, category, allowComments } = req.body;
         const imageUrl = req.file ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}` : null;
+        const allowCommentsBool = allowComments === 'true';
 
         let parsedDescription;
         try {
@@ -19,6 +20,7 @@ export const createPost = async (req, res) => {
             user: req.userId,
             image: imageUrl,
             category,
+            allowComments: allowCommentsBool,
         };
 
         const post = new Post(postData);
@@ -36,7 +38,7 @@ export const getPost = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Post not found' });
     }
     const comments = await Comment.find({ post: req.params.id }).populate('user', 'userName').sort({ createdAt: -1 });
-
+    console.log(post);
     res.status(200).json({ success: true, post, comments });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
