@@ -5,12 +5,16 @@ import { User } from '../models/user.js';
 export const verifyToken = async (req, res, next) => {
     const token = req.headers.authorization?.split(' ')[1] || req.cookies.token;
     if (!token) {
-        return res.status(401).json({ success: false, message: 'Unauthorized - no token provided' });
+        return res
+            .status(401)
+            .json({ success: false, message: 'Unauthorized - no token provided' });
     }
     try {
         const decoded = jwt.verify(token, JWT_SECRET);
         if (!decoded || !decoded.id) {
-            return res.status(401).json({ success: false, message: 'Unauthorized - invalid token' });
+            return res
+                .status(401)
+                .json({ success: false, message: 'Unauthorized - invalid token' });
         }
         const user = await User.findById(decoded.id);
         if (!user) {
@@ -22,4 +26,4 @@ export const verifyToken = async (req, res, next) => {
     } catch (error) {
         return res.status(401).json({ success: false, message: 'Unauthorized - invalid token' });
     }
-}
+};

@@ -4,14 +4,16 @@ import { User } from '../models/user.js';
 export const createPost = async (req, res) => {
     try {
         const { title, description, category, allowComments } = req.body;
-        const imageUrl = req.file ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}` : null;
+        const imageUrl = req.file
+            ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`
+            : null;
         const allowCommentsBool = allowComments === 'true';
 
         let parsedDescription;
         try {
             parsedDescription = JSON.parse(description);
         } catch (err) {
-            return res.status(400).json({ success: false, message: "Invalid description format" });
+            return res.status(400).json({ success: false, message: 'Invalid description format' });
         }
 
         const postData = {
@@ -26,86 +28,92 @@ export const createPost = async (req, res) => {
         const post = new Post(postData);
         await post.save();
         res.status(201).json({ success: true, post, postId: post._id });
-    } catch(error){
-        res.status(500).json({success: false, message: error.message });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
     }
 };
 
 export const getPost = async (req, res) => {
-  try {
-    const post = await Post.findById(req.params.id).populate('user', 'userName department');
-    if (!post) {
-      return res.status(404).json({ success: false, message: 'Post not found' });
+    try {
+        const post = await Post.findById(req.params.id).populate('user', 'userName department');
+        if (!post) {
+            return res.status(404).json({ success: false, message: 'Post not found' });
+        }
+        const comments = await Comment.find({ post: req.params.id })
+            .populate('user', 'userName')
+            .sort({ createdAt: -1 });
+        console.log(post);
+        res.status(200).json({ success: true, post, comments });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
     }
-    const comments = await Comment.find({ post: req.params.id }).populate('user', 'userName').sort({ createdAt: -1 });
-    console.log(post);
-    res.status(200).json({ success: true, post, comments });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
 };
 
 export const getAllPosts = async (req, res) => {
     try {
-        const posts = await Post.find().populate('user', 'userName department').sort({ createdAt: -1 });
+        const posts = await Post.find()
+            .populate('user', 'userName department')
+            .sort({ createdAt: -1 });
         const postsWithCommentCount = await Promise.all(
-        posts.map(async (post) => {
-            const count = await Comment.countDocuments({ post: post._id });
-            return {
-            ...post.toObject(),
-            commentCount: count,
-            };
-        })
+            posts.map(async post => {
+                const count = await Comment.countDocuments({ post: post._id });
+                return {
+                    ...post.toObject(),
+                    commentCount: count,
+                };
+            })
         );
 
-    res.json({ posts: postsWithCommentCount });
+        res.json({ posts: postsWithCommentCount });
     } catch (error) {
-        res.status(500).json({success: false, message: error.message });
+        res.status(500).json({ success: false, message: error.message });
     }
-}
+};
 
 export const deletePost = async (req, res) => {
-    try{
+    try {
         const post = await Post.findById(req.params.id);
-        if(!post){
-            return res.status(404).json({success: false, message: 'Post not found'})
+        if (!post) {
+            return res.status(404).json({ success: false, message: 'Post not found' });
         }
         if (post.user.toString() !== req.userId) {
-            return res.status(403).json({ success: false, message: 'Unauthorized to delete this post' });
+            return res
+                .status(403)
+                .json({ success: false, message: 'Unauthorized to delete this post' });
         }
 
         await Post.deleteOne({ _id: req.params.id });
 
         res.status(200).json({ success: true, message: 'Post deleted successfully' });
-    }
-    catch(error){
+    } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 };
 
 export const getUserPosts = async (req, res) => {
     try {
-        const posts = await Post.find({ user: req.userId }).populate('user', 'username').sort({ createdAt: -1 });
-        res.status(200).json({success: true, posts});
+        const posts = await Post.find({ user: req.userId })
+            .populate('user', 'username')
+            .sort({ createdAt: -1 });
+        res.status(200).json({ success: true, posts });
     } catch (error) {
-        res.status(500).json({success: false, message: error.message });
+        res.status(500).json({ success: false, message: error.message });
     }
-}
+};
 
 export const upVotePost = async (req, res) => {
     try {
         const post = await Post.findById(req.params.id);
-        if(!post) {
-            return res.status(404).json({success: false, message: 'Post not found'});
+        if (!post) {
+            return res.status(404).json({ success: false, message: 'Post not found' });
         }
         const upVoteIndex = post.upVotedUsers.indexOf(req.user.id);
-        if(upVoteIndex > -1){
+        if (upVoteIndex > -1) {
             post.upVotes -= 1;
             post.upVotedUsers.splice(upVoteIndex, 1);
-        }
-        else{
+        } else {
             const downVoteIndex = post.downVotedUsers.indexOf(req.user.id);
-            if(downVoteIndex > -1){
+            if (downVoteIndex > -1) {
                 post.downVotes -= 1;
                 post.downVotedUsers.splice(downVoteIndex, 1);
             }
@@ -113,26 +121,25 @@ export const upVotePost = async (req, res) => {
             post.upVotedUsers.push(req.user.id);
         }
         await post.save();
-        res.status(200).json({success: true, post});
+        res.status(200).json({ success: true, post });
     } catch (error) {
-        res.status(500).json({success: false, message: error.message });
+        res.status(500).json({ success: false, message: error.message });
     }
-}
+};
 
 export const downVotePost = async (req, res) => {
     try {
         const post = await Post.findById(req.params.id);
-        if(!post) {
-            return res.status(404).json({success: false, message: 'Post not found'});
+        if (!post) {
+            return res.status(404).json({ success: false, message: 'Post not found' });
         }
         const downVoteIndex = post.downVotedUsers.indexOf(req.user.id);
-        if(downVoteIndex > -1){
+        if (downVoteIndex > -1) {
             post.downVotes -= 1;
             post.downVotedUsers.splice(downVoteIndex, 1);
-        }
-        else{
+        } else {
             const upVoteIndex = post.upVotedUsers.indexOf(req.user.id);
-            if(upVoteIndex > -1){
+            if (upVoteIndex > -1) {
                 post.upVotes -= 1;
                 post.upVotedUsers.splice(upVoteIndex, 1);
             }
@@ -140,11 +147,11 @@ export const downVotePost = async (req, res) => {
             post.downVotedUsers.push(req.user.id);
         }
         await post.save();
-        res.status(200).json({success: true, post});
+        res.status(200).json({ success: true, post });
     } catch (error) {
-        res.status(500).json({success: false, message: error.message });
+        res.status(500).json({ success: false, message: error.message });
     }
-}
+};
 
 export const toggleSavePost = async (req, res) => {
     try {
@@ -178,8 +185,8 @@ export const getSavedPosts = async (req, res) => {
             path: 'savedPosts',
             populate: {
                 path: 'user',
-                select: 'userName department'
-            }
+                select: 'userName department',
+            },
         });
 
         if (!user) return res.status(404).json({ message: 'User not found' });

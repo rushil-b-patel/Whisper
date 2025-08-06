@@ -10,7 +10,7 @@ export const getUserStats = async (req, res) => {
         if (!user) {
             return res.status(404).json({
                 success: false,
-                message: 'User not found'
+                message: 'User not found',
             });
         }
 
@@ -18,18 +18,18 @@ export const getUserStats = async (req, res) => {
 
         const upvotesResult = await Post.aggregate([
             { $match: { user: new mongoose.Types.ObjectId(userId) } },
-            { $group: { _id: null, totalUpvotes: { $sum: "$upVotes" } } }
+            { $group: { _id: null, totalUpvotes: { $sum: '$upVotes' } } },
         ]);
         const totalUpvotes = upvotesResult[0]?.totalUpvotes || 0;
 
         const commentsCount = await Post.aggregate([
-            { $unwind: "$comments" },
-            { $match: { "comments.user": new mongoose.Types.ObjectId(userId) } },
-            { $count: "totalComments" }
+            { $unwind: '$comments' },
+            { $match: { 'comments.user': new mongoose.Types.ObjectId(userId) } },
+            { $count: 'totalComments' },
         ]);
         const totalComments = commentsCount[0]?.totalComments || 0;
 
-        const karma = totalUpvotes + (totalComments * 2);
+        const karma = totalUpvotes + totalComments * 2;
 
         const recentPosts = await Post.find({ user: userId })
             .sort({ createdAt: -1 })
@@ -37,39 +37,41 @@ export const getUserStats = async (req, res) => {
             .select('title createdAt');
 
         const recentComments = await Post.aggregate([
-            { $unwind: "$comments" },
-            { $match: { "comments.user": new mongoose.Types.ObjectId(userId) } },
-            { $sort: { "comments.createdAt": -1 } },
+            { $unwind: '$comments' },
+            { $match: { 'comments.user': new mongoose.Types.ObjectId(userId) } },
+            { $sort: { 'comments.createdAt': -1 } },
             { $limit: 2 },
             {
                 $lookup: {
-                    from: "posts",
-                    localField: "_id",
-                    foreignField: "_id",
-                    as: "postInfo"
-                }
+                    from: 'posts',
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'postInfo',
+                },
             },
             {
                 $project: {
-                    title: { $arrayElemAt: ["$postInfo.title", 0] },
-                    createdAt: "$comments.createdAt",
-                    type: "comment"
-                }
-            }
+                    title: { $arrayElemAt: ['$postInfo.title', 0] },
+                    createdAt: '$comments.createdAt',
+                    type: 'comment',
+                },
+            },
         ]);
 
         const recentActivity = [
             ...recentPosts.map(post => ({
                 title: `Posted: ${post.title.substring(0, 30)}...`,
                 time: getTimeAgo(post.createdAt),
-                type: 'post'
+                type: 'post',
             })),
             ...recentComments.map(comment => ({
                 title: `Commented on: ${comment.title?.substring(0, 30)}...`,
                 time: getTimeAgo(comment.createdAt),
-                type: 'comment'
-            }))
-        ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3);
+                type: 'comment',
+            })),
+        ]
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .slice(0, 3);
 
         const stats = {
             posts: postsCount,
@@ -77,23 +79,23 @@ export const getUserStats = async (req, res) => {
             comments: totalComments,
             karma,
             joinDate: formatJoinDate(user.createdAt),
-            recentActivity
+            recentActivity,
         };
 
         res.status(200).json({
             success: true,
-            stats
+            stats,
         });
     } catch (error) {
         console.error('Error fetching user stats:', error);
         res.status(500).json({
             success: false,
-            message: 'Failed to fetch user stats'
+            message: 'Failed to fetch user stats',
         });
     }
 };
 
-const getTimeAgo = (date) => {
+const getTimeAgo = date => {
     const now = new Date();
     const diffTime = Math.abs(now - new Date(date));
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -104,7 +106,7 @@ const getTimeAgo = (date) => {
     return `${Math.ceil(diffDays / 30)} months ago`;
 };
 
-const formatJoinDate = (date) => {
+const formatJoinDate = date => {
     const joinDate = new Date(date);
     const month = joinDate.toLocaleString('default', { month: 'short' });
     const year = joinDate.getFullYear();

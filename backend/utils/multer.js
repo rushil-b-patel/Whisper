@@ -21,9 +21,9 @@ const upload = multer({
         if (mimetype && extname) {
             return cb(null, true);
         } else {
-            cb(new Error("Images only!"));
+            cb(new Error('Images only!'));
         }
-    }
+    },
 });
 
 export default upload;

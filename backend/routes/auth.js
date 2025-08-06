@@ -1,5 +1,16 @@
 import express from 'express';
-import { login, logout, signup, verifyEmail, forgotPassword, resetPassword, checkAuth, updateUser, googleLogin, googleSignup } from '../controllers/auth.js';
+import {
+    login,
+    logout,
+    signup,
+    verifyEmail,
+    forgotPassword,
+    resetPassword,
+    checkAuth,
+    updateUser,
+    googleLogin,
+    googleSignup,
+} from '../controllers/auth.js';
 import { verifyToken } from '../middlewares/authVerifyToken.js';
 
 const router = express.Router();

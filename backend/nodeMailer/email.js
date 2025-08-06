@@ -1,6 +1,11 @@
-import { PASSWORD_RESET_REQUEST_TEMPLATE, PASSWORD_RESET_SUCCESS_TEMPLATE, VERIFICATION_TEMPLATE, WELCOME_TEMPLATE } from "./emailTemplates.js";
-import nodemailer from "nodemailer";
-import { GMAIL_USER, GMAIL_PASS } from "../utils/envVariables.js";
+import {
+    PASSWORD_RESET_REQUEST_TEMPLATE,
+    PASSWORD_RESET_SUCCESS_TEMPLATE,
+    VERIFICATION_TEMPLATE,
+    WELCOME_TEMPLATE,
+} from './emailTemplates.js';
+import nodemailer from 'nodemailer';
+import { GMAIL_USER, GMAIL_PASS } from '../utils/envVariables.js';
 
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
@@ -8,68 +13,63 @@ const transporter = nodemailer.createTransport({
     secure: true,
     auth: {
         user: GMAIL_USER,
-        pass: GMAIL_PASS
-    }
+        pass: GMAIL_PASS,
+    },
 });
 
 export const sendVerificationEmail = async (email, verificationToken) => {
     const recipient = email;
-    try{
-      const response = await transporter.sendMail({
-        // from: '"Whisper 👻" <rushil13579@gmail.email>',
-        to: recipient,
-        subject: "Verify your email",
-        html: VERIFICATION_TEMPLATE.replace("{verificationCode}", verificationToken),
-        category: "Verification Email"
-      });
+    try {
+        const response = await transporter.sendMail({
+            // from: '"Whisper 👻" <rushil13579@gmail.email>',
+            to: recipient,
+            subject: 'Verify your email',
+            html: VERIFICATION_TEMPLATE.replace('{verificationCode}', verificationToken),
+            category: 'Verification Email',
+        });
+    } catch (error) {
+        console.error(error);
+        throw new Error('Error sending email');
     }
-    catch(error){
-      console.error(error);
-      throw new Error("Error sending email");
-    }
-}
+};
 
 export const sendWelcomeEmail = async (email, userName) => {
-  const recipient = email;
-  try{
-    const response = await transporter.sendMail({
-      to: recipient,
-      subject: "Welcome to Whisper",
-      html: WELCOME_TEMPLATE.replace("{userName}", userName),
-      category: "Welcome Email"
-    })
-  }
-  catch(error){
-    console.error(error);
-    throw new Error("Error sending email");
-  }
-}
+    const recipient = email;
+    try {
+        const response = await transporter.sendMail({
+            to: recipient,
+            subject: 'Welcome to Whisper',
+            html: WELCOME_TEMPLATE.replace('{userName}', userName),
+            category: 'Welcome Email',
+        });
+    } catch (error) {
+        console.error(error);
+        throw new Error('Error sending email');
+    }
+};
 
 export const sendPasswordResetEmail = async (email, resetToken) => {
-  try{
-    const response = await transporter.sendMail({
-      to: email,
-      subject: "Reset your password",
-      html: PASSWORD_RESET_REQUEST_TEMPLATE.replace("{resetURL}", resetToken)
-    })
-  }
-  catch(error){
-    console.error(error);
-    throw new Error("Error sending email");
-  }
-}
+    try {
+        const response = await transporter.sendMail({
+            to: email,
+            subject: 'Reset your password',
+            html: PASSWORD_RESET_REQUEST_TEMPLATE.replace('{resetURL}', resetToken),
+        });
+    } catch (error) {
+        console.error(error);
+        throw new Error('Error sending email');
+    }
+};
 
-export const sendResetSuccessEmail = async (email) =>{
-
-  try{
-    const response = await transporter.sendMail({
-      to: email,
-      subject: "Password Reset Successful",
-      html: PASSWORD_RESET_SUCCESS_TEMPLATE,
-    })
-  }
-  catch(error){
-    console.error(error);
-    throw new Error("Error sending email");
-  }
-}
+export const sendResetSuccessEmail = async email => {
+    try {
+        const response = await transporter.sendMail({
+            to: email,
+            subject: 'Password Reset Successful',
+            html: PASSWORD_RESET_SUCCESS_TEMPLATE,
+        });
+    } catch (error) {
+        console.error(error);
+        throw new Error('Error sending email');
+    }
+};

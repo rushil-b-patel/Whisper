@@ -1,6 +1,15 @@
 import express from 'express';
-import { createPost, getAllPosts, getUserPosts, getPost, upVotePost,
-    downVotePost, deletePost, toggleSavePost, getSavedPosts} from '../controllers/post.js';
+import {
+    createPost,
+    getAllPosts,
+    getUserPosts,
+    getPost,
+    upVotePost,
+    downVotePost,
+    deletePost,
+    toggleSavePost,
+    getSavedPosts,
+} from '../controllers/post.js';
 import { verifyToken } from '../middlewares/authVerifyToken.js';
 import upload from '../utils/multer.js';
 

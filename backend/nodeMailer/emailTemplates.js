@@ -176,4 +176,3 @@ export const WELCOME_TEMPLATE = `
 </body>
 </html>
 `;
-

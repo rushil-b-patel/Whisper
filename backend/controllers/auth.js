@@ -1,4 +1,9 @@
-import { sendPasswordResetEmail, sendResetSuccessEmail, sendVerificationEmail, sendWelcomeEmail } from '../nodeMailer/email.js';
+import {
+    sendPasswordResetEmail,
+    sendResetSuccessEmail,
+    sendVerificationEmail,
+    sendWelcomeEmail,
+} from '../nodeMailer/email.js';
 import { User } from '../models/user.js';
 import { computeEmailHash, generateTokenAndSetCookie } from '../utils/generateTokenAndSetCookie.js';
 import bcrypt from 'bcryptjs';
@@ -6,35 +11,39 @@ import crypto from 'crypto';
 import { verifyGoogleToken } from '../utils/googleAuth.js';
 import { CLIENT_URI } from '../utils/envVariables.js';
 
-export const login = async (req, res)=>{
+export const login = async (req, res) => {
     const { email, password } = req.body;
-    try{
-        if(!email || !password){
-            return res.status(400).json({message: 'Please fill in all fields'});
+    try {
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Please fill in all fields' });
         }
 
         let user;
         user = await User.findOne({ userName: email });
 
         if (!user) {
-            user = await User.findOne({email});
+            user = await User.findOne({ email });
             if (!user) {
                 const emailHash = computeEmailHash(email);
-                user = await User.findOne({emailHash});
+                user = await User.findOne({ emailHash });
             }
         }
 
-        if(!user){
-            return res.status(400).json({message: `User doesn't exist with the provided username or email`});
+        if (!user) {
+            return res
+                .status(400)
+                .json({ message: `User doesn't exist with the provided username or email` });
         }
 
         const passwordMatch = await bcrypt.compare(password, user.password);
-        if(!passwordMatch){
-            return res.status(400).json({message: 'Invalid password'});
+        if (!passwordMatch) {
+            return res.status(400).json({ message: 'Invalid password' });
         }
 
-        if(!user.isVerified){
-            return res.status(403).json({message: 'Email not verified. Please verify your email', redirect: true});
+        if (!user.isVerified) {
+            return res
+                .status(403)
+                .json({ message: 'Email not verified. Please verify your email', redirect: true });
         }
 
         const token = generateTokenAndSetCookie(res, user._id);
@@ -46,32 +55,31 @@ export const login = async (req, res)=>{
             token,
             user: {
                 ...user._doc,
-                password: null
-            }
-        })
+                password: null,
+            },
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error' });
     }
-    catch(error){
-        res.status(500).json({message: 'Server Error'});
-    }
-}
+};
 
-export const signup = async (req, res)=>{
+export const signup = async (req, res) => {
     const { userName, email, password } = req.body;
-    try{
-        if(!userName || !email || !password){
-            return res.status(400).json({message: 'Please fill in all fields'});
+    try {
+        if (!userName || !email || !password) {
+            return res.status(400).json({ message: 'Please fill in all fields' });
         }
 
-        const userNameExist = await User.findOne({userName});
-        if(userNameExist){
-            return res.status(400).json({success:false, message: 'Username already exists'});
+        const userNameExist = await User.findOne({ userName });
+        if (userNameExist) {
+            return res.status(400).json({ success: false, message: 'Username already exists' });
         }
 
         const emailHash = computeEmailHash(email);
 
         const userEmailExist = await User.findOne({ emailHash });
-        if(userEmailExist){
-            return res.status(400).json({success:false, message: 'Email already exists'});
+        if (userEmailExist) {
+            return res.status(400).json({ success: false, message: 'Email already exists' });
         }
 
         const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
@@ -82,7 +90,7 @@ export const signup = async (req, res)=>{
             password: hashedPassword,
             verificationToken,
             verificationTokenExpires: Date.now() + 1 * 60 * 60 * 1000,
-        })
+        });
 
         await user.save();
 
@@ -97,25 +105,28 @@ export const signup = async (req, res)=>{
                 ...user._doc,
                 password: null,
                 email: undefined,
-            }
-        })
-
-    }catch(error){
-        res.status(500).json({message: 'Server Error'});
+            },
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error' });
         console.error(error);
     }
-}
+};
 
-export const verifyEmail = async (req, res)=>{
-    const {code} = req.body;
-    try{
+export const verifyEmail = async (req, res) => {
+    const { code } = req.body;
+    try {
         const user = await User.findOne({
             verificationToken: code,
-            verificationTokenExpires: { $gt: Date.now() }
-        })
+            verificationTokenExpires: { $gt: Date.now() },
+        });
 
-        if(!user){
-            return res.status(400).json({success: false, message: 'Invalid or expired code. Please try again...', redirect: false});
+        if (!user) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid or expired code. Please try again...',
+                redirect: false,
+            });
         }
 
         user.isVerified = true;
@@ -129,56 +140,54 @@ export const verifyEmail = async (req, res)=>{
             message: 'Email verified successfully',
             user: {
                 ...user._doc,
-                password: null
+                password: null,
             },
-            redirect: true
+            redirect: true,
         });
+    } catch (error) {
+        console.error('Error verifying email', error);
+        res.status(500).json({ message: 'Server Error' });
     }
-    catch(error){
-        console.error("Error verifying email",error);
-        res.status(500).json({message: 'Server Error'});
-    }
-}
+};
 
-export const logout = async (req, res)=>{
+export const logout = async (req, res) => {
     res.clearCookie('token');
-    res.status(200).json({message: 'Logged out successfully'});
-}
+    res.status(200).json({ message: 'Logged out successfully' });
+};
 
-export const forgotPassword = async (req, res)=>{
-    const {email} = req.body;
-    try{
-        const user = await User.findOne({email});
-        if(!user){
-            return res.status(400).json({success:false, message: 'User not found'});
+export const forgotPassword = async (req, res) => {
+    const { email } = req.body;
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ success: false, message: 'User not found' });
         }
         const resetToken = crypto.randomBytes(20).toString('hex');
-        const resetTokenExpires = Date.now() +  15 * 60 * 1000;
+        const resetTokenExpires = Date.now() + 15 * 60 * 1000;
 
         user.resetPasswordToken = resetToken;
         user.resetPasswordTokenExpires = resetTokenExpires;
         await user.save();
         await sendPasswordResetEmail(user.email, `${CLIENT_URI}/reset-password/${resetToken}`);
 
-        res.status(200).json({success: true, message: 'Password reset email sent'});
+        res.status(200).json({ success: true, message: 'Password reset email sent' });
+    } catch (error) {
+        console.error('Error forgetting password', error);
+        res.status(500).json({ message: 'Server Error' });
     }
-    catch(error){
-        console.error("Error forgetting password",error);
-        res.status(500).json({message: 'Server Error'});
-    }
-}
+};
 
-export const resetPassword = async (req, res)=>{
-    try{
+export const resetPassword = async (req, res) => {
+    try {
         const { token } = req.params;
         const { password } = req.body;
 
         const user = await User.findOne({
             resetPasswordToken: token,
-            resetPasswordTokenExpires: { $gt: Date.now() }
-        })
-        if(!user){
-            return res.status(400).json({message: 'Invalid or expired token'});
+            resetPasswordTokenExpires: { $gt: Date.now() },
+        });
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid or expired token' });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -189,19 +198,18 @@ export const resetPassword = async (req, res)=>{
 
         await sendResetSuccessEmail(user.email);
 
-        res.status(200).json({success: true, message: 'Password reset successfully'});
+        res.status(200).json({ success: true, message: 'Password reset successfully' });
+    } catch (error) {
+        console.error('Error resetting password', error);
+        res.status(500).json({ message: 'Server Error' });
     }
-    catch(error){
-        console.error("Error resetting password",error);
-        res.status(500).json({message: 'Server Error'});
-    }
-}
+};
 
 export const checkAuth = async (req, res) => {
-    try{
+    try {
         const user = await User.findById(req.userId);
-        if(!user){
-            return res.status(400).json({message: 'User not found'});
+        if (!user) {
+            return res.status(400).json({ message: 'User not found' });
         }
         const { _id, userName, email, bio, department, savedPosts, isVerified } = user;
         res.status(200).json({
@@ -214,21 +222,20 @@ export const checkAuth = async (req, res) => {
                 department,
                 savedPosts,
                 isVerified,
-                password: null
-            }
-        })
+                password: null,
+            },
+        });
+    } catch (error) {
+        console.error('Error checking auth', error);
+        res.status(500).json({ message: 'Server Error' });
     }
-    catch(error){
-        console.error("Error checking auth",error);
-        res.status(500).json({message: 'Server Error'});
-    }
-}
+};
 
 export const updateUser = async (req, res) => {
-    try{
+    try {
         const user = await User.findById(req.userId);
-        if(!user){
-            return res.status(400).json({message: 'User not found', success: false});
+        if (!user) {
+            return res.status(400).json({ message: 'User not found', success: false });
         }
         const { userName, department, bio } = req.body;
         user.userName = userName;
@@ -240,44 +247,42 @@ export const updateUser = async (req, res) => {
             message: 'User updated successfully',
             user: {
                 ...user._doc,
-                password: null
-            }
-        })
+                password: null,
+            },
+        });
+    } catch (error) {
+        console.error('Error updating user', error);
+        res.status(500).json({ message: 'Server Error' });
     }
-    catch(error){
-        console.error("Error updating user",error);
-        res.status(500).json({message: 'Server Error'});
-    }
-}
+};
 
 export const googleLogin = async (req, res) => {
     const { googleToken } = req.body;
-    try{
+    try {
         const userData = await verifyGoogleToken(googleToken);
-        let user = await User.findOne({ email: userData.email});
-        if(!user){
+        let user = await User.findOne({ email: userData.email });
+        if (!user) {
             const emailHash = computeEmailHash(userData.email);
-            user = await User.findOne({ emailHash })
+            user = await User.findOne({ emailHash });
         }
-        if(!user){
-            return res.status(400).json({message: 'User not found. Please sign up'});
+        if (!user) {
+            return res.status(400).json({ message: 'User not found. Please sign up' });
         }
         const token = generateTokenAndSetCookie(res, user._id);
         await user.save();
-        return res.status(200).json({message: 'Google login success', token, user});
+        return res.status(200).json({ message: 'Google login success', token, user });
+    } catch (error) {
+        console.error('Error logging in with google', error);
+        res.status(500).json({ message: 'Server Error' });
     }
-    catch(error){
-        console.error("Error logging in with google",error);
-        res.status(500).json({message: 'Server Error'});
-    }
-}
+};
 
 export const googleSignup = async (req, res) => {
     const { googleToken } = req.body;
-    try{
+    try {
         const userData = await verifyGoogleToken(googleToken);
         let user = await User.findOne({ email: userData.email });
-        if(user){
+        if (user) {
             return res.status(400).json({ message: 'User already exists. Please log in.' });
         }
         const emailHash = computeEmailHash(userData.email);
@@ -288,16 +293,15 @@ export const googleSignup = async (req, res) => {
             googleId: userData.sub,
             verificationToken,
             verificationTokenExpires: Date.now() + 1 * 60 * 60 * 1000,
-        })
+        });
         await user.save();
 
         const token = generateTokenAndSetCookie(res, user._id);
         await sendVerificationEmail(userData.email, verificationToken);
 
-        res.status(200).json({message: 'User created successfully', user, token});
+        res.status(200).json({ message: 'User created successfully', user, token });
+    } catch (error) {
+        console.error('Error signing up with google', error);
+        res.status(500).json({ message: 'Server Error' });
     }
-    catch(error){
-        console.error("Error signing up with google",error);
-        res.status(500).json({message: 'Server Error'});
-    }
-}
+};

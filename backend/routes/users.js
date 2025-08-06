@@ -1,11 +1,11 @@
 import express from 'express';
 import {
-  getUserData,
-  getUserPosts,
-  getUserComments,
-  getUserSavedPosts,
-  getUserUpvotedPosts,
-  getUserDownvotedPosts,
+    getUserData,
+    getUserPosts,
+    getUserComments,
+    getUserSavedPosts,
+    getUserUpvotedPosts,
+    getUserDownvotedPosts,
 } from '../controllers/users.js';
 
 const router = express.Router();
