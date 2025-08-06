@@ -1,18 +1,14 @@
 import { Post } from '../models/post.js';
 import { User } from '../models/user.js';
 import mongoose from 'mongoose';
+import { sendSuccess, sendError } from '../utils/sendResponse.js';
 
 export const getUserStats = async (req, res) => {
     try {
         const userId = req.userId;
 
         const user = await User.findById(userId).select('createdAt');
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: 'User not found',
-            });
-        }
+        if (!user) return sendError(res, 404, 'User not found');
 
         const postsCount = await Post.countDocuments({ user: userId });
 
@@ -53,25 +49,27 @@ export const getUserStats = async (req, res) => {
                 $project: {
                     title: { $arrayElemAt: ['$postInfo.title', 0] },
                     createdAt: '$comments.createdAt',
-                    type: 'comment',
                 },
             },
         ]);
 
         const recentActivity = [
             ...recentPosts.map(post => ({
-                title: `Posted: ${post.title.substring(0, 30)}...`,
+                title: `Posted: ${post.title?.substring(0, 30)}...`,
                 time: getTimeAgo(post.createdAt),
                 type: 'post',
+                createdAt: post.createdAt,
             })),
             ...recentComments.map(comment => ({
                 title: `Commented on: ${comment.title?.substring(0, 30)}...`,
                 time: getTimeAgo(comment.createdAt),
                 type: 'comment',
+                createdAt: comment.createdAt,
             })),
         ]
             .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-            .slice(0, 3);
+            .slice(0, 3)
+            .map(({ createdAt, ...rest }) => rest); // Remove createdAt from response
 
         const stats = {
             posts: postsCount,
@@ -82,16 +80,10 @@ export const getUserStats = async (req, res) => {
             recentActivity,
         };
 
-        res.status(200).json({
-            success: true,
-            stats,
-        });
+        return sendSuccess(res, 200, 'User stats fetched successfully', { stats });
     } catch (error) {
         console.error('Error fetching user stats:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to fetch user stats',
-        });
+        return sendError(res, 500, 'Failed to fetch user stats', { error: error.message });
     }
 };
 

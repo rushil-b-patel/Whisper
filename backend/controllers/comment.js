@@ -1,16 +1,17 @@
 import { Post, Comment } from '../models/post.js';
+import { sendSuccess, sendError } from '../utils/sendResponse.js';
 
 export const addComment = async (req, res) => {
     try {
         const post = await Post.findById(req.params.id);
-        if (!post) return res.status(404).json({ message: 'Post not found' });
+        if (!post) return sendError(res, 404, 'Post not found');
 
         if (!post.allowComments) {
-            return res.status(403).json({ message: 'Commenting is disabled for this post' });
+            return sendError(res, 403, 'Commenting is disabled for this post');
         }
 
         const { text } = req.body;
-        if (!text) return res.status(400).json({ message: 'Content is required' });
+        if (!text) return sendError(res, 400, 'Content is required');
 
         const comment = new Comment({
             text,
@@ -21,25 +22,25 @@ export const addComment = async (req, res) => {
         await comment.save();
         const populatedComment = await Comment.findById(comment._id).populate('user', 'userName');
 
-        res.status(201).json({ success: true, comment: populatedComment });
+        return sendSuccess(res, 201, 'Comment added successfully', { comment: populatedComment });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        return sendError(res, 500, 'Failed to add comment', { error: error.message });
     }
 };
 
 export const deleteComment = async (req, res) => {
     try {
         const comment = await Comment.findById(req.params.commentId);
-        if (!comment) return res.status(404).json({ message: 'Comment not found' });
+        if (!comment) return sendError(res, 404, 'Comment not found');
 
         if (comment.user.toString() !== req.userId) {
-            return res.status(401).json({ message: 'Unauthorized' });
+            return sendError(res, 401, 'Unauthorized');
         }
 
         await comment.deleteOne();
-        res.status(200).json({ success: true, message: 'Comment deleted' });
+        return sendSuccess(res, 200, 'Comment deleted successfully');
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        return sendError(res, 500, 'Failed to delete comment', { error: error.message });
     }
 };
 
@@ -47,7 +48,7 @@ export const voteComment = async (req, res) => {
     try {
         const { commentId, voteType } = req.body;
         const comment = await Comment.findById(commentId);
-        if (!comment) return res.status(404).json({ message: 'Comment not found' });
+        if (!comment) return sendError(res, 404, 'Comment not found');
 
         const userId = req.userId;
         const removeFromArray = (arr, val) => {
@@ -82,8 +83,8 @@ export const voteComment = async (req, res) => {
         }
 
         await comment.save();
-        res.status(200).json({ success: true, comment });
+        return sendSuccess(res, 200, 'Comment vote updated', { comment });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        return sendError(res, 500, 'Failed to vote on comment', { error: error.message });
     }
 };

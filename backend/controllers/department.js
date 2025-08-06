@@ -1,6 +1,7 @@
 import { Department } from '../models/department.js';
 import { User } from '../models/user.js';
 import { Post } from '../models/post.js';
+import { sendSuccess, sendError } from '../utils/sendResponse.js';
 
 export const getDepartments = async (req, res) => {
     try {
@@ -30,10 +31,10 @@ export const getDepartments = async (req, res) => {
             memberCount: countMap[dept.name] || 0,
         }));
 
-        res.status(200).json({ success: true, departments: data });
+        return sendSuccess(res, 200, 'Departments fetched successfully', { departments: data });
     } catch (err) {
         console.error('Error fetching departments:', err);
-        res.status(500).json({ success: false, message: 'Failed to fetch departments' });
+        return sendError(res, 500, 'Failed to fetch departments', { error: err.message });
     }
 };
 
@@ -41,19 +42,20 @@ export const addDepartment = async (req, res) => {
     const { name } = req.body;
     try {
         if (!name || !name.trim()) {
-            return res.status(400).json({ success: false, message: 'Invalid department name' });
+            return sendError(res, 400, 'Invalid department name');
         }
 
         const existing = await Department.findOne({ name: new RegExp(`^${name}$`, 'i') });
         if (existing) {
-            return res.status(200).json({ success: true, department: existing });
+            return sendSuccess(res, 200, 'Department already exists', { department: existing });
         }
 
         const department = new Department({ name: name.trim() });
         await department.save();
-        res.status(201).json({ success: true, department });
+
+        return sendSuccess(res, 201, 'Department added successfully', { department });
     } catch (err) {
-        res.status(500).json({ success: false, message: 'Error adding department' });
+        return sendError(res, 500, 'Error adding department', { error: err.message });
     }
 };
 
@@ -61,24 +63,15 @@ export const getPostsByDepartment = async (req, res) => {
     try {
         const { name } = req.params;
 
-        let usersInDepartment;
-        try {
-            usersInDepartment = await User.find({ department: name }).select('_id');
-        } catch (err) {
-            return res.status(500).json({ success: false, message: 'Error fetching users' });
-        }
+        const usersInDepartment = await User.find({ department: name }).select('_id');
+        const userIds = usersInDepartment.map(u => u._id);
 
-        let posts;
-        try {
-            posts = await Post.find({ user: { $in: usersInDepartment.map(u => u._id) } })
-                .populate('user', 'userName department avatar')
-                .sort({ createdAt: -1 });
-        } catch (err) {
-            return res.status(500).json({ success: false, message: 'Error fetching posts' });
-        }
+        const posts = await Post.find({ user: { $in: userIds } })
+            .populate('user', 'userName department avatar')
+            .sort({ createdAt: -1 });
 
-        res.status(200).json({ success: true, posts });
+        return sendSuccess(res, 200, 'Posts fetched successfully', { posts });
     } catch (err) {
-        res.status(500).json({ success: false, message: 'Failed to fetch posts for department' });
+        return sendError(res, 500, 'Failed to fetch posts for department', { error: err.message });
     }
 };
