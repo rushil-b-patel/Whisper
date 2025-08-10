@@ -14,7 +14,9 @@ export default function PostCard({ post }) {
   const upVoted = user && post.upVotedUsers.includes(user._id);
   const downVoted = user && post.downVotedUsers.includes(user._id);
 
-  if (!post) return <div className="p-4 text-red-500">Missing post data</div>;
+  if (!post || !post.user || !post.title) {
+    return null;
+  }
 
   return (
     <div

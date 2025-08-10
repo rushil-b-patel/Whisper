@@ -24,17 +24,14 @@ export const getUserPosts = async (req, res) => {
             .populate('user', 'userName email department')
             .sort({ createdAt: -1 });
 
-        const postsWithCommentCount = await Promise.all(
-            posts.map(async post => {
-                const count = await Comment.countDocuments({ post: post._id });
-                return {
-                    ...post.toObject(),
-                    commentCount: count,
-                };
-            })
-        );
+        const postsWithComments = await Promise.all(
+            posts.map(async post => ({
+                ...post.toObject(),
+                commentCount: await Comment.countDocuments({ post: post._id })
+            }))
+            );
 
-        return sendSuccess(res, 200, 'User posts fetched', { items: postsWithCommentCount });
+        return sendSuccess(res, 200, 'User posts fetched', { items: postsWithComments });
     } catch (error) {
         return sendError(res, 500, 'Failed to fetch user posts', { error: error.message });
     }

@@ -27,14 +27,14 @@ export default function UserProfile() {
   }, [username]);
 
   useEffect(() => {
-    const fetchTabData = async () => {
-      if (!username) return;
-      setLoadingTabData(true);
+    if (!username) return;
+    setLoadingTabData(true);
+
+    (async () => {
       const res = await getUsersTabData(username, activeTab);
-      setData(res.items);
+      setData(res.items || []);
       setLoadingTabData(false);
-    };
-    fetchTabData();
+    })();
   }, [activeTab, username]);
 
   if (loadingUser) {
@@ -59,21 +59,20 @@ export default function UserProfile() {
             <div className="w-8 h-8 border-4 border-gray-400 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : data.length === 0 ? (
-          <div className="text-center text-gray-500">No {activeTab.toLowerCase()} found.</div>
+          <div className="text-center text-gray-500">
+            No {activeTab.toLowerCase()} found.
+          </div>
         ) : activeTab === 'Comments' ? (
           data.map((comment) => (
-            <div key={comment._id} className="p-4 bg-gray-100 dark:bg-slate-800 rounded-md shadow-sm">
+            <div
+              key={comment._id}
+              className="p-4 bg-gray-100 dark:bg-slate-800 rounded-md shadow-sm"
+            >
               <p className="text-gray-800 dark:text-gray-200">{comment.text}</p>
             </div>
           ))
         ) : (
-          data.map((post) =>
-            post ? (
-              <PostCard key={post._id} post={post} />
-            ) : (
-              <div className="p-4 bg-red-100 text-red-600 rounded">Post not available</div>
-            )
-          )
+          data.map((post) => <PostCard key={post._id} post={post} />)
         )}
       </div>
     </div>
