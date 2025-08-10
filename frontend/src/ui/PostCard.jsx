@@ -53,7 +53,7 @@ export default function PostCard({ post }) {
 
       <div className="flex justify-between items-center">
         <VoteBar
-          PostId={post._id}
+          postId={post._id}
           initialVotes={voteCount}
           initialUpVoted={upVoted}
           initialDownVoted={downVoted}

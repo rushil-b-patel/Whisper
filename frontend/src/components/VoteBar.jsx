@@ -25,30 +25,12 @@ export default function VoteBar({
   useEffect(() => {
     if (!user || !postId) return;
 
-    if (isComment) {
-      setState({
-        up: initialUpVoted,
-        down: initialDownVoted,
-      });
-      setCount(initialVotes);
-    } else {
-      (async () => {
-        try {
-          const res = await getPost(postId);
-          const p = res.post;
-          if (!p) return;
-
-          setState({
-            up: p.upVotedUsers.includes(user._id),
-            down: p.downVotedUsers.includes(user._id),
-          });
-          setCount(p.upVotes - p.downVotes);
-        } catch (e) {
-          console.warn('VoteBar fetch error (post)', e);
-        }
-      })();
-    }
-  }, [postId, user, isComment, initialUpVoted, initialDownVoted, initialVotes]);
+    setState({
+      up: initialUpVoted,
+      down: initialDownVoted,
+    });
+    setCount(initialVotes);
+  }, [postId, user, initialUpVoted, initialDownVoted, initialVotes]);
 
 
   const cast = async (type) => {
@@ -92,9 +74,9 @@ export default function VoteBar({
 
 const base = 'px-4 py-2 space-x-4 rounded-full text-sm';
 const bg = state.up
-  ? 'bg-[#3DB2FF] text-blue-100'
+  ? 'bg-[#3F72AF] text-blue-100'
   : state.down
-    ? 'bg-[#DA1212] text-black'
+    ? 'bg-[#B83B5E] text-black'
     : 'bg-white text-gray-800 dark:bg-slate-800 dark:text-white';
 
 
