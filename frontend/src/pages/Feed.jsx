@@ -1,5 +1,6 @@
 import PostCard from '../ui/PostCard';
 import { useNavigate } from 'react-router-dom';
+import { PostCardSkeleton } from '../ui/PostCardSkeleton';
 
 export default function Feed({ isLoading, error, filteredPosts, fetchPosts }) {
   const navigate = useNavigate();
@@ -7,8 +8,10 @@ export default function Feed({ isLoading, error, filteredPosts, fetchPosts }) {
   return (
     <main className="flex-1 max-w-2xl mx-auto px-2 py-4 overflow-y-auto feed-scrollbar-hidden">
       {isLoading ? (
-        <div className="h-[40vh] flex items-center justify-center">
-          <div className="w-10 h-10 border-4 border-gray-400 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+        <div className="space-y-4 pb-20">
+          {Array.from({ length: 3 }).map((_, idx) => (
+            <PostCardSkeleton key={idx} />
+          ))}
         </div>
       ) : error ? (
         <div className="text-center py-12">

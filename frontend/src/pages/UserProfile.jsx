@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import Tabs from '../ui/Tabs';
 import PostCard from '../ui/PostCard.jsx';
 import { useUserService } from '../context/UserContext.jsx';
+import { PostCardSkeleton } from '../ui/PostCardSkeleton.jsx';
 
 const TABS = ['Posts', 'Comments', 'Saved', 'Upvoted', 'Downvoted'];
 
@@ -54,9 +55,11 @@ export default function UserProfile() {
       <Tabs tabs={TABS} active={activeTab} onChange={setActiveTab} />
 
       <div className="mt-6 space-y-4">
-        {loadingTabData ? (
-          <div className="h-[20vh] flex items-center justify-center">
-            <div className="w-8 h-8 border-4 border-gray-400 border-t-transparent rounded-full animate-spin" />
+        {loadingTabData && activeTab !== 'Comments' ? (
+          <div className="space-y-4 pb-20">
+            {Array.from({ length: 3 }).map((_, idx) => (
+              <PostCardSkeleton key={idx} />
+            ))}
           </div>
         ) : data.length === 0 ? (
           <div className="text-center text-gray-500">
