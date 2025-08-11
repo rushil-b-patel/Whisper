@@ -99,7 +99,7 @@ export const upVotePost = async (req, res) => {
         const post = await Post.findById(req.params.id);
         if (!post) return sendError(res, 404, 'Post not found');
 
-        const userId = req.user.id;
+        const userId = req.userId;
         const upIndex = post.upVotedUsers.indexOf(userId);
         const downIndex = post.downVotedUsers.indexOf(userId);
 
@@ -127,7 +127,7 @@ export const downVotePost = async (req, res) => {
         const post = await Post.findById(req.params.id);
         if (!post) return sendError(res, 404, 'Post not found');
 
-        const userId = req.user.id;
+        const userId = req.userId;
         const downIndex = post.downVotedUsers.indexOf(userId);
         const upIndex = post.upVotedUsers.indexOf(userId);
 
@@ -152,7 +152,7 @@ export const downVotePost = async (req, res) => {
 
 export const toggleSavePost = async (req, res) => {
     try {
-        const userId = req.user.id;
+        const userId = req.userId;
         const postId = req.params.id;
 
         const user = await User.findById(userId);
@@ -175,7 +175,7 @@ export const toggleSavePost = async (req, res) => {
 
 export const getSavedPosts = async (req, res) => {
     try {
-        const user = await User.findById(req.user.id).populate({
+        const user = await User.findById(req.userId).populate({
             path: 'savedPosts',
             populate: { path: 'user', select: 'userName department' },
         });

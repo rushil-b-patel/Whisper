@@ -23,7 +23,6 @@ export const verifyToken = async (req, res, next) => {
         }
 
         req.userId = decoded.id;
-        req.user = user;
         next();
     } catch (error) {
         console.error('JWT Verification Error:', error.message);
