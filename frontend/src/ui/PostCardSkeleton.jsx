@@ -20,4 +20,4 @@ export const PostCardSkeleton = () => {
       </div>
     </div>
   );
-}
+};

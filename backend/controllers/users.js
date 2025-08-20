@@ -27,9 +27,9 @@ export const getUserPosts = async (req, res) => {
         const postsWithComments = await Promise.all(
             posts.map(async post => ({
                 ...post.toObject(),
-                commentCount: await Comment.countDocuments({ post: post._id })
+                commentCount: await Comment.countDocuments({ post: post._id }),
             }))
-            );
+        );
 
         return sendSuccess(res, 200, 'User posts fetched', { items: postsWithComments });
     } catch (error) {

@@ -1,8 +1,20 @@
-export default function LeftLayout({ activeFilter, handleFilterChange, filters, departments, departmentsLoading, departmentsError, fetchDepartments, activeDepartment, setActiveDepartment }) {
+export default function LeftLayout({
+  activeFilter,
+  handleFilterChange,
+  filters,
+  departments,
+  departmentsLoading,
+  departmentsError,
+  fetchDepartments,
+  activeDepartment,
+  setActiveDepartment,
+}) {
   return (
     <aside className="hidden md:block md:w-64 lg:w-72 h-full overflow-y-auto px-2 py-4">
       <section className="bg-white dark:bg-[#131619] rounded-xl shadow-sm border border-gray-200 dark:border-[#2A2B30] p-4 mb-4">
-        <h2 className="font-mono text-lg font-semibold text-gray-900 dark:text-white mb-3">Discover</h2>
+        <h2 className="font-mono text-lg font-semibold text-gray-900 dark:text-white mb-3">
+          Discover
+        </h2>
         <ul className="space-y-2">
           {filters.map(({ id, label, icon }) => (
             <li key={id}>
@@ -58,7 +70,9 @@ export default function LeftLayout({ activeFilter, handleFilterChange, filters, 
                 <li key={dept.name}>
                   <div
                     className={`flex items-center space-x-3 p-2 rounded-lg transition cursor-pointer ${
-                      isActive ? 'bg-gray-100 dark:bg-gray-800' : 'hover:bg-gray-50 dark:hover:bg-slate-800'
+                      isActive
+                        ? 'bg-gray-100 dark:bg-gray-800'
+                        : 'hover:bg-gray-50 dark:hover:bg-slate-800'
                     }`}
                     onClick={() => setActiveDepartment(dept.name)}
                   >
@@ -72,7 +86,9 @@ export default function LeftLayout({ activeFilter, handleFilterChange, filters, 
                     <div>
                       <p
                         className={`text-sm font-mono ${
-                          isActive ? 'font-semibold text-gray-900 dark:text-white' : 'font-medium text-gray-900 dark:text-white'
+                          isActive
+                            ? 'font-semibold text-gray-900 dark:text-white'
+                            : 'font-medium text-gray-900 dark:text-white'
                         }`}
                       >
                         {dept.name}

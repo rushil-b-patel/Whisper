@@ -38,7 +38,7 @@ const User = () => {
   };
 
   const items = [
-    { title: 'Profile', icon: '👤', action:() => navigate('/user/'+user.userName) },
+    { title: 'Profile', icon: '👤', action: () => navigate('/user/' + user.userName) },
     {
       title: theme === 'light' ? 'Dark Theme' : 'Light Theme',
       icon: theme === 'light' ? '🌙' : '☀️',

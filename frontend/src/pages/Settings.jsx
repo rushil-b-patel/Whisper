@@ -13,9 +13,10 @@ function Settings() {
   const [departments, setDepartments] = useState([]);
   const [query, setQuery] = useState('');
 
-  const filtered = query === ''
-    ? departments
-    : departments.filter((d) => d.name.toLowerCase().includes(query.toLowerCase()));
+  const filtered =
+    query === ''
+      ? departments
+      : departments.filter((d) => d.name.toLowerCase().includes(query.toLowerCase()));
   const token = localStorage.getItem('token');
 
   useEffect(() => {
@@ -48,12 +49,16 @@ function Settings() {
     <div className="min-h-[calc(100vh-4em)] px-4 sm:px-6 py-10 flex justify-center bg-white dark:bg-[#0e1113]">
       <div className="w-full max-w-2xl border border-gray-200 dark:border-slate-800 rounded-lg px-6 py-8 sm:px-10 sm:py-12 transition-all duration-300 shadow-sm">
         <div className="border-l-4 border-black pl-4 mb-10">
-          <h1 className="text-3xl sm:text-4xl font-bold font-mono text-black dark:text-white">Edit Profile</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold font-mono text-black dark:text-white">
+            Edit Profile
+          </h1>
         </div>
 
         <form onSubmit={handleSave} className="space-y-10">
           <div>
-            <label className="block font-semibold mb-2 font-mono text-black dark:text-white">Username</label>
+            <label className="block font-semibold mb-2 font-mono text-black dark:text-white">
+              Username
+            </label>
             <input
               type="text"
               value={userName}
@@ -64,7 +69,9 @@ function Settings() {
           </div>
 
           <div>
-            <label className="block font-semibold mb-2 font-mono text-black dark:text-white">About You</label>
+            <label className="block font-semibold mb-2 font-mono text-black dark:text-white">
+              About You
+            </label>
             <textarea
               value={bio}
               onChange={(e) => setBio(e.target.value)}
@@ -75,7 +82,9 @@ function Settings() {
           </div>
 
           <div>
-            <label className="block font-semibold mb-2 font-mono text-black dark:text-white">Department</label>
+            <label className="block font-semibold mb-2 font-mono text-black dark:text-white">
+              Department
+            </label>
             <Combobox value={department} onChange={setDepartment}>
               <div className="relative">
                 <Combobox.Input

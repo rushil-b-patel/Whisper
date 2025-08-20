@@ -171,7 +171,12 @@ export default function CreatePost() {
                 </div>
               ) : (
                 <label className="cursor-pointer text-sm font-mono text-gray-600 dark:text-gray-300">
-                  <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleImageChange}
+                  />
                   <span className="inline-block px-4 py-2 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-slate-700 transition-all duration-200">
                     Upload Image
                   </span>

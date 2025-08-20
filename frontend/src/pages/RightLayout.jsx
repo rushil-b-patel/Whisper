@@ -1,12 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 
-export default function RightLayout({
-  user,
-  statsLoading,
-  statsError,
-  userStats,
-  fetchUserStats,
-}) {
+export default function RightLayout({ user, statsLoading, statsError, userStats, fetchUserStats }) {
   const navigate = useNavigate();
 
   return (
@@ -75,7 +69,9 @@ export default function RightLayout({
                         key={i}
                         className="border-b border-dashed border-gray-300 dark:border-slate-700 pb-2 last:border-0"
                       >
-                        <p className="text-gray-800 dark:text-gray-100 font-medium">{activity.title}</p>
+                        <p className="text-gray-800 dark:text-gray-100 font-medium">
+                          {activity.title}
+                        </p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">{activity.time}</p>
                       </li>
                     ))}

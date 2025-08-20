@@ -7,7 +7,8 @@ import { showSuccess } from '../utils/toast.jsx';
 const BASE_API = import.meta.env.VITE_BASE_API;
 const BASE_API_MOBILE = `http://${window.location.hostname}:8080`;
 
-const getBaseURI = () => /iphone|ipad|ipod|Android/i.test(navigator.userAgent) ? BASE_API_MOBILE : BASE_API;
+const getBaseURI = () =>
+  /iphone|ipad|ipod|Android/i.test(navigator.userAgent) ? BASE_API_MOBILE : BASE_API;
 let API = getBaseURI();
 
 const AuthContext = createContext();
@@ -61,7 +62,9 @@ export const AuthProvider = ({ children }) => {
 
   const googleLogin = async (response) => {
     return await execute(async () => {
-      const res = await axios.post(`${API}/auth/google/login`, { googleToken: response.credential });
+      const res = await axios.post(`${API}/auth/google/login`, {
+        googleToken: response.credential,
+      });
       const { token, user } = res.data;
       setUser(user);
       localStorage.setItem('token', token);
@@ -99,11 +102,22 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{
-      user, isLoading, error,
-      setIsLoading, setError,
-      login, signup, googleLogin, logout, verifyAuth, verifyEmail, updateUserData,
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isLoading,
+        error,
+        setIsLoading,
+        setError,
+        login,
+        signup,
+        googleLogin,
+        logout,
+        verifyAuth,
+        verifyEmail,
+        updateUserData,
+      }}
+    >
       {!isLoading && children}
     </AuthContext.Provider>
   );

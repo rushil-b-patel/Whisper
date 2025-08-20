@@ -28,7 +28,7 @@ function CommentItem({ comment, postId, onAddReply, onDeleteComment }) {
 
   const voteCount = (comment.upVotes || 0) - (comment.downVotes || 0);
   const upVoted = comment.upVotedUsers?.includes(user?._id);
-  const downVoted = comment.downVotedUsers?.includes(user ?._id);
+  const downVoted = comment.downVotedUsers?.includes(user?._id);
 
   return (
     <div className="bg-white dark:bg-[#1e1f23] border dark:border-[#2A2B30] rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow duration-300">
@@ -62,10 +62,7 @@ function CommentItem({ comment, postId, onAddReply, onDeleteComment }) {
           </button>
 
           {user?._id === comment.User?._id && (
-            <button
-              onClick={handleDelete}
-              className="flex items-center gap-1 hover:text-red-500"
-            >
+            <button onClick={handleDelete} className="flex items-center gap-1 hover:text-red-500">
               <Trash className="w-4 h-4" />
               <span>Delete</span>
             </button>
@@ -180,4 +177,3 @@ export default function CommentThread({ post, comments: initialComments }) {
     </p>
   );
 }
-

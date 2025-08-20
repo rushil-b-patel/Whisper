@@ -9,17 +9,23 @@ export const useUserService = () => {
   const { execute, isLoading, error } = useRequest();
 
   const getUsersData = async (username) => {
-    return await execute(() => axios.get(`${API}/users/${username}`).then(res => res.data), 'Failed to load user data');
-  }
+    return await execute(
+      () => axios.get(`${API}/users/${username}`).then((res) => res.data),
+      'Failed to load user data'
+    );
+  };
 
   const getUsersTabData = async (username, tabName) => {
-    return await execute(() => axios.get(`${API}/users/${username}/${tabName.toLowerCase()}`)
-        .then((res) => res.data),
-        `Failed to load ${tabName.toLowerCase()}`
+    return await execute(
+      () => axios.get(`${API}/users/${username}/${tabName.toLowerCase()}`).then((res) => res.data),
+      `Failed to load ${tabName.toLowerCase()}`
     );
   };
 
   return {
-    isLoading, error, getUsersData, getUsersTabData
+    isLoading,
+    error,
+    getUsersData,
+    getUsersTabData,
   };
 };

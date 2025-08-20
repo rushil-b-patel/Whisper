@@ -22,7 +22,6 @@ function Home() {
   const [showMobileFilter, setShowMobileFilter] = useState(false);
   const [activeDepartment, setActiveDepartment] = useState(null);
 
-
   const isPostsFetchingRef = useRef(false);
   const isDepartmentsFetchingRef = useRef(false);
   const isStatsFetchingRef = useRef(false);
@@ -142,7 +141,6 @@ function Home() {
         return filtered;
     }
   }, [posts, activeFilter, activeDepartment]);
-
 
   const filters = useMemo(
     () => [
