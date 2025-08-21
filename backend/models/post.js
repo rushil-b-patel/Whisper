@@ -16,58 +16,28 @@ const commentSchema = new mongoose.Schema(
 
 const postSchema = new mongoose.Schema(
     {
-        title: {
-            type: String,
-            required: true,
-        },
-        description: {
-            type: Object,
-            required: true,
-        },
-        image: {
-            type: String,
-            required: false,
-        },
-        user: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User',
-            required: true,
-        },
-        upVotes: {
-            type: Number,
-            default: 0,
-        },
-        downVotes: {
-            type: Number,
-            default: 0,
-        },
-        upVotedUsers: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'User',
-            },
-        ],
-        downVotedUsers: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'User',
-            },
-        ],
-        category: {
-            type: String,
-            required: true,
-        },
-        allowComments: {
-            type: Boolean,
-            default: true,
-        },
-        createdAt: {
-            type: Date,
-            default: Date.now,
-        },
+        title: { type: String, required: true },
+        description: { type: Object, required: true },
+        image: { type: String, required: false },
+        user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+        upVotes: { type: Number, default: 0 },
+        downVotes: { type: Number, default: 0 },
+        upVotedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+        downVotedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+        tags: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tag' }],
+        allowComments: { type: Boolean, default: true },
+        createdAt: { type: Date, default: Date.now },
+    },
+    { timestamps: true }
+);
+
+const tagSchema = new mongoose.Schema(
+    {
+        name: { type: String, required: true, unique: true, trim: true, lowercase: true },
     },
     { timestamps: true }
 );
 
 export const Post = mongoose.model('Post', postSchema);
 export const Comment = mongoose.model('Comment', commentSchema);
+export const Tag = mongoose.model('Tag', tagSchema);

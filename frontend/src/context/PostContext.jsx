@@ -193,6 +193,41 @@ export const usePostService = () => {
       'Failed to load department posts'
     );
 
+  const getTag = async () => {
+    return execute(
+      () =>
+        axios.get(`${API}/tags`).then((res) => {
+          const d = res.data;
+          return d?.data?.tags ?? d?.tags ?? d;
+        }),
+      'Failed to fetch tags'
+    );
+  };
+
+  const saveTag = async (token, name) => {
+    return execute(
+      () =>
+        axios
+          .post(`${API}/tags/add`, { name }, { headers: { Authorization: `Bearer ${token}` } })
+          .then((res) => {
+            const d = res.data;
+            return d?.data?.tag ?? d?.tag ?? d;
+          }),
+      'Failed to save tag'
+    );
+  };
+
+  const getPostsByTag = async (name) => {
+    return execute(
+      () =>
+        axios.get(`${API}/tags/${encodeURIComponent(name)}`).then((res) => {
+          const d = res.data;
+          return d?.data?.posts ?? d?.posts ?? d;
+        }),
+      'Failed to load tag posts'
+    );
+  };
+
   return {
     createPost,
     getAllPosts,
@@ -209,6 +244,9 @@ export const usePostService = () => {
     getDepartments,
     saveDepartment,
     getPostsByDepartment,
+    getTag,
+    saveTag,
+    getPostsByTag,
     isLoading,
     error,
   };

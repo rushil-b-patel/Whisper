@@ -1,14 +1,20 @@
-import { Post, Comment } from '../models/post.js';
+import { Post, Comment, Tag } from '../models/post.js';
 import { User } from '../models/user.js';
 import { sendSuccess, sendError } from '../utils/sendResponse.js';
 
 export const createPost = async (req, res) => {
     try {
-        const { title, description, category, allowComments } = req.body;
+        const { title, description, allowComments } = req.body;
+
+        if (!title?.trim()) {
+            return sendError(res, 400, 'Title is required');
+        }
+
         const imageUrl = req.file
             ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`
             : null;
-        const allowCommentsBool = allowComments === 'true';
+
+        const allowCommentsBool = allowComments === 'true' || allowComments === true;
 
         let parsedDescription;
         try {
@@ -17,19 +23,44 @@ export const createPost = async (req, res) => {
             return sendError(res, 400, 'Invalid description format');
         }
 
+        let tags = [];
+        if (req.body.tags) {
+            try {
+                tags = JSON.parse(req.body.tags);
+            } catch {
+                return sendError(res, 400, 'Invalid tags format');
+            }
+        }
+        const tagIds = [];
+        for (const tagName of tags) {
+            let tag = await Tag.findOne({
+                name: new RegExp(`^${tagName}$`, 'i'),
+            });
+            if (!tag) {
+                tag = await Tag.create({ name: tagName.trim() });
+            }
+            tagIds.push(tag._id);
+        }
+
         const post = new Post({
-            title,
+            title: title.trim(),
             description: parsedDescription,
             user: req.userId,
             image: imageUrl,
-            category,
+            tags: tagIds,
             allowComments: allowCommentsBool,
         });
 
         await post.save();
-        return sendSuccess(res, 201, 'Post created successfully', { post, postId: post._id });
+
+        return sendSuccess(res, 201, 'Post created successfully', {
+            post,
+            postId: post._id,
+        });
     } catch (error) {
-        return sendError(res, 500, 'Failed to create post', { error: error.message });
+        return sendError(res, 500, 'Failed to create post', {
+            error: error.message,
+        });
     }
 };
 
@@ -187,5 +218,47 @@ export const getSavedPosts = async (req, res) => {
         });
     } catch (error) {
         return sendError(res, 500, 'Failed to fetch saved posts', { error: error.message });
+    }
+};
+
+export const getTags = async (req, res) => {
+    try {
+        const tags = await Tag.find().sort({ name: 1 });
+        return sendSuccess(res, 200, 'Tags fetched successfully', { tags });
+    } catch (error) {
+        return sendError(res, 500, 'Failed to fetch tags', { error: error.message });
+    }
+};
+
+export const saveTag = async (req, res) => {
+    try {
+        const { name } = req.body;
+        if (!name?.trim()) return sendError(res, 400, 'Tag name required');
+
+        let tag = await Tag.findOne({ name: new RegExp(`^${name}$`, 'i') });
+        if (!tag) {
+            tag = await Tag.create({ name: name.trim() });
+        }
+
+        return sendSuccess(res, 201, 'Tag saved successfully', { tag });
+    } catch (error) {
+        return sendError(res, 500, 'Failed to save tag', { error: error.message });
+    }
+};
+
+export const getPostsByTag = async (req, res) => {
+    try {
+        const { name } = req.params;
+        const tag = await Tag.findOne({ name: new RegExp(`^${name}$`, 'i') });
+        if (!tag) return sendError(res, 404, 'Tag not found');
+
+        const posts = await Post.find({ tags: tag._id })
+            .populate('user', 'userName')
+            .populate('tags', 'name')
+            .sort({ createdAt: -1 });
+
+        return sendSuccess(res, 200, 'Posts by tag fetched', { posts });
+    } catch (error) {
+        return sendError(res, 500, 'Failed to fetch posts by tag', { error: error.message });
     }
 };

@@ -1,50 +1,47 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePostService } from '../context/PostContext';
-import { ChevronDown, ChevronUp } from '../ui/Icons';
 import toast from 'react-hot-toast';
 import Editor from '../components/Editor';
-
-const CATEGORIES = [
-  { value: 'Tech', label: 'Technology' },
-  { value: 'Lifestyle', label: 'Lifestyle' },
-  { value: 'Education', label: 'Education' },
-  { value: 'Sports', label: 'Sports' },
-  { value: 'Entertainment', label: 'Entertainment' },
-  { value: 'Food', label: 'Food & Cooking' },
-  { value: 'Health', label: 'Health & Fitness' },
-  { value: 'Travel', label: 'Travel' },
-  { value: 'Music', label: 'Music' },
-  { value: 'Gaming', label: 'Gaming' },
-];
+import { Combobox } from '@headlessui/react';
 
 export default function CreatePost() {
   const [title, setTitle] = useState('');
-  const [category, setCategory] = useState('');
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [allowComments, setAllowComments] = useState(true);
 
+  const [allTags, setAllTags] = useState([]);
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [query, setQuery] = useState('');
+
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
-  const { createPost } = usePostService();
+  const { createPost, getTag, saveTag } = usePostService();
 
   const editorRef = useRef();
   const titleRef = useRef();
-  const dropdownRef = useRef();
 
   useEffect(() => {
-    setTimeout(() => titleRef.current?.focus(), 50);
-    const handleOutsideClick = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setDropdownOpen(false);
+    titleRef.current?.focus();
+
+    const fetchTags = async () => {
+      try {
+        const tags = await getTag(token); // now returns an array
+        console.log('Fetched tags (frontend):', tags);
+        setAllTags(tags || []);
+      } catch (err) {
+        console.error('Failed to fetch tags:', err);
       }
     };
-    document.addEventListener('mousedown', handleOutsideClick);
-    return () => document.removeEventListener('mousedown', handleOutsideClick);
-  }, []);
+    fetchTags();
+  }, [token]);
+
+  const filteredTags =
+    query === ''
+      ? allTags
+      : allTags.filter((t) => t.name.toLowerCase().includes(query.toLowerCase()));
 
   const handleImageChange = (e) => {
     const file = e.target.files?.[0];
@@ -57,27 +54,44 @@ export default function CreatePost() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!title.trim() || !category) {
-      toast.error('Title and category are required');
+    if (!title.trim() || selectedTags.length === 0) {
+      toast.error('Title and at least one tag are required');
       return;
     }
 
     try {
       setIsLoading(true);
+
+      for (let tagName of selectedTags) {
+        const already = allTags.some((t) => t.name.toLowerCase() === tagName.toLowerCase());
+        if (!already) {
+          try {
+            const saved = await saveTag(token, tagName);
+            const savedTag = saved?.tag ?? saved;
+            if (savedTag) {
+              setAllTags((prev) => {
+                if (prev.some((t) => t.name.toLowerCase() === savedTag.name.toLowerCase()))
+                  return prev;
+                return [...prev, savedTag];
+              });
+            }
+          } catch (err) {
+            console.error('Failed to save tag:', err);
+          }
+        }
+      }
+
       const content = await editorRef.current.save();
 
       const formData = new FormData();
-      formData.append('title', title);
+      formData.append('title', title.trim());
       formData.append('description', JSON.stringify(content));
-      formData.append('category', category);
+      formData.append('tags', JSON.stringify(selectedTags)); // array of tag names
       formData.append('allowComments', allowComments);
       if (image) formData.append('image', image);
 
       const res = await createPost(token, formData);
       navigate(`/post/${res.postId}`);
-    } catch (err) {
-      console.error(err);
-      toast.error('Failed to publish post');
     } finally {
       setIsLoading(false);
     }
@@ -85,7 +99,7 @@ export default function CreatePost() {
 
   const discardPost = () => {
     setTitle('');
-    setCategory('');
+    setSelectedTags([]);
     setImage(null);
     setImagePreview(null);
     toast.success('Post discarded');
@@ -116,30 +130,87 @@ export default function CreatePost() {
             </p>
           </div>
 
-          <div ref={dropdownRef} className="relative">
-            <label className="block text-sm font-semibold mb-2 font-mono">Category</label>
-            <div
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-[#1e1f23] font-mono flex justify-between items-center cursor-pointer"
+          <div>
+            <label className="block text-sm font-semibold mb-2 font-mono">Tags</label>
+            <Combobox
+              value={null}
+              onChange={(tag) => {
+                if (!selectedTags.includes(tag)) {
+                  setSelectedTags((prev) => [...prev, tag]);
+                }
+                setQuery('');
+              }}
             >
-              {category ? CATEGORIES.find((c) => c.value === category)?.label : 'Select a category'}
-              {dropdownOpen ? <ChevronUp /> : <ChevronDown />}
-            </div>
+              <div className="relative">
+                <Combobox.Input
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-[#1e1f23] font-mono"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  displayValue={() => ''}
+                  placeholder="Search or create tags"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && query.trim()) {
+                      e.preventDefault();
+                      if (!selectedTags.includes(query.trim())) {
+                        setSelectedTags((prev) => [...prev, query.trim()]);
+                      }
+                      setQuery('');
+                    }
+                  }}
+                  onBlur={() => {
+                    if (query.trim() && !selectedTags.includes(query.trim())) {
+                      setSelectedTags((prev) => [...prev, query.trim()]);
+                      setQuery('');
+                    }
+                  }}
+                />
 
-            {dropdownOpen && (
-              <div className="absolute left-0 right-0 mt-2 z-10 w-full max-w-full bg-white dark:bg-[#1e1f23] border border-gray-300 dark:border-gray-700 rounded-md shadow max-h-60 overflow-auto">
-                {CATEGORIES.map((cat) => (
-                  <button
-                    key={cat.value}
-                    type="button"
-                    onClick={() => {
-                      setCategory(cat.value);
-                      setDropdownOpen(false);
-                    }}
-                    className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-slate-700 font-mono"
+                {filteredTags.length > 0 && (
+                  <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-gray-800 text-black dark:text-white shadow-lg border border-gray-300 dark:border-gray-700">
+                    {filteredTags.map((tag) => (
+                      <Combobox.Option
+                        key={tag._id}
+                        value={tag.name}
+                        className={({ active }) =>
+                          `cursor-pointer select-none px-4 py-2 ${
+                            active ? 'bg-gray-200 dark:bg-gray-700' : ''
+                          }`
+                        }
+                      >
+                        {tag.name}
+                      </Combobox.Option>
+                    ))}
+
+                    {query &&
+                      !allTags.some((t) => t.name.toLowerCase() === query.toLowerCase()) && (
+                        <Combobox.Option
+                          value={query}
+                          className="cursor-pointer select-none px-4 py-2 text-indigo-500"
+                        >
+                          + Create “{query}”
+                        </Combobox.Option>
+                      )}
+                  </Combobox.Options>
+                )}
+              </div>
+            </Combobox>
+
+            {selectedTags.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {selectedTags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="flex items-center bg-gray-200 dark:bg-gray-700 text-sm px-3 py-1 rounded-full"
                   >
-                    {cat.label}
-                  </button>
+                    {tag}
+                    <button
+                      type="button"
+                      onClick={() => setSelectedTags(selectedTags.filter((t) => t !== tag))}
+                      className="ml-2 text-red-500 hover:text-red-700"
+                    >
+                      ×
+                    </button>
+                  </span>
                 ))}
               </div>
             )}

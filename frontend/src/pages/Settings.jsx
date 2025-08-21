@@ -35,7 +35,7 @@ function Settings() {
 
     if (!exists && department) {
       try {
-        const res = await saveDepartment(localStorage.getItem('token'), department);
+        const res = await saveDepartment(token, department);
         setDepartments((prev) => [...prev, res.data.department]);
       } catch (err) {
         console.error('Failed to add department:', err);
@@ -103,7 +103,7 @@ function Settings() {
                         value={dept.name}
                         className={({ active }) =>
                           `cursor-pointer select-none px-4 py-2 ${
-                            active ? 'bg-indigo-500 text-white' : ''
+                            active ? 'bg-gray-500 text-white' : ''
                           }`
                         }
                       >
