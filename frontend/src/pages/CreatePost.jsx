@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { usePostService } from '../context/PostContext';
 import toast from 'react-hot-toast';
 import Editor from '../components/Editor';
-import { Combobox } from '@headlessui/react';
+import { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react';
 
 export default function CreatePost() {
   const [title, setTitle] = useState('');
@@ -28,7 +28,7 @@ export default function CreatePost() {
 
     const fetchTags = async () => {
       try {
-        const tags = await getTag(token); // now returns an array
+        const tags = await getTag(token);
         console.log('Fetched tags (frontend):', tags);
         setAllTags(tags || []);
       } catch (err) {
@@ -54,8 +54,15 @@ export default function CreatePost() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!title.trim() || selectedTags.length === 0) {
-      toast.error('Title and at least one tag are required');
+
+    const content = await editorRef.current.save();
+    const isDescriptionEmpty =
+      !content.blocks ||
+      content.blocks.length === 0 ||
+      content.blocks.every((block) => !block.data.text?.trim());
+
+    if (!title.trim() || selectedTags.length === 0 || isDescriptionEmpty) {
+      toast.error('Title, at least one tag and a description are required');
       return;
     }
 
@@ -81,12 +88,10 @@ export default function CreatePost() {
         }
       }
 
-      const content = await editorRef.current.save();
-
       const formData = new FormData();
       formData.append('title', title.trim());
       formData.append('description', JSON.stringify(content));
-      formData.append('tags', JSON.stringify(selectedTags)); // array of tag names
+      formData.append('tags', JSON.stringify(selectedTags));
       formData.append('allowComments', allowComments);
       if (image) formData.append('image', image);
 
@@ -135,40 +140,25 @@ export default function CreatePost() {
             <Combobox
               value={null}
               onChange={(tag) => {
-                if (!selectedTags.includes(tag)) {
+                if (tag && !selectedTags.includes(tag)) {
                   setSelectedTags((prev) => [...prev, tag]);
                 }
                 setQuery('');
               }}
             >
               <div className="relative">
-                <Combobox.Input
+                <ComboboxInput
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-[#1e1f23] font-mono"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   displayValue={() => ''}
                   placeholder="Search or create tags"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && query.trim()) {
-                      e.preventDefault();
-                      if (!selectedTags.includes(query.trim())) {
-                        setSelectedTags((prev) => [...prev, query.trim()]);
-                      }
-                      setQuery('');
-                    }
-                  }}
-                  onBlur={() => {
-                    if (query.trim() && !selectedTags.includes(query.trim())) {
-                      setSelectedTags((prev) => [...prev, query.trim()]);
-                      setQuery('');
-                    }
-                  }}
                 />
 
-                {filteredTags.length > 0 && (
-                  <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-gray-800 text-black dark:text-white shadow-lg border border-gray-300 dark:border-gray-700">
+                {(filteredTags.length > 0 || query) && (
+                  <ComboboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-gray-800 text-black dark:text-white shadow-lg border border-gray-300 dark:border-gray-700">
                     {filteredTags.map((tag) => (
-                      <Combobox.Option
+                      <ComboboxOption
                         key={tag._id}
                         value={tag.name}
                         className={({ active }) =>
@@ -178,19 +168,19 @@ export default function CreatePost() {
                         }
                       >
                         {tag.name}
-                      </Combobox.Option>
+                      </ComboboxOption>
                     ))}
 
                     {query &&
                       !allTags.some((t) => t.name.toLowerCase() === query.toLowerCase()) && (
-                        <Combobox.Option
+                        <ComboboxOption
                           value={query}
                           className="cursor-pointer select-none px-4 py-2 text-indigo-500"
                         >
                           + Create “{query}”
-                        </Combobox.Option>
+                        </ComboboxOption>
                       )}
-                  </Combobox.Options>
+                  </ComboboxOptions>
                 )}
               </div>
             </Combobox>
