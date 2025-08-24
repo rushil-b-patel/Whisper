@@ -15,20 +15,29 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
   const { execute, isLoading, error, setError, setIsLoading } = useRequest();
   const navigate = useNavigate();
 
   const verifyAuth = async () => {
-    await execute(async () => {
+    setAuthLoading(true);
+    try {
       const token = localStorage.getItem('token');
-      if (!token) return setUser(null);
+      if (!token) {
+        setUser(null);
+        return;
+      }
 
       const res = await axios.get(`${API}/auth/check-auth`, {
         headers: { Authorization: `Bearer ${token}` },
         withCredentials: true,
       });
       setUser(res.data.user);
-    }, 'Failed to verify user');
+    } catch {
+      setUser(null);
+    } finally {
+      setAuthLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -106,6 +115,7 @@ export const AuthProvider = ({ children }) => {
       value={{
         user,
         isLoading,
+        authLoading,
         error,
         setIsLoading,
         setError,
@@ -118,7 +128,7 @@ export const AuthProvider = ({ children }) => {
         updateUserData,
       }}
     >
-      {!isLoading && children}
+      {!authLoading && children}
     </AuthContext.Provider>
   );
 };
