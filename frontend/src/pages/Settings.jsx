@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Combobox } from '@headlessui/react';
-import axios from 'axios';
+import { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react';
 import { useAuth } from '../context/AuthContext';
 import { usePostService } from '../context/PostContext';
 
@@ -87,7 +86,7 @@ function Settings() {
             </label>
             <Combobox value={department} onChange={setDepartment}>
               <div className="relative">
-                <Combobox.Input
+                <ComboboxInput
                   onChange={(e) => {
                     setQuery(e.target.value);
                     setDepartment(e.target.value);
@@ -96,9 +95,9 @@ function Settings() {
                   placeholder="Select or type your department"
                 />
                 {filtered.length > 0 && (
-                  <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-gray-800 text-black dark:text-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none text-sm">
+                  <ComboboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-gray-800 text-black dark:text-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none text-sm">
                     {filtered.map((dept) => (
-                      <Combobox.Option
+                      <ComboboxOption
                         key={dept._id}
                         value={dept.name}
                         className={({ active }) =>
@@ -108,9 +107,9 @@ function Settings() {
                         }
                       >
                         {dept.name}
-                      </Combobox.Option>
+                      </ComboboxOption>
                     ))}
-                  </Combobox.Options>
+                  </ComboboxOptions>
                 )}
               </div>
             </Combobox>

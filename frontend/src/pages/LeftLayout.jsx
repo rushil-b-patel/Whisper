@@ -9,6 +9,20 @@ export default function LeftLayout({
   activeDepartment,
   setActiveDepartment,
 }) {
+  const getDeptInitials = (name) => {
+    if (!name) return '';
+
+    const stopWords = ['and', '&', 'of', 'the', '(', ')', 'in', 'for'];
+    const words = name.split(' ').filter((w) => w && !stopWords.includes(w.toLowerCase()));
+
+    let initials = words
+      .slice(0, 2)
+      .map((w) => w[0].toUpperCase())
+      .join('');
+
+    return initials;
+  };
+
   return (
     <aside className="hidden md:block md:w-64 lg:w-72 h-full overflow-y-auto px-2 py-4">
       <section className="bg-white dark:bg-[#131619] rounded-xl shadow-sm border border-gray-200 dark:border-[#2A2B30] p-4 mb-4">
@@ -77,11 +91,7 @@ export default function LeftLayout({
                     onClick={() => setActiveDepartment(dept.name)}
                   >
                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-400 to-gray-600 text-white font-bold flex items-center justify-center text-xs">
-                      {dept.name
-                        .split(' ')
-                        .map((w) => w[0])
-                        .join('')
-                        .substring(0, 2)}
+                      {getDeptInitials(dept.name)}
                     </div>
                     <div>
                       <p
@@ -91,7 +101,7 @@ export default function LeftLayout({
                             : 'font-medium text-gray-900 dark:text-white'
                         }`}
                       >
-                        {dept.name}
+                        {getDeptInitials(dept.name)}
                       </p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
                         {dept.memberCount || 0} members
