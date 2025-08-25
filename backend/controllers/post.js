@@ -66,7 +66,7 @@ export const createPost = async (req, res) => {
 
 export const getPost = async (req, res) => {
     try {
-        const post = await Post.findById(req.params.id).populate('user', 'userName department');
+        const post = await Post.findById(req.params.id).populate('user', 'userName department').populate('tags', 'name');
         if (!post) return sendError(res, 404, 'Post not found');
 
         const comments = await Comment.find({ post: req.params.id })
@@ -82,7 +82,7 @@ export const getPost = async (req, res) => {
 export const getAllPosts = async (req, res) => {
     try {
         const posts = await Post.find()
-            .populate('user', 'userName department')
+            .populate('user', 'userName department').populate('tags', 'name')
             .sort({ createdAt: -1 });
 
         const postsWithCommentCount = await Promise.all(

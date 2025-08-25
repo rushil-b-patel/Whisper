@@ -26,6 +26,7 @@ function PostDetail() {
       try {
         setIsLoading(true);
         const response = await getPost(id);
+        console.log(response);
         setPost(response.post);
         setComments(response.comments || []);
         setIsSaved(user?.savedPosts?.includes(response.post._id));
@@ -152,6 +153,19 @@ function PostDetail() {
         {post.image && (
           <div className="mb-6 rounded-xl overflow-hidden">
             <img src={post.image} alt="Post" className="w-full object-cover" />
+          </div>
+        )}
+
+        {post.tags && post.tags.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-6">
+            {post.tags.map((tag, idx) => (
+              <span
+                key={idx}
+                className="px-3 py-1 text-xs font-medium rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300"
+              >
+                {tag.name}
+              </span>
+            ))}
           </div>
         )}
 
