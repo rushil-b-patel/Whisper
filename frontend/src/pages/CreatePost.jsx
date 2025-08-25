@@ -29,7 +29,6 @@ export default function CreatePost() {
     const fetchTags = async () => {
       try {
         const tags = await getTag(token);
-        console.log('Fetched tags (frontend):', tags);
         setAllTags(tags || []);
       } catch (err) {
         console.error('Failed to fetch tags:', err);

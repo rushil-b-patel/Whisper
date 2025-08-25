@@ -12,6 +12,7 @@ import PostDetail from './pages/PostDetail.jsx';
 import Navbar from './components/Navbar.jsx';
 import Department from './pages/Department.jsx';
 import UserProfile from './pages/UserProfile.jsx';
+import Tag from './pages/Tag.jsx';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/departments" element={<Department />} />
         <Route path="/user/:username" element={<UserProfile />} />
+        <Route path="/tags/:name" element={<Tag />} />
         <Route
           path="/settings"
           element={

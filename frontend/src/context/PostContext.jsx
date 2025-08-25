@@ -222,7 +222,7 @@ export const usePostService = () => {
       () =>
         axios.get(`${API}/tags/${encodeURIComponent(name)}`).then((res) => {
           const d = res.data;
-          return d?.data?.posts ?? d?.posts ?? d;
+          return d?.data ?? d;
         }),
       'Failed to load tag posts'
     );

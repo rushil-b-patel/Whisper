@@ -66,7 +66,9 @@ export const createPost = async (req, res) => {
 
 export const getPost = async (req, res) => {
     try {
-        const post = await Post.findById(req.params.id).populate('user', 'userName department').populate('tags', 'name');
+        const post = await Post.findById(req.params.id)
+            .populate('user', 'userName department')
+            .populate('tags', 'name');
         if (!post) return sendError(res, 404, 'Post not found');
 
         const comments = await Comment.find({ post: req.params.id })
@@ -82,7 +84,8 @@ export const getPost = async (req, res) => {
 export const getAllPosts = async (req, res) => {
     try {
         const posts = await Post.find()
-            .populate('user', 'userName department').populate('tags', 'name')
+            .populate('user', 'userName department')
+            .populate('tags', 'name')
             .sort({ createdAt: -1 });
 
         const postsWithCommentCount = await Promise.all(
@@ -253,12 +256,14 @@ export const getPostsByTag = async (req, res) => {
         if (!tag) return sendError(res, 404, 'Tag not found');
 
         const posts = await Post.find({ tags: tag._id })
-            .populate('user', 'userName')
+            .populate('user', 'userName department')
             .populate('tags', 'name')
             .sort({ createdAt: -1 });
 
-        return sendSuccess(res, 200, 'Posts by tag fetched', { posts });
+        return sendSuccess(res, 200, 'Posts by tag fetched', { tag, posts });
     } catch (error) {
-        return sendError(res, 500, 'Failed to fetch posts by tag', { error: error.message });
+        return sendError(res, 500, 'Failed to fetch posts by tag', {
+            error: error.message,
+        });
     }
 };
